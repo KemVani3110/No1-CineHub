@@ -1,8 +1,6 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
-@custom-variant dark (&:is(.dark *));
-
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -41,82 +39,198 @@
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
+  
+  /* CineHub Custom Colors */
+  --color-bg-main: var(--bg-main);
+  --color-bg-card: var(--bg-card);
+  --color-text-main: var(--text-main);
+  --color-text-sub: var(--text-sub);
+  --color-cinehub-accent: var(--cinehub-accent);
+  --color-cinehub-accent-hover: var(--cinehub-accent-hover);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-danger: var(--danger);
 }
 
 :root {
-  --radius: 0.625rem;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.646 0.222 41.116);
-  --chart-2: oklch(0.6 0.118 184.704);
-  --chart-3: oklch(0.398 0.07 227.392);
-  --chart-4: oklch(0.828 0.189 84.429);
-  --chart-5: oklch(0.769 0.188 70.08);
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
-}
-
-.dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.488 0.243 264.376);
-  --chart-2: oklch(0.696 0.17 162.48);
-  --chart-3: oklch(0.769 0.188 70.08);
-  --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  /* Border radius theo BRD - 8px */
+  --radius: 0.5rem;
+  
+  /* CineHub Color Palette theo BRD */
+  --bg-main: #0D1B2A;        /* Nền chính - Navy tối dịu mắt */
+  --bg-card: #1B263B;        /* Nền phụ/card - Sáng hơn nền chính */
+  --text-main: #E0E6ED;      /* Chữ chính - Trắng xanh dễ đọc */
+  --text-sub: #9AAFC3;       /* Chữ phụ/mô tả - Màu mờ */
+  --border: #2E3C51;         /* Viền rõ ràng */
+  --cinehub-accent: #4FD1C5; /* Accent chính - Xanh ngọc nổi bật */
+  --cinehub-accent-hover: #38B2AC; /* Accent hover */
+  --success: #2ECC71;        /* Xanh lá dịu, hiện đại */
+  --warning: #F4B400;        /* Vàng nhạt không gắt */
+  --danger: #EF5350;         /* Đỏ nhẹ không chói */
+  
+  /* Mapping to Tailwind/shadcn variables */
+  --background: var(--bg-main);
+  --foreground: var(--text-main);
+  --card: var(--bg-card);
+  --card-foreground: var(--text-main);
+  --popover: var(--bg-card);
+  --popover-foreground: var(--text-main);
+  --primary: var(--cinehub-accent);
+  --primary-foreground: var(--bg-main);
+  --secondary: var(--bg-card);
+  --secondary-foreground: var(--text-main);
+  --muted: var(--bg-card);
+  --muted-foreground: var(--text-sub);
+  --accent: var(--cinehub-accent);
+  --accent-foreground: var(--bg-main);
+  --destructive: var(--danger);
+  --input: var(--bg-card);
+  --ring: var(--cinehub-accent);
+  
+  /* Chart colors for admin dashboard */
+  --chart-1: var(--cinehub-accent);
+  --chart-2: var(--success);
+  --chart-3: var(--warning);
+  --chart-4: var(--danger);
+  --chart-5: var(--text-sub);
+  
+  /* Sidebar colors */
+  --sidebar: var(--bg-card);
+  --sidebar-foreground: var(--text-main);
+  --sidebar-primary: var(--cinehub-accent);
+  --sidebar-primary-foreground: var(--bg-main);
+  --sidebar-accent: var(--bg-main);
+  --sidebar-accent-foreground: var(--text-main);
+  --sidebar-border: var(--border);
+  --sidebar-ring: var(--cinehub-accent);
 }
 
 @layer base {
   * {
     @apply border-border outline-ring/50;
   }
+  
   body {
     @apply bg-background text-foreground;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  }
+  
+  /* Typography theo BRD */
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-weight: 700; /* Bold */
+  }
+  
+  .subheading {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-weight: 600; /* SemiBold */
+  }
+  
+  /* Button styles theo BRD */
+  .btn-primary {
+    @apply bg-accent text-accent-foreground hover:bg-cinehub-accent-hover;
+    border-radius: 8px;
+    transition: background-color 0.2s ease-in-out;
+  }
+  
+  /* Card styles với border radius 8px */
+  .card {
+    @apply bg-card border-border;
+    border-radius: 8px;
+  }
+  
+  /* Movie card hover effects */
+  .movie-card {
+    @apply bg-card border-border transition-all duration-300 ease-in-out;
+    border-radius: 8px;
+  }
+  
+  .movie-card:hover {
+    @apply scale-105 shadow-lg;
+    box-shadow: 0 10px 25px rgba(79, 209, 197, 0.15);
+  }
+}
+
+@layer utilities {
+  /* Custom CineHub utilities */
+  .text-accent {
+    color: var(--cinehub-accent);
+  }
+  
+  .bg-main {
+    background-color: var(--bg-main);
+  }
+  
+  .bg-card-custom {
+    background-color: var(--bg-card);
+  }
+  
+  .text-sub {
+    color: var(--text-sub);
+  }
+  
+  .border-custom {
+    border-color: var(--border);
+  }
+  
+  /* Gradient backgrounds for special elements */
+  .gradient-accent {
+    background: linear-gradient(135deg, var(--cinehub-accent) 0%, var(--cinehub-accent-hover) 100%);
+  }
+  
+  .gradient-card {
+    background: linear-gradient(135deg, var(--bg-card) 0%, rgba(27, 38, 59, 0.8) 100%);
+  }
+  
+  /* Loading skeleton */
+  .skeleton {
+    @apply bg-card animate-pulse;
+    border-radius: 8px;
+  }
+  
+  /* Coming soon page animations */
+  .fade-in {
+    animation: fadeIn 0.6s ease-in-out;
+  }
+  
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  /* Mobile hamburger menu */
+  .hamburger-line {
+    @apply bg-text-main transition-all duration-300 ease-in-out;
+  }
+  
+  /* Success, Warning, Error states */
+  .success {
+    color: var(--success);
+  }
+  
+  .warning {
+    color: var(--warning);
+  }
+  
+  .danger {
+    color: var(--danger);
+  }
+  
+  .bg-success {
+    background-color: var(--success);
+  }
+  
+  .bg-warning {
+    background-color: var(--warning);
+  }
+  
+  .bg-danger {
+    background-color: var(--danger);
   }
 }
