@@ -2,26 +2,54 @@
 
 /* Loading Animations */
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 @keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
 }
 
 @keyframes bounce {
-  0%, 20%, 53%, 80%, 100% { transform: translate3d(0,0,0); }
-  40%, 43% { transform: translate3d(0,-30px,0); }
-  70% { transform: translate3d(0,-15px,0); }
-  90% { transform: translate3d(0,-4px,0); }
+  0%,
+  20%,
+  53%,
+  80%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+  40%,
+  43% {
+    transform: translate3d(0, -30px, 0);
+  }
+  70% {
+    transform: translate3d(0, -15px, 0);
+  }
+  90% {
+    transform: translate3d(0, -4px, 0);
+  }
 }
 
 /* Fade Animations */
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @keyframes fadeInUp {
@@ -135,7 +163,7 @@
   }
 }
 
-/* Skeleton Loading Animation */
+/* Skeleton Loading Animation - Updated colors */
 @keyframes skeleton {
   0% {
     background-position: -200px 0;
@@ -145,7 +173,7 @@
   }
 }
 
-/* Shimmer Effect */
+/* Shimmer Effect - Updated colors */
 @keyframes shimmer {
   0% {
     background-position: -468px 0;
@@ -181,9 +209,23 @@
 
 /* Shake Animation */
 @keyframes shake {
-  0%, 100% { transform: translateX(0); }
-  10%, 30%, 50%, 70%, 90% { transform: translateX(-10px); }
-  20%, 40%, 60%, 80% { transform: translateX(10px); }
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  10%,
+  30%,
+  50%,
+  70%,
+  90% {
+    transform: translateX(-10px);
+  }
+  20%,
+  40%,
+  60%,
+  80% {
+    transform: translateX(10px);
+  }
 }
 
 /* Utility Classes */
@@ -200,7 +242,7 @@
 }
 
 .animate-fade-in {
-  animation: fadeIn 0.3s ease-in-out;
+  animation: fadeIn 0.6s ease-in-out;
 }
 
 .animate-fade-in-up {
@@ -245,13 +287,23 @@
 
 .animate-skeleton {
   animation: skeleton 1.2s ease-in-out infinite;
-  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background: linear-gradient(
+    90deg,
+    var(--bg-card) 25%,
+    var(--border) 50%,
+    var(--bg-card) 75%
+  );
   background-size: 200px 100%;
 }
 
 .animate-shimmer {
   animation: shimmer 2s infinite;
-  background: linear-gradient(to right, #eff6ff 4%, #dbeafe 25%, #eff6ff 36%);
+  background: linear-gradient(
+    to right,
+    var(--bg-card) 4%,
+    var(--border) 25%,
+    var(--bg-card) 36%
+  );
   background-size: 1000px 100%;
 }
 
@@ -282,7 +334,7 @@
 
 .hover-lift:hover {
   transform: translateY(-4px);
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 10px 25px rgba(79, 209, 197, 0.15);
 }
 
 .hover-glow {
@@ -290,22 +342,27 @@
 }
 
 .hover-glow:hover {
-  box-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
+  box-shadow: 0 0 20px rgba(79, 209, 197, 0.5);
 }
 
 /* Loading States */
 .loading-spinner {
   animation: spin 1s linear infinite;
-  border: 2px solid #f3f4f6;
-  border-top: 2px solid #3b82f6;
+  border: 2px solid var(--border);
+  border-top: 2px solid var(--cinehub-accent);
   border-radius: 50%;
 }
 
 .skeleton-box {
   animation: skeleton 1.2s ease-in-out infinite;
-  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background: linear-gradient(
+    90deg,
+    var(--bg-card) 25%,
+    var(--border) 50%,
+    var(--bg-card) 75%
+  );
   background-size: 200px 100%;
-  border-radius: 4px;
+  border-radius: 8px;
 }
 
 /* Transition Utilities */
@@ -314,7 +371,8 @@
 }
 
 .transition-colors {
-  transition: color 0.2s ease-in-out, background-color 0.2s ease-in-out, border-color 0.2s ease-in-out;
+  transition: color 0.2s ease-in-out, background-color 0.2s ease-in-out,
+    border-color 0.2s ease-in-out;
 }
 
 .transition-transform {
@@ -325,16 +383,7 @@
   transition: opacity 0.2s ease-in-out;
 }
 
-/* Movie Card Animations */
-.movie-card {
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.movie-card:hover {
-  transform: translateY(-8px) scale(1.02);
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
-}
-
+/* Movie Poster Animation */
 .movie-poster {
   transition: transform 0.3s ease;
 }
@@ -350,13 +399,13 @@
 }
 
 .nav-item::after {
-  content: '';
+  content: "";
   position: absolute;
   bottom: -2px;
   left: 0;
   width: 0;
   height: 2px;
-  background-color: #3b82f6;
+  background-color: var(--cinehub-accent);
   transition: width 0.3s ease;
 }
 
@@ -389,8 +438,8 @@
 }
 
 .input-focus:focus {
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  border-color: var(--cinehub-accent);
+  box-shadow: 0 0 0 3px rgba(79, 209, 197, 0.1);
 }
 
 /* Button Animations */
