@@ -1,227 +1,292 @@
-/* eslint-disable @typescript-eslint/no-empty-object-type */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // src/types/movie.ts
 
-export interface Movie {
+import {
+  TMDBMovie,
+  TMDBMovieDetails,
+  TMDBGenre,
+  TMDBCollection,
+  TMDBProductionCountry,
+  TMDBSpokenLanguage,
+  TMDBCredits,
+  TMDBVideos,
+  TMDBImages,
+  TMDBReviews,
+  TMDBExternalIds,
+  TMDBWatchProviders,
+  TMDBKeywords,
+  TMDBTranslations
+} from './tmdb';
+
+// Extended Movie types for CineHub application
+export interface Movie extends TMDBMovie {
+  // Additional properties for local storage/processing
+  watchlist_id?: number;
+  user_rating?: number;
+  user_comment?: string;
+  watch_progress?: WatchProgress;
+  added_to_watchlist_at?: Date;
+  last_watched_at?: Date;
+  is_favorite?: boolean;
+  watched?: boolean;
+}
+
+export interface MovieDetails extends TMDBMovieDetails {
+  // Additional details from TMDB API
+  credits?: TMDBCredits;
+  videos?: TMDBVideos;
+  images?: TMDBImages;
+  reviews?: TMDBReviews;
+  similar?: TMDBMovie[];
+  recommendations?: TMDBMovie[];
+  external_ids?: TMDBExternalIds;
+  watch_providers?: TMDBWatchProviders;
+  keywords?: TMDBKeywords;
+  translations?: TMDBTranslations;
+  release_dates?: MovieReleaseDates;
+
+  // User-specific data
+  user_rating?: number;
+  user_comment?: string;
+  in_watchlist?: boolean;
+  watch_progress?: WatchProgress;
+  watched_at?: Date;
+  user_review?: UserMovieReview;
+}
+
+// Movie Watch Progress
+export interface WatchProgress {
+  duration: number; // total duration in seconds
+  watched_duration: number; // watched duration in seconds
+  percentage: number; // 0-100
+  completed: boolean;
+  last_watched_at: Date;
+  status: WatchStatus;
+}
+
+export enum WatchStatus {
+  NOT_STARTED = 'not_started',
+  WATCHING = 'watching',
+  COMPLETED = 'completed',
+  ON_HOLD = 'on_hold',
+  DROPPED = 'dropped',
+  PLAN_TO_WATCH = 'plan_to_watch'
+}
+
+// User Reviews and Ratings
+export interface UserMovieReview {
   id: number;
-  title: string;
-  originalTitle: string;
-  overview: string;
-  releaseDate: string;
-  posterPath?: string;
-  backdropPath?: string;
-  adult: boolean;
-  genreIds: number[];
-  originalLanguage: string;
-  popularity: number;
-  voteCount: number;
-  voteAverage: number;
-  video: boolean;
+  user_id: number;
+  movie_id: number;
+  rating: number; // 1-5 stars
+  comment?: string;
+  spoiler: boolean;
+  helpful_count: number;
+  created_at: Date;
+  updated_at: Date;
+  user: {
+    id: number;
+    name: string;
+    avatar?: string;
+  };
 }
 
-export interface MovieDetails extends Movie {
-  belongsToCollection?: MovieCollection;
-  budget: number;
-  genres: Genre[];
-  homepage?: string;
-  imdbId?: string;
-  productionCompanies: ProductionCompany[];
-  productionCountries: ProductionCountry[];
-  revenue: number;
-  runtime?: number;
-  spokenLanguages: SpokenLanguage[];
-  status: MovieStatus;
-  tagline?: string;
-  credits?: MovieCredits;
-  videos?: MovieVideos;
-  images?: MovieImages;
-  recommendations?: MovieRecommendations;
-  similar?: MovieSimilar;
-  reviews?: MovieReviews;
-  keywords?: MovieKeywords;
-  releaseDates?: MovieReleaseDates;
-  watchProviders?: WatchProviders;
+export interface MovieReviewRequest {
+  movie_id: number;
+  rating: number;
+  comment?: string;
+  spoiler?: boolean;
 }
 
-export interface MovieCollection {
-  id: number;
-  name: string;
-  overview: string;
-  posterPath?: string;
-  backdropPath?: string;
-  parts: Movie[];
-}
-
-export interface Genre {
-  id: number;
-  name: string;
-}
-
-export interface ProductionCompany {
-  id: number;
-  logoPath?: string;
-  name: string;
-  originCountry: string;
-}
-
-export interface ProductionCountry {
-  iso31661: string;
-  name: string;
-}
-
-export interface SpokenLanguage {
-  englishName: string;
-  iso6391: string;
-  name: string;
-}
-
-export enum MovieStatus {
-  RUMORED = 'Rumored',
-  PLANNED = 'Planned',
-  IN_PRODUCTION = 'In Production',
-  POST_PRODUCTION = 'Post Production',
-  RELEASED = 'Released',
-  CANCELED = 'Canceled'
-}
-
-// Credits
-export interface MovieCredits {
-  cast: CastMember[];
-  crew: CrewMember[];
-}
-
-export interface CastMember {
-  id: number;
-  name: string;
-  character: string;
-  creditId: string;
-  order: number;
-  adult: boolean;
-  gender?: number;
-  knownForDepartment: string;
-  originalName: string;
-  popularity: number;
-  profilePath?: string;
-}
-
-export interface CrewMember {
-  id: number;
-  name: string;
-  job: string;
-  department: string;
-  creditId: string;
-  adult: boolean;
-  gender?: number;
-  knownForDepartment: string;
-  originalName: string;
-  popularity: number;
-  profilePath?: string;
-}
-
-// Videos
-export interface MovieVideos {
-  results: MovieVideo[];
-}
-
-export interface MovieVideo {
+// Movie Lists and Categories
+export interface MovieList {
   id: string;
-  iso6391: string;
-  iso31661: string;
-  key: string;
   name: string;
-  official: boolean;
-  publishedAt: string;
-  site: string;
-  size: number;
-  type: VideoType;
+  description?: string;
+  movies: Movie[];
+  total_count: number;
+  created_at?: Date;
+  updated_at?: Date;
 }
 
-export enum VideoType {
-  TRAILER = 'Trailer',
-  TEASER = 'Teaser',
-  CLIP = 'Clip',
-  FEATURETTE = 'Featurette',
-  BEHIND_THE_SCENES = 'Behind the Scenes',
-  BLOOPERS = 'Bloopers'
-}
-
-// Images
-export interface MovieImages {
-  backdrops: MovieImage[];
-  logos: MovieImage[];
-  posters: MovieImage[];
-}
-
-export interface MovieImage {
-  aspectRatio: number;
-  height: number;
-  iso6391?: string;
-  filePath: string;
-  voteAverage: number;
-  voteCount: number;
-  width: number;
-}
-
-// Recommendations and Similar
-export interface MovieRecommendations {
-  page: number;
-  results: Movie[];
-  totalPages: number;
-  totalResults: number;
-}
-
-export interface MovieSimilar extends MovieRecommendations { }
-
-// Reviews
-export interface MovieReviews {
-  page: number;
-  results: MovieReview[];
-  totalPages: number;
-  totalResults: number;
-}
-
-export interface MovieReview {
+export interface MovieCategory {
   id: string;
-  author: string;
-  authorDetails: ReviewAuthor;
-  content: string;
-  createdAt: string;
-  updatedAt: string;
-  url: string;
-}
-
-export interface ReviewAuthor {
   name: string;
-  username: string;
-  avatarPath?: string;
-  rating?: number;
+  slug: string;
+  description?: string;
+  movies: Movie[];
+  total_pages: number;
+  current_page: number;
 }
 
-// Keywords
-export interface MovieKeywords {
-  keywords: Keyword[];
+// Movie Search and Filter
+export interface MovieSearchParams {
+  query?: string;
+  page?: number;
+  include_adult?: boolean;
+  language?: string;
+  primary_release_year?: number;
+  year?: number;
+  region?: string;
+  with_genres?: number[];
+  without_genres?: number[];
+  vote_average_gte?: number;
+  vote_average_lte?: number;
+  release_date_gte?: string;
+  release_date_lte?: string;
+  with_runtime_gte?: number;
+  with_runtime_lte?: number;
+  sort_by?: MovieSortBy;
+  sort_order?: 'asc' | 'desc';
 }
 
-export interface Keyword {
+export enum MovieSortBy {
+  POPULARITY = 'popularity.desc',
+  RATING = 'vote_average.desc',
+  RELEASE_DATE = 'release_date.desc',
+  TITLE = 'title.asc',
+  REVENUE = 'revenue.desc'
+}
+
+export interface MovieFilterOptions {
+  genres: TMDBGenre[];
+  years: number[];
+  ratings: {
+    min: number;
+    max: number;
+  };
+  runtime: {
+    min: number;
+    max: number;
+  };
+  languages: TMDBSpokenLanguage[];
+  countries: TMDBProductionCountry[];
+}
+
+// Watchlist Management
+export interface MovieWatchlistItem {
   id: number;
-  name: string;
+  user_id: number;
+  movie_id: number;
+  movie: Movie;
+  added_at: Date;
+  priority: WatchlistPriority;
+  notes?: string;
+  reminder_date?: Date;
+  status: WatchStatus;
 }
 
-// Release Dates
+export enum WatchlistPriority {
+  LOW = 'low',
+  MEDIUM = 'medium',
+  HIGH = 'high',
+  URGENT = 'urgent'
+}
+
+export interface AddToWatchlistRequest {
+  movie_id: number;
+  priority?: WatchlistPriority;
+  notes?: string;
+  reminder_date?: Date;
+}
+
+// Movie History
+export interface MovieWatchHistory {
+  id: number;
+  user_id: number;
+  movie_id: number;
+  movie: Movie;
+  watched_at: Date;
+  duration_watched?: number;
+  completed?: boolean;
+  device?: string;
+  platform?: string;
+}
+
+export interface MovieWatchHistoryRequest {
+  movie_id: number;
+  duration_watched?: number;
+  completed?: boolean;
+}
+
+// Movie Recommendations
+export interface MovieRecommendation {
+  id: number;
+  user_id: number;
+  movie: Movie;
+  reason: RecommendationReason;
+  confidence_score: number; // 0-1
+  based_on: {
+    type: 'genre' | 'similar_movie' | 'cast' | 'director' | 'collection';
+    reference_id: number;
+    reference_name: string;
+  };
+  created_at: Date;
+  clicked?: boolean;
+  clicked_at?: Date;
+  added_to_watchlist?: boolean;
+}
+
+export enum RecommendationReason {
+  SIMILAR_GENRE = 'similar_genre',
+  SIMILAR_MOVIE = 'similar_movie',
+  SAME_DIRECTOR = 'same_director',
+  SAME_CAST = 'same_cast',
+  SAME_COLLECTION = 'same_collection',
+  TRENDING = 'trending',
+  HIGH_RATED = 'high_rated',
+  NEW_RELEASE = 'new_release'
+}
+
+// Movie Statistics
+export interface MovieStats {
+  total_movies_watched: number;
+  total_watch_time: number; // in minutes
+  favorite_genres: Array<{
+    genre: TMDBGenre;
+    count: number;
+    percentage: number;
+  }>;
+  favorite_directors: Array<{
+    director: {
+      id: number;
+      name: string;
+    };
+    count: number;
+    percentage: number;
+  }>;
+  average_rating: number;
+  completion_rate: number; // percentage
+  most_watched_year: number;
+  favorite_decade: string;
+}
+
+// External Integration
+export interface ExternalMovieData {
+  imdb_id?: string;
+  imdb_rating?: number;
+  rotten_tomatoes_score?: number;
+  metacritic_score?: number;
+  letterboxd_rating?: number;
+  trakt_id?: number;
+}
+
+// Release Dates (extended from TMDB)
 export interface MovieReleaseDates {
   results: CountryReleaseDate[];
 }
 
 export interface CountryReleaseDate {
-  iso31661: string;
-  releaseDates: ReleaseDate[];
+  iso_3166_1: string;
+  release_dates: ReleaseDate[];
 }
 
 export interface ReleaseDate {
   certification: string;
   descriptors: string[];
-  iso6391: string;
+  iso_639_1: string;
   note: string;
-  releaseDate: string;
+  release_date: string;
   type: ReleaseDateType;
 }
 
@@ -234,172 +299,95 @@ export enum ReleaseDateType {
   TV = 6
 }
 
-// Watch Providers
-export interface WatchProviders {
-  results: {
-    [countryCode: string]: CountryWatchProviders;
+// Notification Types for Movies
+export interface MovieNotification {
+  id: number;
+  user_id: number;
+  movie_id: number;
+  type: MovieNotificationType;
+  title: string;
+  message: string;
+  data?: Record<string, any>;
+  read: boolean;
+  created_at: Date;
+}
+
+export enum MovieNotificationType {
+  NEW_TRAILER = 'new_trailer',
+  RELEASE_DATE = 'release_date',
+  STREAMING_AVAILABLE = 'streaming_available',
+  WATCHLIST_REMINDER = 'watchlist_reminder',
+  RECOMMENDATION = 'recommendation',
+  COLLECTION_UPDATE = 'collection_update'
+}
+
+// Export types for API responses
+export interface MovieResponse {
+  success: boolean;
+  data: Movie | Movie[];
+  pagination?: {
+    page: number;
+    total_pages: number;
+    total_results: number;
   };
+  message?: string;
 }
 
-export interface CountryWatchProviders {
-  link: string;
-  flatrate?: WatchProvider[];
-  rent?: WatchProvider[];
-  buy?: WatchProvider[];
-  ads?: WatchProvider[];
+export interface MovieDetailsResponse {
+  success: boolean;
+  data: MovieDetails;
+  message?: string;
 }
 
-export interface WatchProvider {
-  displayPriority: number;
-  logoPath: string;
-  providerId: number;
-  providerName: string;
-}
+// Utility types
+export type MovieID = number;
 
-// Discover and Search
-export interface DiscoverMovieParams {
-  sortBy?: MovieSortBy;
-  page?: number;
-  includeAdult?: boolean;
-  includeVideo?: boolean;
-  language?: string;
-  primaryReleaseYear?: number;
-  primaryReleaseDateGte?: string;
-  primaryReleaseDateLte?: string;
-  releaseDateGte?: string;
-  releaseDateLte?: string;
-  withReleaseType?: ReleaseDateType[];
-  year?: number;
-  voteCountGte?: number;
-  voteCountLte?: number;
-  voteAverageGte?: number;
-  voteAverageLte?: number;
-  withCast?: string;
-  withCrew?: string;
-  withPeople?: string;
-  withCompanies?: string;
-  withGenres?: string;
-  withoutGenres?: string;
-  withKeywords?: string;
-  withoutKeywords?: string;
-  withRuntimeGte?: number;
-  withRuntimeLte?: number;
-  withOriginalLanguage?: string;
-  withWatchProviders?: string;
-  watchRegion?: string;
-  withWatchMonetizationTypes?: string;
-  withoutCompanies?: string;
-  region?: string;
-}
-
-export enum MovieSortBy {
-  POPULARITY_ASC = 'popularity.asc',
-  POPULARITY_DESC = 'popularity.desc',
-  RELEASE_DATE_ASC = 'release_date.asc',
-  RELEASE_DATE_DESC = 'release_date.desc',
-  REVENUE_ASC = 'revenue.asc',
-  REVENUE_DESC = 'revenue.desc',
-  PRIMARY_RELEASE_DATE_ASC = 'primary_release_date.asc',
-  PRIMARY_RELEASE_DATE_DESC = 'primary_release_date.desc',
-  ORIGINAL_TITLE_ASC = 'original_title.asc',
-  ORIGINAL_TITLE_DESC = 'original_title.desc',
-  VOTE_AVERAGE_ASC = 'vote_average.asc',
-  VOTE_AVERAGE_DESC = 'vote_average.desc',
-  VOTE_COUNT_ASC = 'vote_count.asc',
-  VOTE_COUNT_DESC = 'vote_count.desc'
-}
-
-export interface MovieSearchParams {
-  query: string;
-  page?: number;
-  includeAdult?: boolean;
-  region?: string;
-  year?: number;
-  primaryReleaseYear?: number;
-}
-
-// Lists
-export interface MovieListResponse {
-  page: number;
-  results: Movie[];
-  totalPages: number;
-  totalResults: number;
-  dates?: {
-    maximum: string;
-    minimum: string;
-  };
-}
-
-// User-specific movie data
-export interface UserMovieData {
-  movieId: number;
-  movie: Movie;
-  isInWatchlist: boolean;
-  userRating?: number;
-  userComment?: string;
-  watchedAt?: Date;
-  addedToWatchlistAt?: Date;
-  ratedAt?: Date;
-}
-
-// Movie filters for UI
-export interface MovieFilters {
-  genres?: number[];
-  releaseYear?: {
-    min?: number;
-    max?: number;
-  };
-  rating?: {
-    min?: number;
-    max?: number;
-  };
-  runtime?: {
-    min?: number;
-    max?: number;
-  };
-  sortBy?: MovieSortBy;
-  includeAdult?: boolean;
-  language?: string;
-  region?: string;
+export interface MovieIdentifier {
+  movie_id: MovieID;
 }
 
 // Trending
 export interface TrendingMoviesParams {
-  timeWindow: 'day' | 'week';
+  time_window: 'day' | 'week';
   page?: number;
 }
 
-// Person (Actor/Director) details
-export interface Person {
-  id: number;
-  name: string;
-  biography: string;
-  birthday?: string;
-  deathday?: string;
-  gender: number;
-  homepage?: string;
-  imdbId?: string;
-  knownForDepartment: string;
-  placeOfBirth?: string;
-  popularity: number;
-  profilePath?: string;
-  adult: boolean;
-  alsoKnownAs: string[];
+// Movie Lists from TMDB
+export type TMDBMovieListType =
+  | 'popular'
+  | 'top_rated'
+  | 'now_playing'
+  | 'upcoming';
+
+// Component Props Types
+export interface MovieCardProps {
+  movie: Movie;
+  showProgress?: boolean;
+  showRating?: boolean;
+  showWatchlistButton?: boolean;
+  size?: 'small' | 'medium' | 'large';
+  onClick?: (movie: Movie) => void;
 }
 
+export interface MovieCollectionProps {
+  collection: TMDBCollection;
+  onClick?: (collection: TMDBCollection) => void;
+}
+
+// Person Credits (for cast/crew in movies)
 export interface PersonMovieCredits {
-  cast: MovieCastCredit[];
-  crew: MovieCrewCredit[];
+  cast: PersonMovieCastCredit[];
+  crew: PersonMovieCrewCredit[];
 }
 
-export interface MovieCastCredit extends Movie {
+export interface PersonMovieCastCredit extends TMDBMovie {
   character: string;
-  creditId: string;
+  credit_id: string;
   order?: number;
 }
 
-export interface MovieCrewCredit extends Movie {
+export interface PersonMovieCrewCredit extends TMDBMovie {
   job: string;
   department: string;
-  creditId: string;
+  credit_id: string;
 }
