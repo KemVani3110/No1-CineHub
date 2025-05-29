@@ -80,10 +80,10 @@ export default function NotFound() {
   };
 
   return (
-    <>
-      <div className="h-screen w-full flex items-center justify-center fixed inset-0 overflow-hidden px-4">
+    <div className="overflow-hidden">
+      <div className="h-screen w-full flex items-center justify-center fixed inset-0 overflow-hidden p-4">
         {/*  Animated Background */}
-        <div className="absolute inset-0 bg-gradient-to-br from-bg-main via-slate-900 to-bg-main">
+        <div className="absolute inset-0 bg-gradient-to-br from-bg-main via-slate-900 to-bg-main overflow-hidden">
           {/* Animated grid pattern */}
           <div className="absolute inset-0 opacity-5">
             <div
@@ -174,17 +174,17 @@ export default function NotFound() {
 
         {/* Main Content Card */}
         <Card
-          className={`w-full max-w-md z-10 backdrop-blur-lg bg-bg-card/60 border-border/30 shadow-2xl transition-all duration-500 hover:shadow-cinehub-accent/20 hover:scale-[1.02] animate-fade-in-up ${
+          className={`w-full max-w-sm z-10 backdrop-blur-lg bg-bg-card/60 border-border/30 shadow-2xl transition-all duration-500 hover:shadow-cinehub-accent/20 hover:scale-[1.02] animate-fade-in-up ${
             isHovering ? "shadow-lg shadow-cinehub-accent/30" : ""
           }`}
           onMouseEnter={handleHover}
           onMouseLeave={handleLeave}
         >
-          <CardContent className="p-6 text-center space-y-4">
+          <CardContent className="p-5 text-center space-y-3">
             {/* Status Badge */}
             <Badge
               variant="secondary"
-              className={`transition-all duration-300 animate-scale-in px-3 py-1.5 text-xs font-semibold cursor-pointer ${
+              className={`transition-all duration-300 animate-scale-in px-3 py-1 text-xs font-semibold cursor-pointer ${
                 isHovering
                   ? "bg-warning/20 text-warning border-warning/30 shadow-warning/20"
                   : "bg-cinehub-accent/20 text-cinehub-accent border-cinehub-accent/30 shadow-cinehub-accent/20"
@@ -204,16 +204,16 @@ export default function NotFound() {
             </Badge>
 
             {/* Cinema Icon with  Glow */}
-            <div className="mb-4 relative">
+            <div className="mb-3 relative">
               <div
-                className={`w-16 h-16 mx-auto rounded-full bg-gradient-to-br from-cinehub-accent/20 to-success/10 flex items-center justify-center relative transition-all duration-300 cursor-pointer ${
+                className={`w-14 h-14 mx-auto rounded-full bg-gradient-to-br from-cinehub-accent/20 to-success/10 flex items-center justify-center relative transition-all duration-300 cursor-pointer ${
                   showGlitch ? "animate-shake" : ""
                 }`}
               >
                 <div className="absolute inset-0 rounded-full animate-pulse bg-cinehub-accent/20 blur-sm"></div>
                 <div className="absolute inset-2 rounded-full bg-gradient-to-br from-cinehub-accent/10 to-transparent"></div>
                 <Film
-                  className={`w-8 h-8 text-cinehub-accent transition-all duration-300 z-10 ${
+                  className={`w-7 h-7 text-cinehub-accent transition-all duration-300 z-10 ${
                     showGlitch ? "opacity-70" : "opacity-100"
                   }`}
                   style={{
@@ -225,49 +225,49 @@ export default function NotFound() {
 
             {/* 404 Title */}
             <div
-              className={`relative mb-4 animate-zoom-in ${
+              className={`relative mb-3 animate-zoom-in ${
                 showGlitch ? "animate-shake" : ""
               }`}
             >
-              <h1 className="text-4xl sm:text-5xl font-bold text-transparent bg-gradient-to-r from-cinehub-accent via-success to-cinehub-accent bg-clip-text flex items-center justify-center gap-2">
+              <h1 className="text-3xl sm:text-4xl font-bold text-transparent bg-gradient-to-r from-cinehub-accent via-success to-cinehub-accent bg-clip-text flex items-center justify-center gap-2">
                 4
                 <div className="relative">
                   <Film
-                    className="w-8 h-8 animate-spin text-cinehub-accent"
+                    className="w-7 h-7 animate-spin text-cinehub-accent"
                     style={{
                       filter: "drop-shadow(0 0 8px rgba(79, 209, 197, 0.8))",
                     }}
                   />
                   {showGlitch && (
-                    <Film className="absolute inset-0 w-8 h-8 text-danger opacity-70 animate-spin" />
+                    <Film className="absolute inset-0 w-7 h-7 text-danger opacity-70 animate-spin" />
                   )}
                 </div>
                 4
                 {showGlitch && (
                   <span className="absolute inset-0 text-danger opacity-70 -translate-x-1 translate-y-0.5 blur-sm">
-                    4<Film className="w-8 h-8 inline-block mx-2" />4
+                    4<Film className="w-7 h-7 inline-block mx-2" />4
                   </span>
                 )}
               </h1>
-              <div className="h-0.5 w-16 mx-auto mt-3 bg-gradient-to-r from-transparent via-cinehub-accent to-transparent rounded-full animate-shimmer"></div>
+              <div className="h-0.5 w-12 mx-auto mt-2 bg-gradient-to-r from-transparent via-cinehub-accent to-transparent rounded-full animate-shimmer"></div>
             </div>
 
-            <h2 className="text-lg font-semibold mb-3 text-text-main animate-fade-in-down flex items-center justify-center gap-2">
+            <h2 className="text-base font-semibold mb-2 text-text-main animate-fade-in-down flex items-center justify-center gap-2">
               <Star className="w-4 h-4 text-warning" />
-              Reel Not Found
+              Không Tìm Thấy Trang
               <Star className="w-4 h-4 text-warning" />
             </h2>
 
             {/* Error Message */}
-            <Card className="bg-danger/10 border-danger/20 animate-fade-in-left cursor-pointer">
+            <Card className="bg-danger/10 border-danger/20 animate-fade-in-left">
               <CardContent className="p-3">
                 <div className="flex items-start space-x-2 text-left">
                   <div className="w-6 h-6 rounded-full bg-danger/20 flex items-center justify-center flex-shrink-0">
-                    <Film className="w-3 h-3 text-danger" />
+                    <Film className="w-4 h-4 text-danger" />
                   </div>
                   <div className="space-y-1">
-                    <h3 className="font-semibold text-danger text-xs">
-                      Scene Not Found - 404
+                    <h3 className="font-semibold text-danger text-sm">
+                      Trang Không Tồn Tại - 404
                     </h3>
                     <p className="text-xs text-text-sub leading-relaxed">
                       Trang phim bạn tìm không tồn tại hoặc đã bị gỡ khỏi web.
@@ -299,7 +299,7 @@ export default function NotFound() {
                   ) : (
                     <span className="animate-pulse flex items-center gap-1.5">
                       <Film className="w-3 h-3 text-cinehub-accent" />
-                      Tự động về lobby sau{" "}
+                      Tự động về trang chủ sau{" "}
                       <Badge
                         variant="outline"
                         className="text-cinehub-accent border-cinehub-accent/50 px-1.5 py-0"
@@ -322,30 +322,12 @@ export default function NotFound() {
               </div>
             </div>
 
-            {/* Cinema Seats */}
-            <div className="space-y-2 animate-fade-in-up">
-              <div className="flex justify-center gap-1">
-                {[...Array(8)].map((_, i) => (
-                  <div
-                    key={i}
-                    className={`w-3 h-3 rounded-t transition-all duration-300 hover:scale-110 border cursor-pointer ${
-                      i === 3 || i === 4
-                        ? "bg-cinehub-accent border-cinehub-accent/50 animate-pulse shadow-cinehub-accent/50"
-                        : "bg-bg-main border-border hover:bg-bg-card hover:border-cinehub-accent/30"
-                    }`}
-                  ></div>
-                ))}
-              </div>
-              <div className="w-24 h-0.5 mx-auto bg-gradient-to-r from-transparent via-cinehub-accent to-transparent rounded-full animate-shimmer"></div>
-              <p className="text-xs text-text-sub">🎬 Cinema Seating</p>
-            </div>
-
             {/* Navigation Buttons */}
             <div className="flex gap-2 animate-slide-in-up">
               <Button
                 variant="outline"
                 size="sm"
-                className="flex-1 border-slate-600 text-slate-300 hover:bg-slate-700 hover:border-slate-500 hover:text-white hover-lift cursor-pointer transition-all duration-300"
+                className="flex-1 border-cinehub-accent/50 text-cinehub-accent hover:bg-cinehub-accent/10 hover:border-cinehub-accent hover:text-cinehub-accent-hover hover-lift cursor-pointer transition-all duration-300"
                 onClick={() => router.back()}
               >
                 <ArrowLeft className="mr-1.5 h-3 w-3" />
@@ -358,13 +340,13 @@ export default function NotFound() {
                   className="w-full bg-cinehub-accent hover:bg-cinehub-accent-hover text-bg-main font-semibold hover-lift shadow-cinehub-accent/20 cursor-pointer"
                 >
                   <Home className="mr-1.5 h-3 w-3" />
-                  Về Lobby
+                  Trang Chủ
                 </Button>
               </Link>
             </div>
 
             {/* Quick Actions */}
-            <div className="flex justify-center items-center gap-4 pt-3 border-t border-border/50 animate-fade-in">
+            <div className="flex justify-center items-center gap-4 pt-2 border-t border-border/50 animate-fade-in">
               <Link href="/search">
                 <Button
                   variant="ghost"
@@ -401,6 +383,6 @@ export default function NotFound() {
           </CardContent>
         </Card>
       </div>
-    </>
+    </div>
   );
 }
