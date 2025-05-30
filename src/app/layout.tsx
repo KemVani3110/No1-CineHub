@@ -1,6 +1,10 @@
 import type { Metadata } from "next";
-
+import { Inter } from "next/font/google";
+import { SessionProvider } from "@/components/providers/SessionProvider";
+import { Toaster } from "sonner";
 import "@/styles/globals.css";
+
+const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "CineHub",
@@ -9,12 +13,17 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
-    <html lang="vi">
-      <body>{children}</body>
+    <html lang="en">
+      <body className={inter.className}>
+        <SessionProvider>
+          {children}
+          <Toaster />
+        </SessionProvider>
+      </body>
     </html>
   );
 }

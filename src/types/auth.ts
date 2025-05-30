@@ -1,6 +1,69 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 // src/types/auth.ts
 
+import { User as NextAuthUser } from "next-auth";
+
+export interface AuthUser {
+    id: string;
+    email: string;
+    name: string;
+    image?: string | null;
+    role: string;
+}
+
+export interface ProfileUpdateData {
+    name: string;
+    email: string;
+    currentPassword?: string;
+    newPassword?: string;
+}
+
+export interface LoginCredentials {
+    email: string;
+    password: string;
+}
+
+export interface RegisterCredentials {
+    email: string;
+    password: string;
+    name: string;
+    confirmPassword: string;
+}
+
+export interface ForgotPasswordData {
+    email: string;
+    token?: string;
+    newPassword?: string;
+}
+
+export interface AuthState {
+    user: AuthUser | null;
+    isLoading: boolean;
+    error: string | null;
+    isAuthenticated: boolean;
+}
+
+export interface AuthStore {
+    user: AuthUser | null;
+    isLoading: boolean;
+    error: string | null;
+    isAuthenticated: boolean;
+    setUser: (user: AuthUser | null) => void;
+    setIsAuthenticated: (isAuthenticated: boolean) => void;
+    login: (email: string, password: string) => Promise<void>;
+    register: (email: string, password: string, name: string) => Promise<void>;
+    logout: () => Promise<void>;
+    updateProfile: (data: Partial<AuthUser>) => Promise<void>;
+    resetPassword: (email: string) => Promise<void>;
+}
+
+export interface SocialAuthProvider {
+    id: string;
+    name: string;
+    type: string;
+    signIn: () => Promise<void>;
+}
+
 export interface User {
     id: number;
     email: string;
@@ -34,19 +97,6 @@ export interface AuthSession {
     refreshToken: string;
     expiresAt: Date;
     issuedAt: Date;
-}
-
-export interface LoginCredentials {
-    email: string;
-    password: string;
-    rememberMe?: boolean;
-}
-
-export interface RegisterCredentials {
-    name: string;
-    email: string;
-    password: string;
-    confirmPassword: string;
 }
 
 export interface SocialAuthResult {
@@ -88,30 +138,6 @@ export enum AuthErrorCode {
     TOKEN_EXPIRED = 'TOKEN_EXPIRED',
     SOCIAL_AUTH_ERROR = 'SOCIAL_AUTH_ERROR',
     RATE_LIMIT_EXCEEDED = 'RATE_LIMIT_EXCEEDED'
-}
-
-export interface AuthState {
-    user: User | null;
-    isAuthenticated: boolean;
-    isLoading: boolean;
-    error: AuthError | null;
-    token: string | null;
-}
-
-export interface JWTPayload {
-    sub: number; // user id
-    email: string;
-    role: UserRole;
-    iat: number;
-    exp: number;
-    provider?: AuthProvider;
-}
-
-export interface RefreshTokenPayload {
-    sub: number;
-    tokenId: string;
-    iat: number;
-    exp: number;
 }
 
 export interface AuthConfig {
