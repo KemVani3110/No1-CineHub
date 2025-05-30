@@ -2,40 +2,52 @@ import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/store/authStore";
 import { AuthUser, ProfileUpdateData } from "@/types/auth";
-import { useSession, signIn, signOut } from "next-auth/react";
+import { auth } from "@/lib/firebase";
+import { 
+  onAuthStateChanged, 
+  GoogleAuthProvider, 
+  FacebookAuthProvider, 
+  signInWithPopup,
+  sendPasswordResetEmail
+} from "firebase/auth";
 
 export function useAuth() {
   const router = useRouter();
   const { user, setUser } = useAuthStore();
-  const { data: session, status } = useSession();
 
   useEffect(() => {
-    if (session?.user) {
-      setUser({
-        id: session.user.id as string,
-        email: session.user.email as string,
-        name: session.user.name as string,
-        image: session.user.image as string,
-        role: session.user.role as string,
-      });
-    } else {
-      setUser(null);
-    }
-  }, [session, setUser]);
+    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+      if (firebaseUser) {
+        // Get user data from your API
+        const response = await fetch(`/api/auth/user?email=${firebaseUser.email}`);
+        if (response.ok) {
+          const userData = await response.json();
+          setUser(userData);
+        }
+      } else {
+        setUser(null);
+      }
+    });
+
+    return () => unsubscribe();
+  }, [setUser]);
 
   const login = async (email: string, password: string) => {
     try {
-      const result = await signIn("credentials", {
-        email,
-        password,
-        redirect: false,
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
       });
 
-      if (result?.error) {
-        throw new Error(result.error);
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Login failed');
       }
 
-      return result;
+      const userData = await response.json();
+      setUser(userData);
+      return userData;
     } catch (error) {
       throw error;
     }
@@ -43,19 +55,20 @@ export function useAuth() {
 
   const register = async (email: string, password: string, name: string) => {
     try {
-      const response = await fetch("/api/auth/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+      const response = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password, name }),
       });
 
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.error || "Failed to register");
+        throw new Error(error.error || 'Registration failed');
       }
 
-      // After successful registration, sign in
-      await login(email, password);
+      const userData = await response.json();
+      setUser(userData);
+      return userData;
     } catch (error) {
       throw error;
     }
@@ -63,7 +76,31 @@ export function useAuth() {
 
   const loginWithGoogle = async () => {
     try {
-      await signIn("google", { redirect: false });
+      const provider = new GoogleAuthProvider();
+      const userCredential = await signInWithPopup(auth, provider);
+      const user = userCredential.user;
+
+      // Get or create user in your database via API
+      const response = await fetch('/api/auth/social-login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: user.email,
+          name: user.displayName,
+          provider: 'google',
+          providerId: user.uid,
+          avatar: user.photoURL,
+        }),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Google login failed');
+      }
+
+      const userData = await response.json();
+      setUser(userData);
+      return userData;
     } catch (error) {
       throw error;
     }
@@ -71,7 +108,31 @@ export function useAuth() {
 
   const loginWithFacebook = async () => {
     try {
-      await signIn("facebook", { redirect: false });
+      const provider = new FacebookAuthProvider();
+      const userCredential = await signInWithPopup(auth, provider);
+      const user = userCredential.user;
+
+      // Get or create user in your database via API
+      const response = await fetch('/api/auth/social-login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: user.email,
+          name: user.displayName,
+          provider: 'facebook',
+          providerId: user.uid,
+          avatar: user.photoURL,
+        }),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Facebook login failed');
+      }
+
+      const userData = await response.json();
+      setUser(userData);
+      return userData;
     } catch (error) {
       throw error;
     }
@@ -79,7 +140,7 @@ export function useAuth() {
 
   const logout = async () => {
     try {
-      await signOut({ redirect: false });
+      await auth.signOut();
       setUser(null);
     } catch (error) {
       throw error;
@@ -104,15 +165,10 @@ export function useAuth() {
   };
 
   const forgotPassword = async (email: string) => {
-    const response = await fetch("/api/auth/forgot-password", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email }),
-    });
-
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.error || "Failed to send reset email");
+    try {
+      await sendPasswordResetEmail(auth, email);
+    } catch (error) {
+      throw error;
     }
   };
 
@@ -125,6 +181,5 @@ export function useAuth() {
     logout,
     updateProfile,
     forgotPassword,
-    status,
   };
 }
