@@ -198,6 +198,13 @@
     );
   }
 
+  .gradient-text {
+    background: linear-gradient(135deg, var(--cinehub-accent) 0%, var(--primary) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
   /* Loading skeleton */
   .skeleton {
     @apply bg-card animate-pulse;
@@ -206,7 +213,8 @@
 
   /* Mobile hamburger menu */
   .hamburger-line {
-    @apply bg-text-main transition-all duration-300 ease-in-out;
+    @apply bg-foreground transition-all duration-300 ease-in-out;
+    transform-origin: center;
   }
 
   /* Success, Warning, Error states */
@@ -233,4 +241,24 @@
   .bg-danger {
     background-color: var(--danger);
   }
+}
+
+.nav-item {
+  position: relative;
+}
+
+.nav-item::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: linear-gradient(135deg, var(--cinehub-accent) 0%, var(--primary) 100%);
+  transition: width 0.3s ease;
+}
+
+.nav-item:hover::after,
+.nav-item.active::after {
+  width: 100%;
 }
