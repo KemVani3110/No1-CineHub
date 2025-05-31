@@ -220,6 +220,9 @@ export interface Statistics {
     period?: string;
 }
 
+// Color scheme
+export type ColorScheme = 'light' | 'dark' | 'system';
+
 // Language
 export interface Language {
     code: string;
