@@ -13,14 +13,12 @@ import {
   Home,
   Film,
   Tv,
-  Info,
   Bell,
   Settings
 } from 'lucide-react';
 import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
-import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 
 const Header = () => {
   const pathname = usePathname();
@@ -28,9 +26,9 @@ const Header = () => {
 
   const navItems = [
     { name: 'Home', path: '/', icon: Home },
+    { name: 'Search', path: '/search', icon: Search },
     { name: 'Movies', path: '/movies', icon: Film },
     { name: 'TV Shows', path: '/tv-shows', icon: Tv },
-    { name: 'About', path: '/about', icon: Info },
   ];
 
   const closeMobileMenu = () => {
@@ -138,14 +136,6 @@ const Header = () => {
                         isMobileMenuOpen 
                           ? 'rotate-90 opacity-0 scale-0' 
                           : 'rotate-0 opacity-100 scale-100'
-                      }`} 
-                    />
-                    <X 
-                      size={20} 
-                      className={`absolute inset-0 transition-all duration-300 ${
-                        isMobileMenuOpen 
-                          ? 'rotate-0 opacity-100 scale-100' 
-                          : '-rotate-90 opacity-0 scale-0'
                       }`} 
                     />
                   </div>

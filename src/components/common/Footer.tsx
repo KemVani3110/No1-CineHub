@@ -104,7 +104,7 @@ const Footer = () => {
                 <h2 className="text-2xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
                   CineHub
                 </h2>
-                <p className="text-sm text-muted-foreground font-medium">Cinema Experience Redefined</p>
+                <p className="text-sm text-muted-foreground font-medium">Cinema Experience</p>
               </div>
             </div>
             
@@ -151,7 +151,7 @@ const Footer = () => {
                   </div>
                   <div>
                     <p className="font-medium">Location</p>
-                    <p className="text-sm">Thành phố Hồ Chí Minh, Việt Name</p>
+                    <p className="text-sm">Thành phố Hồ Chí Minh, Việt Nam</p>
                   </div>
                 </div>
                 
