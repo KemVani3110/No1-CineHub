@@ -5,9 +5,7 @@ import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
 import { 
-  Search, 
   Menu, 
-  X, 
   User, 
   LogIn,
   Home,
@@ -15,11 +13,14 @@ import {
   Tv,
   Bell,
   Settings,
-  LogOut
+  LogOut,
+  Search
 } from 'lucide-react';
 import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -51,13 +52,36 @@ const Header = () => {
     closeMobileMenu();
   };
 
+  // Get user initials for avatar fallback
+  const getUserInitials = (name: string) => {
+    if (!name) return 'U';
+    return name
+      .split(' ')
+      .map(word => word.charAt(0).toUpperCase())
+      .join('')
+      .slice(0, 2);
+  };
+
+  // Get user avatar with fallback
+  const getUserAvatar = () => {
+    if (!user) return null;
+    
+    const avatarUrl = user.avatar || 
+                     (user as any).picture || 
+                     (user as any).photoURL || 
+                     (user as any).image || 
+                     (user as any).profilePicture;
+    
+    return avatarUrl || null;
+  };
+
   return (
-    <header className="w-full bg-background/95 backdrop-blur-sm border-b border-border sticky top-0 z-50">
-      <div className="container mx-auto px-4 py-4">
+    <header className="w-full bg-background/80 backdrop-blur-md border-b border-border/50 sticky top-0 z-40">
+      <div className="container mx-auto px-4 lg:px-6 py-4">
         <div className="flex items-center justify-between">
-          {/* Logo Section */}
-          <Link href="/" className="flex items-center space-x-3 hover:opacity-80 transition-opacity group">
-            <div className="relative w-14 h-14 group-hover:scale-110 transition-transform">
+          {/* Logo Section - Simplified */}
+          <Link href="/" className="flex items-center space-x-3 hover:opacity-90 transition-opacity">
+            <div className="relative w-12 h-12 lg:w-14 lg:h-14">
               <Image
                 src="/logo.png"
                 alt="CineHub Logo"
@@ -67,26 +91,27 @@ const Header = () => {
               />
             </div>
             <div className="flex flex-col">
-              <span className="text-2xl font-bold gradient-text">CineHub</span>
-              <span className="text-xs text-muted-foreground -mt-1">Cinema Experience</span>
+              <span className="text-2xl lg:text-3xl font-bold gradient-text">CineHub</span>
+              <span className="text-sm text-muted-foreground -mt-1 hidden lg:block">Cinema Experience</span>
             </div>
           </Link>
           
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-8">
+          <nav className="hidden md:flex items-center">
             {navItems.map((item) => {
               const Icon = item.icon;
+              const isActive = pathname === item.path;
               return (
                 <Link
                   key={item.path}
                   href={item.path}
-                  className={`nav-item flex items-center space-x-2 text-sm font-medium transition-all hover:scale-105 ${
-                    pathname === item.path 
-                      ? 'text-primary' 
-                      : 'text-muted-foreground hover:text-primary'
+                  className={`nav-item flex items-center space-x-2 px-4 py-2 mx-1 rounded-full text-sm font-medium transition-all duration-200 ${
+                    isActive 
+                      ? 'text-white bg-primary shadow-lg shadow-primary/25' 
+                      : 'text-muted-foreground hover:text-primary hover:bg-accent/10'
                   }`}
                 >
-                  <Icon size={16} />
+                  <Icon size={20} />
                   <span>{item.name}</span>
                 </Link>
               );
@@ -95,71 +120,85 @@ const Header = () => {
 
           {/* Right Section */}
           <div className="flex items-center space-x-3">
-            {/* Search Button */}
-            <Button 
-              variant="ghost" 
-              size="icon"
-              className="hidden sm:flex"
-            >
-              <Search size={18} />
-            </Button>
-
             {user ? (
               <>
                 {/* Notifications Button */}
-                <Button 
-                  variant="ghost" 
-                  size="icon"
-                  className="hidden sm:flex relative"
-                >
-                  <Bell size={18} />
-                  <span className="absolute -top-1 -right-1 w-3 h-3 bg-destructive rounded-full">
-                    <span className="sr-only">Notifications</span>
-                  </span>
-                </Button>
+                <div className="relative hidden sm:block ">
+                  <Button 
+                    variant="ghost" 
+                    size="icon"
+                    className="h-10 w-10 rounded-full hover:bg-accent/10 cursor-pointer"
+                  >
+                    <Bell size={20} />
+                  </Button>
+                  <Badge 
+                    variant="destructive" 
+                    className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs"
+                  >
+                    3
+                  </Badge>
+                </div>
 
                 {/* User Menu */}
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button 
                       variant="ghost" 
-                      size="icon"
-                      className="hidden sm:flex"
+                      className="hidden sm:flex p-1 rounded-full hover:bg-accent/10 cursor-pointer"
                     >
-                      <div className="relative w-8 h-8 rounded-full overflow-hidden">
-                        {user.avatar ? (
-                          <Image
-                            src={user.avatar}
-                            alt={user.name}
-                            fill
-                            className="object-cover"
-                          />
-                        ) : (
-                          <div className="w-full h-full bg-primary/10 flex items-center justify-center">
-                            <User size={16} className="text-primary" />
-                          </div>
-                        )}
-                      </div>
+                      <Avatar className="h-10 w-10 border-2 border-primary/20">
+                        <AvatarImage 
+                          src={getUserAvatar()} 
+                          alt={user.name || user.email || 'User'}
+                          className="object-cover"
+                          referrerPolicy="no-referrer"
+                        />
+                        <AvatarFallback className="bg-primary/10 text-primary font-semibold">
+                          {getUserInitials(user.name || user.email || 'User')}
+                        </AvatarFallback>
+                      </Avatar>
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="w-56">
-                    <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                    <DropdownMenuLabel className="pb-2 ">
+                      <div className="flex items-center space-x-3">
+                        <Avatar className="h-8 w-8 ">
+                          <AvatarImage 
+                            src={getUserAvatar()} 
+                            alt={user.name || user.email || 'User'}
+                            referrerPolicy="no-referrer"
+                          />
+                          <AvatarFallback className="bg-primary/10 text-primary text-xs">
+                            {getUserInitials(user.name || user.email || 'User')}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div className="flex flex-col min-w-0 flex-1">
+                          <span className="font-medium truncate">{user.name || user.email}</span>
+                          {user.email && user.name && (
+                            <span className="text-xs text-muted-foreground truncate">{user.email}</span>
+                          )}
+                        </div>
+                      </div>
+                    </DropdownMenuLabel>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem asChild>
-                      <Link href="/profile">
-                        <User className="mr-2 h-4 w-4" />
+                      <Link href="/profile" className="cursor-pointer">
+                        <User className="mr-3 h-4 w-4" />
                         Profile
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>
-                      <Link href="/settings">
-                        <Settings className="mr-2 h-4 w-4" />
+                      <Link href="/settings" className="cursor-pointer">
+                        <Settings className="mr-3 h-4 w-4" />
                         Settings
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={handleLogout}>
-                      <LogOut className="mr-2 h-4 w-4" />
+                    <DropdownMenuItem 
+                      onClick={handleLogout}
+                      className="cursor-pointer text-destructive focus:text-destructive"
+                    >
+                      <LogOut className="mr-3 h-4 w-4" />
                       Logout
                     </DropdownMenuItem>
                   </DropdownMenuContent>
@@ -168,16 +207,16 @@ const Header = () => {
             ) : (
               <>
                 {/* Auth Buttons */}
-                <div className="hidden sm:flex items-center space-x-3">
-                  <Button variant="ghost" size="sm" asChild>
+                <div className="hidden sm:flex items-center space-x-2">
+                  <Button variant="ghost" size="sm" asChild className="rounded-full">
                     <Link href="/login">
-                      <LogIn size={16} className="mr-2" />
+                      <LogIn size={18} className="mr-2" />
                       Sign In
                     </Link>
                   </Button>
-                  <Button size="sm" asChild>
+                  <Button size="sm" asChild className="rounded-full">
                     <Link href="/register">
-                      <User size={16} className="mr-2" />
+                      <User size={18} className="mr-2" />
                       Sign Up
                     </Link>
                   </Button>
@@ -185,37 +224,28 @@ const Header = () => {
               </>
             )}
 
-            {/* Mobile Menu Sheet */}
+            {/* Mobile Menu */}
             <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
               <SheetTrigger asChild>
                 <Button 
                   variant="ghost" 
                   size="icon"
-                  className="md:hidden"
+                  className="md:hidden h-10 w-10 rounded-full"
                 >
-                  <div className="relative w-5 h-5">
-                    <Menu 
-                      size={20} 
-                      className={`absolute inset-0 transition-all duration-300 ${
-                        isMobileMenuOpen 
-                          ? 'rotate-90 opacity-0 scale-0' 
-                          : 'rotate-0 opacity-100 scale-100'
-                      }`} 
-                    />
-                  </div>
+                  <Menu size={22} />
                 </Button>
               </SheetTrigger>
               
-              <SheetContent side="left" className="w-80 p-0">
+              <SheetContent side="left" className="w-80 p-0 flex flex-col max-h-screen">
                 <SheetHeader className="sr-only">
                   <SheetTitle>Navigation Menu</SheetTitle>
                 </SheetHeader>
                 
-                <div className="flex flex-col h-full">
-                  {/* Header trong sidebar */}
-                  <div className="p-6 border-b">
+                <div className="flex flex-col h-full overflow-hidden">
+                  {/* Header inside sidebar */}
+                  <div className="p-6 border-b flex-shrink-0">
                     <div className="flex items-center space-x-3">
-                      <div className="relative w-10 h-10">
+                      <div className="relative w-12 h-12">
                         <Image
                           src="/logo.png"
                           alt="CineHub Logo"
@@ -224,112 +254,140 @@ const Header = () => {
                         />
                       </div>
                       <div className="flex flex-col">
-                        <span className="text-lg font-bold gradient-text">CineHub</span>
-                        <span className="text-xs text-muted-foreground">Cinema Experience</span>
+                        <span className="text-xl font-bold gradient-text">CineHub</span>
+                        <span className="text-sm text-muted-foreground">Cinema Experience</span>
                       </div>
                     </div>
                   </div>
 
+                  {/* User Info */}
+                  {user && (
+                    <div className="p-6 border-b flex-shrink-0">
+                      <div className="flex items-center space-x-3">
+                        <Avatar className="h-12 w-12 border-2 border-primary/20">
+                          <AvatarImage 
+                            src={getUserAvatar()} 
+                            alt={user.name || user.email || 'User'}
+                            referrerPolicy="no-referrer"
+                          />
+                          <AvatarFallback className="bg-primary/10 text-primary">
+                            {getUserInitials(user.name || user.email || 'User')}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div className="flex flex-col min-w-0 flex-1">
+                          <span className="font-medium text-foreground truncate">
+                            {user.name || user.email}
+                          </span>
+                          {user.email && user.name && (
+                            <span className="text-sm text-muted-foreground truncate">
+                              {user.email}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
                   {/* Navigation Items */}
-                  <div className="flex-1 p-6">
-                    <nav className="space-y-2">
-                      {navItems.map((item) => {
-                        const Icon = item.icon;
-                        return (
-                          <Link
-                            key={item.path}
-                            href={item.path}
-                            onClick={closeMobileMenu}
-                            className={`flex items-center space-x-3 px-4 py-3 rounded-lg text-sm font-medium transition-all hover:bg-accent ${
-                              pathname === item.path 
-                                ? 'text-primary bg-primary/10 border-l-4 border-primary' 
-                                : 'text-muted-foreground hover:text-primary'
-                            }`}
-                          >
-                            <Icon size={20} />
-                            <span>{item.name}</span>
-                          </Link>
-                        );
-                      })}
-                    </nav>
+                  <div className="flex-1 overflow-y-auto">
+                    <div className="p-6">
+                      <nav className="space-y-2">
+                        {navItems.map((item) => {
+                          const Icon = item.icon;
+                          const isActive = pathname === item.path;
+                          return (
+                            <Link
+                              key={item.path}
+                              href={item.path}
+                              onClick={closeMobileMenu}
+                              className={`flex items-center space-x-3 px-4 py-4 rounded-xl text-base font-medium transition-all ${
+                                isActive 
+                                  ? 'text-white bg-primary shadow-lg' 
+                                  : 'text-muted-foreground hover:text-primary hover:bg-accent/10'
+                              }`}
+                            >
+                              <Icon size={22} />
+                              <span>{item.name}</span>
+                            </Link>
+                          );
+                        })}
+                      </nav>
 
-                    <Separator className="my-6" />
+                      <Separator className="my-6" />
 
-                    {/* Additional Actions */}
-                    <div className="space-y-2">
-                      <Button 
-                        variant="ghost" 
-                        className="w-full justify-start h-auto px-4 py-3"
-                        onClick={closeMobileMenu}
-                      >
-                        <Search size={20} className="mr-3" />
-                        Search
-                      </Button>
-                      
+                      {/* Additional Actions */}
                       {user && (
-                        <>
+                        <div className="space-y-2">
                           <Button 
                             variant="ghost" 
-                            className="w-full justify-start h-auto px-4 py-3"
+                            className="w-full justify-start h-auto px-4 py-4 text-base rounded-xl relative"
                             onClick={closeMobileMenu}
                           >
-                            <Bell size={20} className="mr-3" />
+                            <Bell size={22} className="mr-3" />
                             Notifications
+                            <Badge 
+                              variant="destructive" 
+                              className="ml-auto h-5 w-5 flex items-center justify-center p-0 text-xs"
+                            >
+                              3
+                            </Badge>
                           </Button>
                           
                           <Button 
                             variant="ghost" 
-                            className="w-full justify-start h-auto px-4 py-3"
+                            className="w-full justify-start h-auto px-4 py-4 text-base rounded-xl"
                             onClick={closeMobileMenu}
                             asChild
                           >
                             <Link href="/settings">
-                              <Settings size={20} className="mr-3" />
+                              <Settings size={22} className="mr-3" />
                               Settings
                             </Link>
                           </Button>
-                        </>
+                        </div>
                       )}
                     </div>
                   </div>
 
-                  {/* Auth Buttons ở cuối */}
-                  {user ? (
-                    <div className="p-6 border-t">
-                      <Button 
-                        variant="outline" 
-                        className="w-full justify-start"
-                        onClick={handleLogout}
-                      >
-                        <LogOut size={18} className="mr-2" />
-                        Logout
-                      </Button>
-                    </div>
-                  ) : (
-                    <div className="p-6 border-t space-y-3">
-                      <Button 
-                        variant="outline" 
-                        className="w-full justify-start"
-                        onClick={closeMobileMenu}
-                        asChild
-                      >
-                        <Link href="/login">
-                          <LogIn size={18} className="mr-2" />
-                          Sign In
-                        </Link>
-                      </Button>
-                      <Button 
-                        className="w-full justify-start"
-                        onClick={closeMobileMenu}
-                        asChild
-                      >
-                        <Link href="/register">
-                          <User size={18} className="mr-2" />
-                          Sign Up
-                        </Link>
-                      </Button>
-                    </div>
-                  )}
+                  {/* Auth Buttons */}
+                  <div className="border-t flex-shrink-0">
+                    {user ? (
+                      <div className="p-6">
+                        <Button 
+                          variant="outline" 
+                          className="w-full justify-start h-12 text-base text-destructive border-destructive hover:bg-destructive hover:text-destructive-foreground rounded-xl"
+                          onClick={handleLogout}
+                        >
+                          <LogOut size={20} className="mr-3" />
+                          Logout
+                        </Button>
+                      </div>
+                    ) : (
+                      <div className="p-6 space-y-3">
+                        <Button 
+                          variant="outline" 
+                          className="w-full justify-start h-12 text-base rounded-xl"
+                          onClick={closeMobileMenu}
+                          asChild
+                        >
+                          <Link href="/login">
+                            <LogIn size={20} className="mr-3" />
+                            Sign In
+                          </Link>
+                        </Button>
+                        <Button 
+                          className="w-full justify-start h-12 text-base rounded-xl"
+                          onClick={closeMobileMenu}
+                          asChild
+                        >
+                          <Link href="/register">
+                            <User size={20} className="mr-3" />
+                            Sign Up
+                          </Link>
+                        </Button>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </SheetContent>
             </Sheet>

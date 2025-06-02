@@ -20,7 +20,7 @@ const Loading = ({ message = 'Đang tải...' }: LoadingProps) => {
            alt="CineHub Logo"
            width={60}
            height={60}
-           className="animate-pulse"
+           className="animate-pulse rounded-full"
          />
        </div>
      </div>
