@@ -6,14 +6,14 @@ interface LoadingProps {
  message?: string;
 }
 
-const Loading = ({ message = 'Đang tải...' }: LoadingProps) => {
+const Loading = ({ message = 'Loading...' }: LoadingProps) => {
  return (
    <div className="flex flex-col items-center justify-center min-h-[300px] gap-6">
      <div className="relative">
-       {/* Spinner ring bên ngoài */}
+       {/* Spinner ring outside */}
        <div className="w-24 h-24 rounded-full border-6 border-primary/30 border-t-primary animate-spin"></div>
        
-       {/* Logo ở giữa */}
+       {/* Middle Logo*/}
        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
          <Image
            src="/logo.png"

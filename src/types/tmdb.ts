@@ -436,11 +436,7 @@ export interface TMDBTrendingParams {
 }
 
 // TMDB Movie Lists
-export type TMDBMovieListType =
-    | 'popular'
-    | 'top_rated'
-    | 'now_playing'
-    | 'upcoming';
+export type TMDBMovieListType = 'popular' | 'top_rated' | 'now_playing' | 'upcoming';
 
 // TMDB TV Lists
 export type TMDBTVListType =
@@ -555,4 +551,16 @@ export interface TMDBTranslation {
         homepage?: string;
         tagline?: string;
     };
+}
+
+export interface TMDBTVShow {
+    id: number;
+    name: string;
+    poster_path: string | null;
+    backdrop_path: string | null;
+    overview: string;
+    first_air_date: string;
+    vote_average: number;
+    vote_count: number;
+    genre_ids: number[];
 }

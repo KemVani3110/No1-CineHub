@@ -20,7 +20,7 @@ const LandingPage = () => {
 
     // Auto redirect after 5 seconds
     const redirectTimer = setTimeout(() => {
-      router.push("/");
+      router.push("/home");
     }, 5000);
 
     return () => {
@@ -32,7 +32,7 @@ const LandingPage = () => {
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 via-slate-900 to-black">
-        <Loading message="Loading Landing Page..." />
+        <Loading message="Welcome to CineHub..." />
       </div>
     );
   }
@@ -157,8 +157,8 @@ const LandingPage = () => {
             className="mb-16"
           >
             <button
-              onClick={() => router.push("/")}
-              className="group relative inline-flex items-center justify-center space-x-3 bg-gradient-to-r from-cinehub-accent to-cinehub-accent-hover hover:from-cinehub-accent-hover hover:to-cinehub-accent text-white px-12 py-5 rounded-full text-lg font-semibold transition-all duration-300 transform hover:scale-105 hover:shadow-2xl hover:shadow-cinehub-accent/25"
+              onClick={() => router.push("/home")}
+              className="group relative inline-flex items-center justify-center space-x-3 bg-gradient-to-r from-cinehub-accent to-cinehub-accent-hover hover:from-cinehub-accent-hover hover:to-cinehub-accent text-white px-12 py-5 rounded-full text-lg font-semibold transition-all duration-300 transform hover:scale-105 hover:shadow-2xl hover:shadow-cinehub-accent/25 cursor-pointer"
             >
               <Play className="w-6 h-6 group-hover:scale-110 transition-transform" />
               <span>Watch Now</span>

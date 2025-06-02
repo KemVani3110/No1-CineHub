@@ -37,7 +37,7 @@ const Header = () => {
   const { user, logout } = useAuth();
 
   const navItems = [
-    { name: 'Home', path: '/', icon: Home },
+    { name: 'Home', path: '/home', icon: Home },
     { name: 'Search', path: '/search', icon: Search },
     { name: 'Movies', path: '/movies', icon: Film },
     { name: 'TV Shows', path: '/tv-shows', icon: Tv },
