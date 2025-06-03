@@ -142,7 +142,7 @@ export default function HomePage() {
         <main className={`transition-all duration-300 ${isSidebarOpen ? 'ml-70' : ''}`}>
           <div className="container mx-auto px-4 py-8">
             {/* Hero Section */}
-            {/* <LazyHeroSection /> */}
+            <LazyHeroSection />
 
             {/* Section Toggle */}
             <div className="flex gap-4 mb-12 justify-center">
