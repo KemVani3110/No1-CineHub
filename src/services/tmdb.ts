@@ -30,7 +30,6 @@ export const TMDB_ENDPOINTS = {
   TV: {
     POPULAR: 'popular',
     TOP_RATED: 'top_rated',
-    ON_THE_AIR: 'on_the_air',
     UPCOMING: 'on_the_air',
   },
 };
@@ -76,4 +75,27 @@ export const fetchGenres = async (type: 'movie' | 'tv') => {
 export const getImageUrl = (path: string | null, size: 'w500' | 'original' = 'w500'): string => {
   if (!path) return '/images/no-poster.jpg';
   return `${TMDB_IMAGE_BASE_URL}/${size}${path}`;
+};
+
+export const fetchMovieDetails = async (movieId: number) => {
+  try {
+    const [movieDetails, credits, videos, reviews, similar] = await Promise.all([
+      tmdbApi.get(`/movie/${movieId}`),
+      tmdbApi.get(`/movie/${movieId}/credits`),
+      tmdbApi.get(`/movie/${movieId}/videos`),
+      tmdbApi.get(`/movie/${movieId}/reviews`),
+      tmdbApi.get(`/movie/${movieId}/similar`),
+    ]);
+
+    return {
+      ...movieDetails.data,
+      credits: credits.data,
+      videos: videos.data,
+      reviews: reviews.data,
+      similar: similar.data.results,
+    };
+  } catch (error) {
+    console.error('Error fetching movie details:', error);
+    throw error;
+  }
 }; 

@@ -1,12 +1,12 @@
-'use client';
+"use client";
 
-import Link from 'next/link';
-import Image from 'next/image';
-import { usePathname } from 'next/navigation';
-import { useState } from 'react';
-import { 
-  Menu, 
-  User, 
+import Link from "next/link";
+import Image from "next/image";
+import { usePathname } from "next/navigation";
+import { useState } from "react";
+import {
+  Menu,
+  User,
   LogIn,
   Home,
   Compass,
@@ -15,13 +15,19 @@ import {
   LogOut,
   Search,
   PanelLeftClose,
-  PanelLeft
-} from 'lucide-react';
-import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from '@/components/ui/sheet';
-import { Button } from '@/components/ui/button';
-import { Separator } from '@/components/ui/separator';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Badge } from '@/components/ui/badge';
+  PanelLeft,
+} from "lucide-react";
+import {
+  Sheet,
+  SheetContent,
+  SheetTrigger,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
+import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -29,9 +35,9 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { useAuth } from '@/hooks/useAuth';
-import Sidebar from './Sidebar';
+} from "@/components/ui/dropdown-menu";
+import { useAuth } from "@/hooks/useAuth";
+import Sidebar from "./Sidebar";
 
 interface HeaderProps {
   onSidebarChange?: (isOpen: boolean) => void;
@@ -44,9 +50,9 @@ const Header = ({ onSidebarChange }: HeaderProps) => {
   const { user, logout } = useAuth();
 
   const navItems = [
-    { name: 'Home', path: '/home', icon: Home },
-    { name: 'Explore', path: '/explore', icon: Compass },
-    { name: 'Search', path: '/search', icon: Search },
+    { name: "Home", path: "/home", icon: Home },
+    { name: "Explore", path: "/explore", icon: Compass },
+    { name: "Search", path: "/search", icon: Search },
   ];
 
   const closeMobileMenu = () => {
@@ -65,46 +71,54 @@ const Header = ({ onSidebarChange }: HeaderProps) => {
 
   // Get user initials for avatar fallback
   const getUserInitials = (name: string) => {
-    if (!name) return 'U';
+    if (!name) return "U";
     return name
-      .split(' ')
-      .map(word => word.charAt(0).toUpperCase())
-      .join('')
+      .split(" ")
+      .map((word) => word.charAt(0).toUpperCase())
+      .join("")
       .slice(0, 2);
   };
 
   // Get user avatar with fallback
   const getUserAvatar = () => {
     if (!user) return null;
-    
-    const avatarUrl = user.avatar || 
-                     (user as any).picture || 
-                     (user as any).photoURL || 
-                     (user as any).image || 
-                     (user as any).profilePicture;
-    
+
+    const avatarUrl =
+      user.avatar ||
+      (user as any).picture ||
+      (user as any).photoURL ||
+      (user as any).image ||
+      (user as any).profilePicture;
+
     return avatarUrl || null;
   };
 
   return (
     <>
-      <Sidebar isOpen={isSidebarOpen} onClose={() => handleSidebarToggle(false)} />
-      
-      <header className={`w-full bg-background/80 backdrop-blur-md border-b border-border/50 sticky top-0 z-40 transition-all duration-300 ${isSidebarOpen ? 'hidden' : 'block'}`}>
+      {/* <Sidebar isOpen={isSidebarOpen} onClose={() => handleSidebarToggle(false)} /> */}
+
+      <header
+        className={`w-full bg-background/80 backdrop-blur-md border-b border-border/50 sticky top-0 z-40 transition-all duration-300 ${
+          isSidebarOpen ? "hidden" : "block"
+        }`}
+      >
         <div className="container mx-auto px-4 lg:px-6 py-4">
           <div className="flex items-center justify-between">
             {/* Logo Section - Simplified */}
             <div className="flex items-center space-x-4">
-              <Button
+              {/* <Button
                 variant="ghost"
                 size="icon"
                 className="h-10 w-10 rounded-full hover:bg-accent/10"
                 onClick={() => handleSidebarToggle(!isSidebarOpen)}
               >
                 {isSidebarOpen ? <PanelLeftClose size={22} /> : <PanelLeft size={22} />}
-              </Button>
-              
-              <Link href="/home" className="flex items-center space-x-3 hover:opacity-90 transition-opacity">
+              </Button> */}
+
+              <Link
+                href="/home"
+                className="flex items-center space-x-3 hover:opacity-90 transition-opacity"
+              >
                 <div className="relative w-12 h-12 lg:w-14 lg:h-14">
                   <Image
                     src="/logo.png"
@@ -115,12 +129,16 @@ const Header = ({ onSidebarChange }: HeaderProps) => {
                   />
                 </div>
                 <div className="flex flex-col">
-                  <span className="text-2xl lg:text-3xl font-bold gradient-text">CineHub</span>
-                  <span className="text-sm text-muted-foreground -mt-1 hidden lg:block">Cinema Experience</span>
+                  <span className="text-2xl lg:text-3xl font-bold gradient-text">
+                    CineHub
+                  </span>
+                  <span className="text-sm text-muted-foreground -mt-1 hidden lg:block">
+                    Cinema Experience
+                  </span>
                 </div>
               </Link>
             </div>
-            
+
             {/* Desktop Navigation */}
             <nav className="hidden md:flex items-center">
               {navItems.map((item) => {
@@ -131,9 +149,9 @@ const Header = ({ onSidebarChange }: HeaderProps) => {
                     key={item.path}
                     href={item.path}
                     className={`nav-item flex items-center space-x-2 px-4 py-2 mx-1 rounded-full text-sm font-medium transition-all duration-200 ${
-                      isActive 
-                        ? 'text-white bg-primary shadow-lg shadow-primary/25' 
-                        : 'text-muted-foreground hover:text-primary hover:bg-accent/10'
+                      isActive
+                        ? "text-white bg-primary shadow-lg shadow-primary/25"
+                        : "text-muted-foreground hover:text-primary hover:bg-accent/10"
                     }`}
                   >
                     <Icon size={20} />
@@ -149,15 +167,15 @@ const Header = ({ onSidebarChange }: HeaderProps) => {
                 <>
                   {/* Notifications Button */}
                   <div className="relative hidden sm:block ">
-                    <Button 
-                      variant="ghost" 
+                    <Button
+                      variant="ghost"
                       size="icon"
                       className="h-10 w-10 rounded-full hover:bg-accent/10 cursor-pointer"
                     >
                       <Bell size={20} />
                     </Button>
-                    <Badge 
-                      variant="destructive" 
+                    <Badge
+                      variant="destructive"
                       className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs"
                     >
                       3
@@ -167,19 +185,19 @@ const Header = ({ onSidebarChange }: HeaderProps) => {
                   {/* User Menu */}
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button 
-                        variant="ghost" 
+                      <Button
+                        variant="ghost"
                         className="hidden sm:flex p-1 rounded-full hover:bg-accent/10 cursor-pointer"
                       >
                         <Avatar className="h-10 w-10 border-2 border-primary/20">
-                          <AvatarImage 
-                            src={getUserAvatar()} 
-                            alt={user.name || user.email || 'User'}
+                          <AvatarImage
+                            src={getUserAvatar()}
+                            alt={user.name || user.email || "User"}
                             className="object-cover"
                             referrerPolicy="no-referrer"
                           />
                           <AvatarFallback className="bg-primary/10 text-primary font-semibold">
-                            {getUserInitials(user.name || user.email || 'User')}
+                            {getUserInitials(user.name || user.email || "User")}
                           </AvatarFallback>
                         </Avatar>
                       </Button>
@@ -188,19 +206,25 @@ const Header = ({ onSidebarChange }: HeaderProps) => {
                       <DropdownMenuLabel className="pb-2 ">
                         <div className="flex items-center space-x-3">
                           <Avatar className="h-8 w-8 ">
-                            <AvatarImage 
-                              src={getUserAvatar()} 
-                              alt={user.name || user.email || 'User'}
+                            <AvatarImage
+                              src={getUserAvatar()}
+                              alt={user.name || user.email || "User"}
                               referrerPolicy="no-referrer"
                             />
                             <AvatarFallback className="bg-primary/10 text-primary text-xs">
-                              {getUserInitials(user.name || user.email || 'User')}
+                              {getUserInitials(
+                                user.name || user.email || "User"
+                              )}
                             </AvatarFallback>
                           </Avatar>
                           <div className="flex flex-col min-w-0 flex-1">
-                            <span className="font-medium truncate">{user.name || user.email}</span>
+                            <span className="font-medium truncate">
+                              {user.name || user.email}
+                            </span>
                             {user.email && user.name && (
-                              <span className="text-xs text-muted-foreground truncate">{user.email}</span>
+                              <span className="text-xs text-muted-foreground truncate">
+                                {user.email}
+                              </span>
                             )}
                           </div>
                         </div>
@@ -219,7 +243,7 @@ const Header = ({ onSidebarChange }: HeaderProps) => {
                         </Link>
                       </DropdownMenuItem>
                       <DropdownMenuSeparator />
-                      <DropdownMenuItem 
+                      <DropdownMenuItem
                         onClick={handleLogout}
                         className="cursor-pointer text-destructive focus:text-destructive"
                       >
@@ -233,7 +257,12 @@ const Header = ({ onSidebarChange }: HeaderProps) => {
                 <>
                   {/* Auth Buttons */}
                   <div className="hidden sm:flex items-center space-x-2">
-                    <Button variant="ghost" size="sm" asChild className="rounded-full">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      asChild
+                      className="rounded-full"
+                    >
                       <Link href="/login">
                         <LogIn size={18} className="mr-2" />
                         Sign In
@@ -252,20 +281,23 @@ const Header = ({ onSidebarChange }: HeaderProps) => {
               {/* Mobile Menu */}
               <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
                 <SheetTrigger asChild>
-                  <Button 
-                    variant="ghost" 
+                  <Button
+                    variant="ghost"
                     size="icon"
                     className="md:hidden h-10 w-10 rounded-full"
                   >
                     <Menu size={22} />
                   </Button>
                 </SheetTrigger>
-                
-                <SheetContent side="left" className="w-80 p-0 flex flex-col max-h-screen">
+
+                <SheetContent
+                  side="left"
+                  className="w-80 p-0 flex flex-col max-h-screen"
+                >
                   <SheetHeader className="sr-only">
                     <SheetTitle>Navigation Menu</SheetTitle>
                   </SheetHeader>
-                  
+
                   <div className="flex flex-col h-full overflow-hidden">
                     {/* Header inside sidebar */}
                     <div className="p-6 border-b flex-shrink-0">
@@ -279,8 +311,12 @@ const Header = ({ onSidebarChange }: HeaderProps) => {
                           />
                         </div>
                         <div className="flex flex-col">
-                          <span className="text-xl font-bold gradient-text">CineHub</span>
-                          <span className="text-sm text-muted-foreground">Cinema Experience</span>
+                          <span className="text-xl font-bold gradient-text">
+                            CineHub
+                          </span>
+                          <span className="text-sm text-muted-foreground">
+                            Cinema Experience
+                          </span>
                         </div>
                       </div>
                     </div>
@@ -290,13 +326,15 @@ const Header = ({ onSidebarChange }: HeaderProps) => {
                       <div className="p-6 border-b flex-shrink-0">
                         <div className="flex items-center space-x-3">
                           <Avatar className="h-12 w-12 border-2 border-primary/20">
-                            <AvatarImage 
-                              src={getUserAvatar()} 
-                              alt={user.name || user.email || 'User'}
+                            <AvatarImage
+                              src={getUserAvatar()}
+                              alt={user.name || user.email || "User"}
                               referrerPolicy="no-referrer"
                             />
                             <AvatarFallback className="bg-primary/10 text-primary">
-                              {getUserInitials(user.name || user.email || 'User')}
+                              {getUserInitials(
+                                user.name || user.email || "User"
+                              )}
                             </AvatarFallback>
                           </Avatar>
                           <div className="flex flex-col min-w-0 flex-1">
@@ -326,9 +364,9 @@ const Header = ({ onSidebarChange }: HeaderProps) => {
                                 href={item.path}
                                 onClick={closeMobileMenu}
                                 className={`flex items-center space-x-3 px-4 py-4 rounded-xl text-base font-medium transition-all ${
-                                  isActive 
-                                    ? 'text-white bg-primary shadow-lg' 
-                                    : 'text-muted-foreground hover:text-primary hover:bg-accent/10'
+                                  isActive
+                                    ? "text-white bg-primary shadow-lg"
+                                    : "text-muted-foreground hover:text-primary hover:bg-accent/10"
                                 }`}
                               >
                                 <Icon size={22} />
@@ -343,23 +381,23 @@ const Header = ({ onSidebarChange }: HeaderProps) => {
                         {/* Additional Actions */}
                         {user && (
                           <div className="space-y-2">
-                            <Button 
-                              variant="ghost" 
+                            <Button
+                              variant="ghost"
                               className="w-full justify-start h-auto px-4 py-4 text-base rounded-xl relative"
                               onClick={closeMobileMenu}
                             >
                               <Bell size={22} className="mr-3" />
                               Notifications
-                              <Badge 
-                                variant="destructive" 
+                              <Badge
+                                variant="destructive"
                                 className="ml-auto h-5 w-5 flex items-center justify-center p-0 text-xs"
                               >
                                 3
                               </Badge>
                             </Button>
-                            
-                            <Button 
-                              variant="ghost" 
+
+                            <Button
+                              variant="ghost"
                               className="w-full justify-start h-auto px-4 py-4 text-base rounded-xl"
                               onClick={closeMobileMenu}
                               asChild
@@ -378,8 +416,8 @@ const Header = ({ onSidebarChange }: HeaderProps) => {
                     <div className="border-t flex-shrink-0">
                       {user ? (
                         <div className="p-6">
-                          <Button 
-                            variant="outline" 
+                          <Button
+                            variant="outline"
                             className="w-full justify-start h-12 text-base text-destructive border-destructive hover:bg-destructive hover:text-destructive-foreground rounded-xl"
                             onClick={handleLogout}
                           >
@@ -389,8 +427,8 @@ const Header = ({ onSidebarChange }: HeaderProps) => {
                         </div>
                       ) : (
                         <div className="p-6 space-y-3">
-                          <Button 
-                            variant="outline" 
+                          <Button
+                            variant="outline"
                             className="w-full justify-start h-12 text-base rounded-xl"
                             onClick={closeMobileMenu}
                             asChild
@@ -400,7 +438,7 @@ const Header = ({ onSidebarChange }: HeaderProps) => {
                               Sign In
                             </Link>
                           </Button>
-                          <Button 
+                          <Button
                             className="w-full justify-start h-12 text-base rounded-xl"
                             onClick={closeMobileMenu}
                             asChild

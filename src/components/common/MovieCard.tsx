@@ -1,11 +1,11 @@
-'use client';
+"use client";
 
-import React from 'react';
-import Image from 'next/image';
-import { Star, Clock, Play, Calendar, Film } from 'lucide-react';
-import { getImageUrl } from '@/services/tmdb';
-import { useRouter } from 'next/navigation';
-import { format } from 'date-fns';
+import React from "react";
+import Image from "next/image";
+import { Star, Clock, Play, Calendar, Film } from "lucide-react";
+import { getImageUrl } from "@/services/tmdb";
+import { useRouter } from "next/navigation";
+import { format } from "date-fns";
 
 interface MovieCardProps {
   movie: {
@@ -37,7 +37,7 @@ export const MovieCard: React.FC<MovieCardProps> = ({ movie }) => {
   const router = useRouter();
   const title = movie.title || movie.name;
   const releaseDate = movie.release_date || movie.first_air_date;
-  const year = releaseDate ? new Date(releaseDate).getFullYear() : '';
+  const year = releaseDate ? new Date(releaseDate).getFullYear() : "";
   const rating = movie.vote_average;
 
   const handleClick = () => {
@@ -45,14 +45,15 @@ export const MovieCard: React.FC<MovieCardProps> = ({ movie }) => {
   };
 
   return (
-    <div 
-      onClick={handleClick}
-      className="group relative cursor-pointer"
-    >
+    <div onClick={handleClick} className="group relative cursor-pointer">
       <div className="relative overflow-hidden rounded-2xl">
         <ImageWithFallback
-          src={movie.poster_path ? getImageUrl(movie.poster_path) : '/images/no-poster.jpg'}
-          alt={title || 'Movie poster'}
+          src={
+            movie.poster_path
+              ? getImageUrl(movie.poster_path)
+              : "/images/no-poster.jpg"
+          }
+          alt={title || "Movie poster"}
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
         <div className="absolute bottom-0 left-0 right-0 p-4 translate-y-full group-hover:translate-y-0 transition-transform duration-300">
@@ -66,7 +67,7 @@ export const MovieCard: React.FC<MovieCardProps> = ({ movie }) => {
               <span>{format(new Date(releaseDate), "MMM d, yyyy")}</span>
             </div>
           )}
-          <button className="w-full bg-[#4FD1C5] text-white py-2 rounded-lg flex items-center justify-center gap-2 hover:bg-[#4FD1C5]/90 transition-colors">
+          <button className="w-full bg-[#4FD1C5] text-white py-2 rounded-lg flex items-center justify-center gap-2 hover:bg-[#4FD1C5]/90 transition-colors cursor-pointer">
             <Play className="w-4 h-4" />
             <span>Watch Now</span>
           </button>

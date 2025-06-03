@@ -4,8 +4,7 @@ import React from "react";
 import { useTVShows } from "@/hooks/useTMDB";
 import { TMDBTVShow } from "@/types/tmdb";
 import { Skeleton } from "@/components/ui/skeleton";
-import { getImageUrl } from "@/services/tmdb";
-import Link from "next/link";
+import { TVShowCard } from "@/components/common/TVShowCard";
 
 interface TVShowListProps {
   listType: 'popular' | 'top_rated' | 'on_the_air';
@@ -34,10 +33,20 @@ const TVShowList = ({ listType }: TVShowListProps) => {
 
   if (isLoading) {
     return (
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 md:gap-6">
         {Array(24).fill(0).map((_, index) => (
-          <div key={index} className="relative aspect-[2/3] rounded-2xl overflow-hidden">
-            <Skeleton className="w-full h-full" />
+          <div key={index} className="group relative cursor-pointer">
+            <div className="relative overflow-hidden rounded-2xl">
+              <div className="relative aspect-[2/3] w-full">
+                <div className="absolute inset-0 bg-[#1B263B]">
+                  <Skeleton className="w-full h-full" />
+                </div>
+              </div>
+              <div className="mt-3 px-2">
+                <Skeleton className="h-4 w-3/4 mb-2" />
+                <Skeleton className="h-3 w-1/2" />
+              </div>
+            </div>
           </div>
         ))}
       </div>
@@ -53,29 +62,9 @@ const TVShowList = ({ listType }: TVShowListProps) => {
   }
 
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 md:gap-6">
       {displayShows.map((show: TMDBTVShow) => (
-        <Link 
-          href={`/tv/${show.id}`} 
-          key={show.id}
-          className="group relative aspect-[2/3] rounded-2xl overflow-hidden transition-transform duration-300 hover:scale-105"
-        >
-          <img
-            src={getImageUrl(show.poster_path)}
-            alt={show.name}
-            className="w-full h-full object-cover"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-            <div className="absolute bottom-0 left-0 right-0 p-4">
-              <h3 className="text-white font-semibold text-sm line-clamp-2">{show.name}</h3>
-              {show.next_episode_to_air && (
-                <p className="text-gray-300 text-xs mt-1">
-                  Next episode: {new Date(show.next_episode_to_air.air_date).toLocaleDateString()}
-                </p>
-              )}
-            </div>
-          </div>
-        </Link>
+        <TVShowCard key={show.id} show={show} />
       ))}
     </div>
   );
