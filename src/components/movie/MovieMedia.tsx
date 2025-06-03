@@ -5,7 +5,7 @@ interface MovieMediaProps {
   videos: TMDBVideos;
 }
 
-export function MovieMedia({ videos }: MovieMediaProps) {
+export default function MovieMedia({ videos }: MovieMediaProps) {
   const trailers = videos.results.filter(
     (video) => video.type === "Trailer" && video.site === "YouTube"
   );

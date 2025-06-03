@@ -1,31 +1,46 @@
 "use client";
 
 import { useParams } from "next/navigation";
-import { useMovieDetails } from "@/hooks/useMovieDetails";
+import { useEffect, useState } from "react";
+import { fetchMovieDetails } from "@/services/tmdb";
+import { TMDBMovieDetails } from "@/types/tmdb";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { MovieOverview } from "@/components/movie/MovieOverview";
-import { MovieCast } from "@/components/movie/MovieCast";
-import { MovieReviews } from "@/components/movie/MovieReviews";
-import { MovieMedia } from "@/components/movie/MovieMedia";
-import { SimilarMovies } from "@/components/movie/SimilarMovies";
+import MovieOverview from "@/components/movie/MovieOverview";
+import MovieCast from "@/components/movie/MovieCast";
+import MovieReviews from "@/components/movie/MovieReviews";
+import MovieMedia from "@/components/movie/MovieMedia";
+import SimilarMovies from "@/components/movie/SimilarMovies";
 import Loading from "@/components/common/Loading";
 import { Share2, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { getImageUrl } from "@/services/tmdb";
 import { TMDBGenre } from "@/types/tmdb";
-import { Header, Footer } from "@/components/lazy";
-import { useState } from "react";
 
-export default function MovieDetailPage() {
+export default function MovieDetail() {
   const { id } = useParams();
-  const { data: movie, isLoading, error } = useMovieDetails(Number(id));
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [movie, setMovie] = useState<TMDBMovieDetails | null>(null);
+  const [loading, setLoading] = useState(true);
 
-  if (isLoading) {
+  useEffect(() => {
+    const loadMovie = async () => {
+      try {
+        const data = await fetchMovieDetails(Number(id));
+        setMovie(data);
+      } catch (error) {
+        console.error("Error loading movie:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadMovie();
+  }, [id]);
+
+  if (loading) {
     return <Loading message="Loading movie details..." />;
   }
 
-  if (error || !movie) {
+  if (!movie) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
@@ -52,15 +67,13 @@ export default function MovieDetailPage() {
 
   return (
     <div className="min-h-screen bg-bg-main">
-      <Header onSidebarChange={(open) => setIsSidebarOpen(open)} />
-
       {/* Hero Section */}
       <div className="relative h-[60vh] min-h-[500px]">
         <div
           className="absolute inset-0 bg-cover bg-center"
           style={{
             backgroundImage: `url(${getImageUrl(
-              movie.backdrop_path,
+              movie.backdrop_path || null,
               "original"
             )})`,
           }}
@@ -73,7 +86,7 @@ export default function MovieDetailPage() {
             {/* Poster */}
             <div className="hidden md:block w-64 h-96 rounded-lg overflow-hidden shadow-xl">
               <img
-                src={getImageUrl(movie.poster_path, "w500")}
+                src={getImageUrl(movie.poster_path || null, "w500")}
                 alt={movie.title}
                 className="w-full h-full object-cover"
               />
@@ -128,12 +141,13 @@ export default function MovieDetailPage() {
 
       {/* Content Tabs */}
       <div className="container mx-auto px-4 py-8">
-        <Tabs defaultValue="overview" className="space-y-8">
-          <TabsList className="bg-bg-card">
+        <Tabs defaultValue="overview" className="w-full">
+          <TabsList className="grid w-full grid-cols-2 md:grid-cols-5 gap-4">
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="cast">Cast</TabsTrigger>
             <TabsTrigger value="reviews">Reviews</TabsTrigger>
             <TabsTrigger value="media">Media</TabsTrigger>
+            <TabsTrigger value="similar">Similar Movies</TabsTrigger>
           </TabsList>
 
           <TabsContent value="overview">
@@ -141,26 +155,22 @@ export default function MovieDetailPage() {
           </TabsContent>
 
           <TabsContent value="cast">
-            <MovieCast credits={movie.credits} />
+            {movie.credits && <MovieCast credits={movie.credits} />}
           </TabsContent>
 
           <TabsContent value="reviews">
-            <MovieReviews reviews={movie.reviews} />
+            {movie.reviews && <MovieReviews reviews={movie.reviews} />}
           </TabsContent>
 
           <TabsContent value="media">
-            <MovieMedia videos={movie.videos} />
+            {movie.videos && <MovieMedia videos={movie.videos} />}
+          </TabsContent>
+
+          <TabsContent value="similar">
+            {movie.similar && <SimilarMovies movies={movie.similar} />}
           </TabsContent>
         </Tabs>
-
-        {/* Similar Movies */}
-        <div className="mt-12">
-          <h2 className="text-2xl font-bold mb-6">Similar Movies</h2>
-          <SimilarMovies movies={movie.similar} />
-        </div>
       </div>
-
-      <Footer isSidebarOpen={isSidebarOpen} />
     </div>
   );
 }

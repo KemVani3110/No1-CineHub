@@ -59,6 +59,10 @@ export interface TMDBMovieDetails extends TMDBMovie {
     spoken_languages: TMDBSpokenLanguage[];
     status: string;
     tagline?: string;
+    credits?: TMDBCredits;
+    videos?: TMDBVideos;
+    reviews?: TMDBReviews;
+    similar?: TMDBMovie[];
 }
 
 // TMDB TV Show object
@@ -99,6 +103,10 @@ export interface TMDBTVDetails extends TMDBTV {
     status: string;
     tagline?: string;
     type: string;
+    credits?: TMDBCredits;
+    videos?: TMDBVideos;
+    reviews?: TMDBReviews;
+    similar?: TMDBTV[];
 }
 
 // TMDB Season

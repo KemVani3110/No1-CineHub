@@ -6,7 +6,7 @@ interface MovieCastProps {
   credits: TMDBCredits;
 }
 
-export function MovieCast({ credits }: MovieCastProps) {
+export default function MovieCast({ credits }: MovieCastProps) {
   const cast = credits.cast.slice(0, 10);
   const crew = credits.crew.filter((person) =>
     ["Director", "Producer", "Screenplay"].includes(person.job)

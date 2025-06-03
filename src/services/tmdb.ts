@@ -98,4 +98,37 @@ export const fetchMovieDetails = async (movieId: number) => {
     console.error('Error fetching movie details:', error);
     throw error;
   }
+};
+
+export const fetchTVShowDetails = async (tvShowId: number) => {
+  try {
+    const [details, credits, videos, reviews, similar] = await Promise.all([
+      tmdbApi.get(`/tv/${tvShowId}`),
+      tmdbApi.get(`/tv/${tvShowId}/credits`),
+      tmdbApi.get(`/tv/${tvShowId}/videos`),
+      tmdbApi.get(`/tv/${tvShowId}/reviews`),
+      tmdbApi.get(`/tv/${tvShowId}/similar`),
+    ]);
+
+    return {
+      ...details.data,
+      credits: credits.data,
+      videos: videos.data,
+      reviews: reviews.data,
+      similar: similar.data.results,
+    };
+  } catch (error) {
+    console.error('Error fetching TV show details:', error);
+    throw error;
+  }
+};
+
+export const fetchSeasonDetails = async (tvShowId: number, seasonNumber: number) => {
+  try {
+    const { data } = await tmdbApi.get(`/tv/${tvShowId}/season/${seasonNumber}`);
+    return data;
+  } catch (error) {
+    console.error('Error fetching season details:', error);
+    throw error;
+  }
 }; 

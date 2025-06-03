@@ -41,14 +41,36 @@ export const TopRatedTVShows = lazy(
   () => import("@/components/sections/TopRatedTVShows")
 );
 
-// Featured Movies
-export const FeaturedMovies = lazy(
-  () => import("@/components/sections/FeaturedMovies")
-);
-
 export const LazyUpcomingTVShows = lazy(
   () => import("@/components/sections/UpcomingTVShows")
 );
+
+// TV Show Detail components
+export const TVShowOverview = lazy(
+  () => import("@/components/tv/TVShowOverview")
+);
+export const TVShowCast = lazy(
+  () => import("@/components/tv/TVShowCast")
+);
+export const TVShowReviews = lazy(
+  () => import("@/components/tv/TVShowReviews")
+);
+export const TVShowSeasons = lazy(
+  () => import("@/components/tv/TVShowSeasons")
+);
+export const TVShowMedia = lazy(
+  () => import("@/components/tv/TVShowMedia")
+);
+export const SimilarTVShows = lazy(
+  () => import("@/components/tv/SimilarTVShows")
+);
+
+// Movie Detail components
+export const MovieOverview = lazy(() => import("@/components/movie/MovieOverview"));
+export const MovieCast = lazy(() => import("@/components/movie/MovieCast"));
+export const MovieReviews = lazy(() => import("@/components/movie/MovieReviews"));
+export const MovieMedia = lazy(() => import("@/components/movie/MovieMedia"));
+export const SimilarMovies = lazy(() => import("@/components/movie/SimilarMovies"));
 
 // Lazy loading wrapper component
 export const withLazyLoading = (Component: React.ComponentType) => {

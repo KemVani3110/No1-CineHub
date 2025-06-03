@@ -4,7 +4,7 @@ interface MovieOverviewProps {
   movie: TMDBMovieDetails;
 }
 
-export function MovieOverview({ movie }: MovieOverviewProps) {
+export default function MovieOverview({ movie }: MovieOverviewProps) {
   return (
     <div className="space-y-6">
       <div>

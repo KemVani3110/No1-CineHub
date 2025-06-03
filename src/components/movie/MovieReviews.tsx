@@ -7,7 +7,7 @@ interface MovieReviewsProps {
   reviews: TMDBReviews;
 }
 
-export function MovieReviews({ reviews }: MovieReviewsProps) {
+export default function MovieReviews({ reviews }: MovieReviewsProps) {
   if (!reviews.results.length) {
     return (
       <div className="text-center py-8">
