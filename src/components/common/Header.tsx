@@ -104,7 +104,7 @@ const Header = ({ onSidebarChange }: HeaderProps) => {
                 {isSidebarOpen ? <PanelLeftClose size={22} /> : <PanelLeft size={22} />}
               </Button>
               
-              <Link href="/" className="flex items-center space-x-3 hover:opacity-90 transition-opacity">
+              <Link href="/home" className="flex items-center space-x-3 hover:opacity-90 transition-opacity">
                 <div className="relative w-12 h-12 lg:w-14 lg:h-14">
                   <Image
                     src="/logo.png"

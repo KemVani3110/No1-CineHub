@@ -2,7 +2,6 @@
 
 import React, { lazy, Suspense } from "react";
 import Loading from "@/components/common/Loading";
-import dynamic from "next/dynamic";
 
 // Common components
 export const Header = lazy(() => import("@/components/common/Header"));
@@ -41,13 +40,14 @@ export const PopularTVShows = lazy(
 export const TopRatedTVShows = lazy(
   () => import("@/components/sections/TopRatedTVShows")
 );
-export const OnTheAirTVShows = lazy(
-  () => import("@/components/sections/OnTheAirTVShows")
-);
 
 // Featured Movies
 export const FeaturedMovies = lazy(
   () => import("@/components/sections/FeaturedMovies")
+);
+
+export const LazyUpcomingTVShows = lazy(
+  () => import("@/components/sections/UpcomingTVShows")
 );
 
 // Lazy loading wrapper component

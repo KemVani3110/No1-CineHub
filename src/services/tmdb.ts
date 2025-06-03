@@ -31,6 +31,7 @@ export const TMDB_ENDPOINTS = {
     POPULAR: 'popular',
     TOP_RATED: 'top_rated',
     ON_THE_AIR: 'on_the_air',
+    UPCOMING: 'on_the_air',
   },
 };
 
@@ -49,13 +50,26 @@ export const fetchMovies = async (listType: TMDBMovieListType = 'popular', page:
 
 export const fetchTVShows = async (listType: string = 'popular', page: number = 1) => {
   try {
-    const { data } = await tmdbApi.get(`/tv/${listType}`, {
+    // Ensure listType is one of the valid TV endpoints
+    const validListType = TMDB_ENDPOINTS.TV[listType.toUpperCase() as keyof typeof TMDB_ENDPOINTS.TV] || 'popular';
+    
+    const { data } = await tmdbApi.get(`/tv/${validListType}`, {
       params: { page },
     });
     return data;
   } catch (error) {
     console.error('Error fetching TV shows:', error);
     return { results: [], page: 1, total_pages: 1, total_results: 0 };
+  }
+};
+
+export const fetchGenres = async (type: 'movie' | 'tv') => {
+  try {
+    const { data } = await tmdbApi.get(`/genre/${type}/list`);
+    return data.genres;
+  } catch (error) {
+    console.error(`Error fetching ${type} genres:`, error);
+    return [];
   }
 };
 

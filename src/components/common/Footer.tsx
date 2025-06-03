@@ -34,7 +34,11 @@ import {
   Zap
 } from 'lucide-react';
 
-const Footer = () => {
+interface FooterProps {
+  isSidebarOpen?: boolean;
+}
+
+const Footer = ({ isSidebarOpen = false }: FooterProps) => {
   const currentYear = new Date().getFullYear();
 
   const quickLinks = [
@@ -83,8 +87,8 @@ const Footer = () => {
   ];
 
   return (
-    <footer className="w-full bg-gradient-to-br from-card/95 via-card to-card/90 backdrop-blur-lg border-t border-border/50">
-      <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
+    <footer className={`w-full bg-gradient-to-br from-card/95 via-card to-card/90 backdrop-blur-lg border-t border-border/50 transition-all duration-300 ${isSidebarOpen ? 'ml-30' : ''}`}>
+      <div className={`mx-auto px-4 py-16 sm:px-6 lg:px-8 ${isSidebarOpen ? 'max-w-[calc(100%-16rem)]' : 'max-w-7xl'}`}>
         
         {/* Top Section - Brand + Contact */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-16">
