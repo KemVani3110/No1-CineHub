@@ -5,8 +5,7 @@ import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { 
   Home,
-  Film,
-  Tv,
+  Compass,
   Bell,
   Settings,
   LogOut,
@@ -32,9 +31,8 @@ const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
 
   const navItems = [
     { name: 'Home', path: '/home', icon: Home },
+    { name: 'Explore', path: '/explore', icon: Compass },
     { name: 'Search', path: '/search', icon: Search },
-    { name: 'Movies', path: '/movies', icon: Film },
-    { name: 'TV Shows', path: '/tv-shows', icon: Tv },
   ];
 
   const handleLogout = async () => {

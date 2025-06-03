@@ -2,7 +2,7 @@
 "use client"
 
 import React, { useState } from 'react';
-import { TrendingUp, Clock, Award, Settings, Tv, Film } from 'lucide-react';
+import { TrendingUp, Clock, Award, Settings, Tv, Film, Star, PlayCircle, Calendar } from 'lucide-react';
 import { 
   Header, 
   Footer, 
@@ -40,26 +40,61 @@ const queryClient = new QueryClient({
   },
 });
 
-const SectionTitle = ({ children, icon: Icon }: { children: React.ReactNode; icon: React.ElementType }) => (
-  <div className="flex items-center gap-3 mb-8">
-    <Icon className="w-8 h-8 text-[#4FD1C5]" />
-    <h2 className="text-3xl font-bold bg-gradient-to-r from-[#4FD1C5] to-[#63B3ED] bg-clip-text text-transparent" style={{ fontFamily: 'Poppins' }}>
-      {children}
-    </h2>
+const SectionTitle = ({ 
+  children, 
+  icon: Icon, 
+  subtitle 
+}: { 
+  children: React.ReactNode; 
+  icon: React.ElementType;
+  subtitle?: string;
+}) => (
+  <div className="mb-8">
+    <div className="flex items-center gap-3 mb-2">
+      <div className="flex items-center justify-center w-10 h-10 rounded-full bg-[#4FD1C5]/10">
+        <Icon className="w-6 h-6 text-[#4FD1C5]" />
+      </div>
+      <div>
+        <h2 className="text-2xl md:text-3xl font-bold text-white" style={{ fontFamily: 'Poppins' }}>
+          {children}
+        </h2>
+        {subtitle && (
+          <p className="text-gray-400 text-sm mt-1">{subtitle}</p>
+        )}
+      </div>
+    </div>
+    <div className="h-1 w-16 bg-gradient-to-r from-[#4FD1C5] to-[#63B3ED] rounded-full" />
   </div>
 );
 
-const ToggleButton = ({ active, onClick, icon: Icon, label }: { active: boolean; onClick: () => void; icon: React.ElementType; label: string }) => (
+const ToggleButton = ({ 
+  active, 
+  onClick, 
+  icon: Icon, 
+  label,
+  count 
+}: { 
+  active: boolean; 
+  onClick: () => void; 
+  icon: React.ElementType; 
+  label: string;
+  count?: string;
+}) => (
   <button
     onClick={onClick}
-    className={`flex items-center gap-2 px-6 py-3 rounded-lg transition-all duration-300 ${
+    className={`flex items-center gap-3 px-6 py-4 rounded-xl transition-all duration-300 ${
       active 
-        ? 'bg-[#4FD1C5] text-white shadow-lg shadow-[#4FD1C5]/20' 
-        : 'bg-[#1B263B] text-gray-400 hover:bg-[#2D3748]'
+        ? 'bg-gradient-to-r from-[#4FD1C5] to-[#63B3ED] text-white shadow-lg shadow-[#4FD1C5]/20' 
+        : 'bg-[#1B263B] text-gray-400 hover:bg-[#2D3748] hover:text-white border border-[#2D3748]'
     }`}
   >
     <Icon className="w-5 h-5" />
-    <span className="font-medium">{label}</span>
+    <div className="text-left">
+      <span className="font-semibold text-base">{label}</span>
+      {count && (
+        <div className="text-xs opacity-80">{count}</div>
+      )}
+    </div>
   </button>
 );
 
@@ -106,50 +141,104 @@ export default function HomePage() {
         {/* Main Content */}
         <main className={`transition-all duration-300 ${isSidebarOpen ? 'ml-70' : ''}`}>
           <div className="container mx-auto px-4 py-8">
+            {/* Hero Section */}
+            {/* <LazyHeroSection /> */}
+
             {/* Section Toggle */}
-            <div className="flex gap-4 mb-12">
+            <div className="flex gap-4 mb-12 justify-center">
               <ToggleButton
                 active={activeSection === 'movies'}
                 onClick={() => setActiveSection('movies')}
                 icon={Film}
                 label="Movies"
+                count="Latest releases"
               />
               <ToggleButton
                 active={activeSection === 'tv'}
                 onClick={() => setActiveSection('tv')}
                 icon={Tv}
                 label="TV Shows"
+                count="Trending series"
               />
             </div>
 
             {/* Movies Section */}
             {activeSection === 'movies' && (
-              <div className="mb-16">
-                <SectionTitle icon={Film}>Popular Movies</SectionTitle>
-                <LazyPopularMovies />
+              <div className="space-y-12">
+                <section>
+                  <SectionTitle 
+                    icon={TrendingUp} 
+                    subtitle="Discover what everyone's watching right now"
+                  >
+                    Trending Movies
+                  </SectionTitle>
+                  <LazyPopularMovies />
+                </section>
 
-                <SectionTitle icon={Film}>Top Rated Movies</SectionTitle>
-                <LazyTopRatedMovies />
+                <section>
+                  <SectionTitle 
+                    icon={Star} 
+                    subtitle="Critically acclaimed and audience favorites"
+                  >
+                    Top Rated Movies
+                  </SectionTitle>
+                  <LazyTopRatedMovies />
+                </section>
 
-                <SectionTitle icon={Film}>Now Playing</SectionTitle>
-                <LazyNowPlayingMovies />
+                <section>
+                  <SectionTitle 
+                    icon={PlayCircle} 
+                    subtitle="Currently playing in theaters"
+                  >
+                    Now Playing
+                  </SectionTitle>
+                  <LazyNowPlayingMovies />
+                </section>
 
-                <SectionTitle icon={Film}>Upcoming Movies</SectionTitle>
-                <LazyUpcomingMovies />
+                <section>
+                  <SectionTitle 
+                    icon={Calendar} 
+                    subtitle="Coming soon to theaters"
+                  >
+                    Upcoming Releases
+                  </SectionTitle>
+                  <LazyUpcomingMovies />
+                </section>
               </div>
             )}
 
             {/* TV Shows Section */}
             {activeSection === 'tv' && (
-              <div className="mb-16">
-                <SectionTitle icon={Tv}>Popular TV Shows</SectionTitle>
-                <LazyPopularTVShows />
+              <div className="space-y-12">
+                <section>
+                  <SectionTitle 
+                    icon={TrendingUp} 
+                    subtitle="Most popular series this week"
+                  >
+                    Trending TV Shows
+                  </SectionTitle>
+                  <LazyPopularTVShows />
+                </section>
 
-                <SectionTitle icon={Tv}>Top Rated TV Shows</SectionTitle>
-                <LazyTopRatedTVShows />
+                <section>
+                  <SectionTitle 
+                    icon={Star} 
+                    subtitle="Highest rated series of all time"
+                  >
+                    Top Rated Series
+                  </SectionTitle>
+                  <LazyTopRatedTVShows />
+                </section>
 
-                <SectionTitle icon={Tv}>On The Air</SectionTitle>
-                <LazyOnTheAirTVShows />
+                <section>
+                  <SectionTitle 
+                    icon={Tv} 
+                    subtitle="Currently airing new episodes"
+                  >
+                    On The Air
+                  </SectionTitle>
+                  <LazyOnTheAirTVShows />
+                </section>
               </div>
             )}
           </div>
@@ -160,4 +249,4 @@ export default function HomePage() {
       </div>
     </QueryClientProvider>
   );
-} 
+}
