@@ -10,7 +10,7 @@ import {
   FacebookAuthProvider,
   signInWithPopup,
 } from "firebase/auth";
-import { Chrome, Facebook, Github, Apple, Loader2 } from "lucide-react";
+import { Facebook, Github, Apple, Loader2 } from "lucide-react";
 
 export default function SocialLoginButtons() {
   const router = useRouter();
@@ -52,7 +52,7 @@ export default function SocialLoginButtons() {
         description: "Successfully signed in with Google",
       });
 
-      router.push("/");
+      router.push("/home");
       router.refresh();
     } catch (error) {
       toast({
@@ -101,7 +101,7 @@ export default function SocialLoginButtons() {
         description: "Successfully signed in with Facebook",
       });
 
-      router.push("/");
+      router.push("/home");
       router.refresh();
     } catch (error) {
       toast({

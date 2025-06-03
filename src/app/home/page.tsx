@@ -6,7 +6,7 @@ import { TrendingUp, Clock, Award, Settings, Tv, Film } from 'lucide-react';
 import { 
   Header, 
   Footer, 
-  HeroSection, 
+  HeroSection,
   PopularMovies,
   TopRatedMovies,
   NowPlayingMovies,
@@ -17,6 +17,7 @@ import {
   withLazyLoading 
 } from '@/components/lazy';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import BackToTop from '@/components/common/BackToTop';
 
 // Wrap components with lazy loading
 const LazyHeader = withLazyLoading(Header);
@@ -65,11 +66,12 @@ const ToggleButton = ({ active, onClick, icon: Icon, label }: { active: boolean;
 export default function HomePage() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState<'movies' | 'tv'>('movies');
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   return (
     <QueryClientProvider client={queryClient}>
       <div className="min-h-screen" style={{ backgroundColor: '#0D1B2A', color: '#E0E6ED' }}>
-        <LazyHeader />
+        <Header onSidebarChange={(open) => setIsSidebarOpen(open)} />
 
         {/* Mobile Sidebar */}
         {isMenuOpen && (
@@ -102,58 +104,59 @@ export default function HomePage() {
         )}
 
         {/* Main Content */}
-        <main className="container mx-auto px-4 py-8">
-          {/* <LazyHeroSection /> */}
-          
-          {/* Section Toggle */}
-          <div className="flex gap-4 mb-12">
-            <ToggleButton
-              active={activeSection === 'movies'}
-              onClick={() => setActiveSection('movies')}
-              icon={Film}
-              label="Movies"
-            />
-            <ToggleButton
-              active={activeSection === 'tv'}
-              onClick={() => setActiveSection('tv')}
-              icon={Tv}
-              label="TV Shows"
-            />
+        <main className={`transition-all duration-300 ${isSidebarOpen ? 'ml-70' : ''}`}>
+          <div className="container mx-auto px-4 py-8">
+            {/* Section Toggle */}
+            <div className="flex gap-4 mb-12">
+              <ToggleButton
+                active={activeSection === 'movies'}
+                onClick={() => setActiveSection('movies')}
+                icon={Film}
+                label="Movies"
+              />
+              <ToggleButton
+                active={activeSection === 'tv'}
+                onClick={() => setActiveSection('tv')}
+                icon={Tv}
+                label="TV Shows"
+              />
+            </div>
+
+            {/* Movies Section */}
+            {activeSection === 'movies' && (
+              <div className="mb-16">
+                <SectionTitle icon={Film}>Popular Movies</SectionTitle>
+                <LazyPopularMovies />
+
+                <SectionTitle icon={Film}>Top Rated Movies</SectionTitle>
+                <LazyTopRatedMovies />
+
+                <SectionTitle icon={Film}>Now Playing</SectionTitle>
+                <LazyNowPlayingMovies />
+
+                <SectionTitle icon={Film}>Upcoming Movies</SectionTitle>
+                <LazyUpcomingMovies />
+              </div>
+            )}
+
+            {/* TV Shows Section */}
+            {activeSection === 'tv' && (
+              <div className="mb-16">
+                <SectionTitle icon={Tv}>Popular TV Shows</SectionTitle>
+                <LazyPopularTVShows />
+
+                <SectionTitle icon={Tv}>Top Rated TV Shows</SectionTitle>
+                <LazyTopRatedTVShows />
+
+                <SectionTitle icon={Tv}>On The Air</SectionTitle>
+                <LazyOnTheAirTVShows />
+              </div>
+            )}
           </div>
-
-          {/* Movies Section */}
-          {activeSection === 'movies' && (
-            <div className="mb-16">
-              <SectionTitle icon={Film}>Popular Movies</SectionTitle>
-              <LazyPopularMovies />
-
-              <SectionTitle icon={Film}>Top Rated Movies</SectionTitle>
-              <LazyTopRatedMovies />
-
-              <SectionTitle icon={Film}>Now Playing</SectionTitle>
-              <LazyNowPlayingMovies />
-
-              <SectionTitle icon={Film}>Upcoming Movies</SectionTitle>
-              <LazyUpcomingMovies />
-            </div>
-          )}
-
-          {/* TV Shows Section */}
-          {activeSection === 'tv' && (
-            <div className="mb-16">
-              <SectionTitle icon={Tv}>Popular TV Shows</SectionTitle>
-              <LazyPopularTVShows />
-
-              <SectionTitle icon={Tv}>Top Rated TV Shows</SectionTitle>
-              <LazyTopRatedTVShows />
-
-              <SectionTitle icon={Tv}>On The Air</SectionTitle>
-              <LazyOnTheAirTVShows />
-            </div>
-          )}
         </main>
 
-        <LazyFooter />
+        <Footer />
+        <BackToTop />
       </div>
     </QueryClientProvider>
   );

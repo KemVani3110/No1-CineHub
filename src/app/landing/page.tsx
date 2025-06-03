@@ -31,14 +31,14 @@ const LandingPage = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 via-slate-900 to-black">
+      <div className="fixed inset-0 flex items-center justify-center bg-gradient-to-br from-gray-900 via-slate-900 to-black">
         <Loading message="Welcome to CineHub..." />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen relative overflow-hidden">
+    <div className="fixed inset-0 overflow-hidden">
       {/* Background with movie posters pattern */}
       <div className="absolute inset-0">
         {/* Dark overlay with movie poster pattern */}
@@ -55,7 +55,7 @@ const LandingPage = () => {
 
         {/* Additional decorative elements */}
         <motion.div
-          className="absolute -top-20 -left-20 w-40 h-40 bg-cinehub-accent/5 rounded-full blur-3xl"
+          className="absolute -top-20 -left-20 w-32 h-32 bg-cinehub-accent/5 rounded-full blur-3xl"
           animate={{
             scale: [1, 1.2, 1],
             opacity: [0.3, 0.5, 0.3],
@@ -67,7 +67,7 @@ const LandingPage = () => {
           }}
         />
         <motion.div
-          className="absolute -bottom-20 -right-20 w-60 h-60 bg-cinehub-accent/5 rounded-full blur-3xl"
+          className="absolute -bottom-20 -right-20 w-48 h-48 bg-cinehub-accent/5 rounded-full blur-3xl"
           animate={{
             scale: [1.2, 1, 1.2],
             opacity: [0.2, 0.4, 0.2],
@@ -81,24 +81,24 @@ const LandingPage = () => {
       </div>
 
       {/* Main Content */}
-      <div className="relative z-20 min-h-screen flex items-center justify-center px-6">
+      <div className="relative z-20 h-full flex items-center justify-center px-4">
         <motion.div
           initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ duration: 0.8, ease: "easeOut" }}
-          className="text-center max-w-4xl mx-auto"
+          className="text-center max-w-3xl mx-auto"
         >
           {/* Logo */}
           <motion.div
             initial={{ y: -30, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.2, duration: 0.8 }}
-            className="mb-12"
+            className="mb-8"
           >
-            <div className="flex items-center justify-center mb-6">
+            <div className="flex items-center justify-center mb-4">
               <div className="relative">
                 {/* Logo container with glow effect */}
-                <div className="relative w-24 h-24 mx-auto mb-4">
+                <div className="relative w-20 h-20 mx-auto mb-3">
                   <div className="absolute inset-0 bg-cinehub-accent/20 rounded-2xl blur-xl"></div>
                   <div className="relative w-full h-full rounded-2xl flex items-center justify-center">
                     <Image
@@ -112,10 +112,10 @@ const LandingPage = () => {
                 </div>
 
                 {/* Logo text */}
-                <div className="flex items-center justify-center space-x-3">
-                  <h1 className="text-4xl font-bold text-white">CineHub</h1>
-                  <div className="h-6 w-px bg-gradient-to-b from-cinehub-accent to-transparent"></div>
-                  <span className="text-text-sub text-lg">Movies & Shows</span>
+                <div className="flex items-center justify-center space-x-2">
+                  <h1 className="text-3xl font-bold text-white">CineHub</h1>
+                  <div className="h-5 w-px bg-gradient-to-b from-cinehub-accent to-transparent"></div>
+                  <span className="text-text-sub text-base">Movies & Shows</span>
                 </div>
               </div>
             </div>
@@ -126,9 +126,9 @@ const LandingPage = () => {
             initial={{ y: 30, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.4, duration: 0.8 }}
-            className="mb-12"
+            className="mb-8"
           >
-            <h2 className="text-3xl md:text-5xl lg:text-6xl font-bold text-white leading-tight mb-6">
+            <h2 className="text-2xl md:text-4xl lg:text-5xl font-bold text-white leading-tight mb-4">
               Watch Movies & TV Shows
               <br />
               <span className="bg-gradient-to-r from-cinehub-accent to-cinehub-accent-hover bg-clip-text text-transparent">
@@ -139,7 +139,7 @@ const LandingPage = () => {
             </h2>
 
             <motion.p
-              className="text-xl md:text-2xl text-text-sub max-w-3xl mx-auto leading-relaxed"
+              className="text-lg md:text-xl text-text-sub max-w-2xl mx-auto leading-relaxed"
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 0.6, duration: 0.8 }}
@@ -154,15 +154,15 @@ const LandingPage = () => {
             initial={{ y: 30, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.8, duration: 0.8 }}
-            className="mb-16"
+            className="mb-12"
           >
             <button
               onClick={() => router.push("/home")}
-              className="group relative inline-flex items-center justify-center space-x-3 bg-gradient-to-r from-cinehub-accent to-cinehub-accent-hover hover:from-cinehub-accent-hover hover:to-cinehub-accent text-white px-12 py-5 rounded-full text-lg font-semibold transition-all duration-300 transform hover:scale-105 hover:shadow-2xl hover:shadow-cinehub-accent/25 cursor-pointer"
+              className="group relative inline-flex items-center justify-center space-x-2 bg-gradient-to-r from-cinehub-accent to-cinehub-accent-hover hover:from-cinehub-accent-hover hover:to-cinehub-accent text-white px-8 py-4 rounded-full text-base font-semibold transition-all duration-300 transform hover:scale-105 hover:shadow-2xl hover:shadow-cinehub-accent/25 cursor-pointer"
             >
-              <Play className="w-6 h-6 group-hover:scale-110 transition-transform" />
+              <Play className="w-5 h-5 group-hover:scale-110 transition-transform" />
               <span>Watch Now</span>
-              <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
 
               {/* Button glow effect */}
               <div className="absolute inset-0 rounded-full bg-gradient-to-r from-cinehub-accent to-cinehub-accent-hover opacity-0 group-hover:opacity-20 blur-xl transition-opacity duration-300"></div>
@@ -174,7 +174,7 @@ const LandingPage = () => {
             initial={{ y: 30, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 1, duration: 0.8 }}
-            className="flex flex-wrap justify-center gap-4 mb-12"
+            className="flex flex-wrap justify-center gap-3 mb-8"
           >
             {[
               "🎬 50,000+ Movies & Shows",
@@ -188,7 +188,7 @@ const LandingPage = () => {
                 initial={{ scale: 0.8, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 transition={{ delay: 1.2 + index * 0.1, duration: 0.5 }}
-                className="bg-bg-card/50 backdrop-blur-sm border border-border/30 rounded-full px-6 py-3 text-text-main hover:bg-bg-card/70 hover:border-cinehub-accent/30 transition-all duration-300 hover:scale-105"
+                className="bg-bg-card/50 backdrop-blur-sm border border-border/30 rounded-full px-4 py-2 text-sm text-text-main hover:bg-bg-card/70 hover:border-cinehub-accent/30 transition-all duration-300 hover:scale-105"
               >
                 {feature}
               </motion.div>
@@ -200,27 +200,27 @@ const LandingPage = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 2, duration: 0.8 }}
-            className="flex items-center justify-center space-x-3 text-text-sub"
+            className="flex items-center justify-center space-x-2 text-text-sub"
           >
             <div className="flex space-x-1">
-              <div className="w-2 h-2 bg-cinehub-accent rounded-full animate-pulse"></div>
+              <div className="w-1.5 h-1.5 bg-cinehub-accent rounded-full animate-pulse"></div>
               <div
-                className="w-2 h-2 bg-cinehub-accent rounded-full animate-pulse"
+                className="w-1.5 h-1.5 bg-cinehub-accent rounded-full animate-pulse"
                 style={{ animationDelay: "0.2s" }}
               ></div>
               <div
-                className="w-2 h-2 bg-cinehub-accent rounded-full animate-pulse"
+                className="w-1.5 h-1.5 bg-cinehub-accent rounded-full animate-pulse"
                 style={{ animationDelay: "0.4s" }}
               ></div>
             </div>
-            <span className="text-sm">Auto-redirecting in 5 seconds...</span>
+            <span className="text-xs">Auto-redirecting in 5 seconds...</span>
           </motion.div>
         </motion.div>
       </div>
 
       {/* Background particles effect */}
       <div className="absolute inset-0 z-0">
-        {[...Array(20)].map((_, i) => (
+        {[...Array(15)].map((_, i) => (
           <motion.div
             key={i}
             className="absolute w-1 h-1 bg-cinehub-accent/20 rounded-full"

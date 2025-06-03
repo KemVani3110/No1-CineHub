@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/components/ui/use-toast';
-import { LogIn, Eye, EyeOff, ArrowLeft } from 'lucide-react'; // Thêm ArrowLeft icon
+import { LogIn, Eye, EyeOff, ArrowLeft } from 'lucide-react'; 
 import SocialLoginButtons from './SocialLoginButtons';
 import { Separator } from '@/components/ui/separator';
 import { useAuthStore } from '@/store/authStore';
@@ -40,7 +40,7 @@ export default function LoginForm() {
         title: "Success",
         description: "Welcome back to CineHub!",
       });
-      router.push('/');
+      router.push('/home');
       router.refresh();
     } catch (error) {
       toast({
@@ -55,7 +55,7 @@ export default function LoginForm() {
     <div className="relative w-full max-w-md mx-auto px-4 sm:px-0">
       {/* Return to Main Page Button */}
       <div className="absolute -top-16 -left-4 sm:-left-0">
-        <Link href="/">
+        <Link href="/home">
           <Button
             variant="ghost"
             className="flex items-center text-muted-foreground hover:text-foreground transition-colors p-2"
