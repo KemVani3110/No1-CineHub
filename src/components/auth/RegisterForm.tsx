@@ -256,7 +256,7 @@ export default function RegisterForm() {
         <Button
           type="submit"
           disabled={isLoading}
-          className="w-full h-12 bg-gradient-to-r from-primary to-blue-500 hover:from-primary/90 hover:to-blue-500/90 text-white font-semibold rounded-lg transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] mt-6"
+          className="w-full h-12 bg-gradient-to-r from-primary to-blue-500 hover:from-primary/90 hover:to-blue-500/90 text-white font-semibold rounded-lg transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] mt-6 cursor-pointer"
         >
           {isLoading ? (
             <div className="flex items-center justify-center">
@@ -272,7 +272,7 @@ export default function RegisterForm() {
         </Button>
 
         {/* Login Link */}
-        <div className="text-center pt-6 animate-fade-in">
+        <div className="text-center pt-1 animate-fade-in">
           <span className="text-muted-foreground">Already have an account? </span>
           <Link
             href="/login"

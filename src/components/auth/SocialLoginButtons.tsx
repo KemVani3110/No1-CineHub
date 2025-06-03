@@ -117,12 +117,12 @@ export default function SocialLoginButtons() {
     }
   };
 
-  const handleComingSoon = (provider: string) => {
-    toast({
-      title: "Coming Soon! 🚀",
-      description: `${provider} authentication is coming in the next update`,
-    });
-  };
+  // const handleComingSoon = (provider: string) => {
+  //   toast({
+  //     title: "Coming Soon! 🚀",
+  //     description: `${provider} authentication is coming in the next update`,
+  //   });
+  // };
 
   return (
     <div className="space-y-6">
@@ -145,7 +145,7 @@ export default function SocialLoginButtons() {
           variant="outline"
           onClick={handleGoogleLogin}
           disabled={isLoading !== null}
-          className="group relative overflow-hidden h-12 bg-card border-border hover:bg-accent hover:border-primary/50 transition-all duration-300 ease-in-out hover:scale-105 hover:shadow-lg"
+          className="group relative overflow-hidden h-12 bg-card border-border hover:bg-accent hover:border-primary/50 transition-all duration-300 ease-in-out hover:scale-105 hover:shadow-lg cursor-pointer"
         >
           <div className="absolute inset-0 bg-gradient-to-r from-transparent via-primary/10 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 ease-out" />
 
@@ -192,7 +192,7 @@ export default function SocialLoginButtons() {
           variant="outline"
           onClick={handleFacebookLogin}
           disabled={isLoading !== null}
-          className="group relative overflow-hidden h-12 bg-card border-border hover:bg-accent hover:border-primary/50 transition-all duration-300 ease-in-out hover:scale-105 hover:shadow-lg"
+          className="group relative overflow-hidden h-12 bg-card border-border hover:bg-accent hover:border-primary/50 transition-all duration-300 ease-in-out hover:scale-105 hover:shadow-lg cursor-pointer"
         >
           <div className="absolute inset-0 bg-gradient-to-r from-transparent via-primary/10 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 ease-out" />
 
@@ -214,7 +214,7 @@ export default function SocialLoginButtons() {
         </Button>
 
         {/* GitHub Button - Coming Soon */}
-        <Button
+        {/* <Button
           variant="outline"
           onClick={() => handleComingSoon("GitHub")}
           disabled={false}
@@ -227,18 +227,18 @@ export default function SocialLoginButtons() {
             <span className="text-sm font-medium group-hover:text-yellow-500 transition-colors duration-200">
               GitHub
             </span>
-          </div>
+          </div> */}
 
           {/* Coming Soon Badge */}
-          <div className="absolute -top-2 -right-2">
+          {/* <div className="absolute -top-2 -right-2">
             <div className="bg-yellow-500 text-gray-900 text-xs px-2 py-1 rounded-full font-bold shadow-lg animate-pulse">
               Soon
             </div>
           </div>
-        </Button>
+        </Button> */}
 
         {/* Apple Button - Coming Soon */}
-        <Button
+        {/* <Button
           variant="outline"
           onClick={() => handleComingSoon("Apple")}
           disabled={false}
@@ -251,15 +251,15 @@ export default function SocialLoginButtons() {
             <span className="text-sm font-medium group-hover:text-yellow-500 transition-colors duration-200">
               Apple ID
             </span>
-          </div>
+          </div> */}
 
           {/* Coming Soon Badge */}
-          <div className="absolute -top-2 -right-2">
+          {/* <div className="absolute -top-2 -right-2">
             <div className="bg-yellow-500 text-gray-900 text-xs px-2 py-1 rounded-full font-bold shadow-lg animate-pulse">
               Soon
             </div>
           </div>
-        </Button>
+        </Button> */}
       </div>
     </div>
   );
