@@ -2,7 +2,7 @@
 
 import React from "react";
 import { useQuery } from "@tanstack/react-query";
-import { getTVShows, getImageUrl } from "@/services/tmdb";
+import { fetchTVShows, getImageUrl } from "@/services/tmdb";
 import { TMDBTVShow } from "@/types/tmdb";
 import { Skeleton } from "@/components/ui/skeleton";
 import Image from "next/image";
@@ -134,7 +134,7 @@ const TVShowCard = ({ show }: { show: TMDBTVShow }) => {
 const TVShowList = ({ listType, title }: TVShowListProps) => {
   const { data, isLoading, error } = useQuery({
     queryKey: ["tvShows", listType],
-    queryFn: () => getTVShows(listType),
+    queryFn: () => fetchTVShows(listType),
   });
 
   if (isLoading) {

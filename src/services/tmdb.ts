@@ -1,8 +1,24 @@
-import { TMDBMovie, TMDBMovieListType, TMDBResponse } from '@/types/tmdb';
+import axios from 'axios';
+import { TMDBMovie, TMDBResponse } from '@/types/tmdb';
+
+export type TMDBMovieListType = 'popular' | 'top_rated' | 'now_playing' | 'upcoming';
 
 const TMDB_API_KEY = process.env.NEXT_PUBLIC_TMDB_API_KEY;
 const TMDB_BASE_URL = process.env.NEXT_PUBLIC_TMDB_BASE_URL;
 const TMDB_IMAGE_BASE_URL = process.env.NEXT_PUBLIC_TMDB_IMAGE_BASE_URL;
+
+// Create axios instance
+const tmdbApi = axios.create({
+  baseURL: TMDB_BASE_URL,
+  params: {
+    api_key: TMDB_API_KEY,
+    language: 'en-US',
+  },
+  headers: {
+    'Accept': 'application/json',
+    'Content-Type': 'application/json',
+  },
+});
 
 export const TMDB_ENDPOINTS = {
   MOVIES: {
@@ -18,46 +34,25 @@ export const TMDB_ENDPOINTS = {
   },
 };
 
-export const getMovies = async (listType: TMDBMovieListType = 'popular', page: number = 1): Promise<TMDBResponse<TMDBMovie>> => {
+// API functions
+export const fetchMovies = async (listType: TMDBMovieListType = 'popular', page: number = 1): Promise<TMDBResponse<TMDBMovie>> => {
   try {
-    const response = await fetch(
-      `${TMDB_BASE_URL}/movie/${listType}?api_key=${TMDB_API_KEY}&language=en-US&page=${page}`,
-      {
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json',
-        },
-      }
-    );
-
-    if (!response.ok) {
-      throw new Error('Failed to fetch movies');
-    }
-
-    return response.json();
+    const { data } = await tmdbApi.get(`/movie/${listType}`, {
+      params: { page },
+    });
+    return data;
   } catch (error) {
     console.error('Error fetching movies:', error);
     return { results: [], page: 1, total_pages: 1, total_results: 0 };
   }
 };
 
-export const getTVShows = async (listType: string = 'popular', page: number = 1) => {
+export const fetchTVShows = async (listType: string = 'popular', page: number = 1) => {
   try {
-    const response = await fetch(
-      `${TMDB_BASE_URL}/tv/${listType}?api_key=${TMDB_API_KEY}&language=en-US&page=${page}`,
-      {
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json',
-        },
-      }
-    );
-
-    if (!response.ok) {
-      throw new Error('Failed to fetch TV shows');
-    }
-
-    return response.json();
+    const { data } = await tmdbApi.get(`/tv/${listType}`, {
+      params: { page },
+    });
+    return data;
   } catch (error) {
     console.error('Error fetching TV shows:', error);
     return { results: [], page: 1, total_pages: 1, total_results: 0 };

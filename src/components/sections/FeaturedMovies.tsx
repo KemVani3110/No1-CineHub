@@ -2,13 +2,13 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { Star, Play } from 'lucide-react';
-import { getMovies, getImageUrl } from '@/services/tmdb';
+import { fetchMovies, getImageUrl } from '@/services/tmdb';
 import { TMDBMovieListType } from '@/types/tmdb';
 
 const FeaturedMovies = () => {
   const { data, status } = useQuery({
     queryKey: ['movies', 'top_rated'],
-    queryFn: () => getMovies('top_rated' as TMDBMovieListType, 1),
+    queryFn: () => fetchMovies('top_rated' as TMDBMovieListType, 1),
   });
 
   if (status === 'error') {

@@ -4,7 +4,7 @@ import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { MovieCard } from '@/components/common/MovieCard';
 import { Skeleton } from '@/components/ui/skeleton';
-import { getMovies, getTVShows } from '@/services/tmdb';
+import { fetchMovies, fetchTVShows } from '@/services/tmdb';
 
 interface MovieListProps {
   listType: string;
@@ -17,9 +17,9 @@ const MovieList: React.FC<MovieListProps> = ({ listType, apiPath = 'movies' }) =
     queryFn: async () => {
       try {
         if (apiPath === 'tv') {
-          return getTVShows(listType);
+          return fetchTVShows(listType);
         }
-        return getMovies(listType as any);
+        return fetchMovies(listType as any);
       } catch (error) {
         console.error('Error fetching data:', error);
         throw error;
