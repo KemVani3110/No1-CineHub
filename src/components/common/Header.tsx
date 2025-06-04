@@ -16,6 +16,8 @@ import {
   Search,
   PanelLeftClose,
   PanelLeft,
+  Users,
+  Activity,
 } from "lucide-react";
 import {
   Sheet,
@@ -236,6 +238,37 @@ const Header = ({ onSidebarChange }: HeaderProps) => {
                           Profile
                         </Link>
                       </DropdownMenuItem>
+                      {user?.role === "admin" && (
+                        <>
+                          <DropdownMenuItem asChild>
+                            <Link
+                              href="/admin/dashboard"
+                              className="cursor-pointer"
+                            >
+                              <PanelLeft className="mr-3 h-4 w-4" />
+                              Admin Dashboard
+                            </Link>
+                          </DropdownMenuItem>
+                          <DropdownMenuItem asChild>
+                            <Link
+                              href="/admin/users"
+                              className="cursor-pointer"
+                            >
+                              <Users className="mr-3 h-4 w-4" />
+                              User Management
+                            </Link>
+                          </DropdownMenuItem>
+                          <DropdownMenuItem asChild>
+                            <Link
+                              href="/admin/activity-logs"
+                              className="cursor-pointer"
+                            >
+                              <Activity className="mr-3 h-4 w-4" />
+                              Activity Logs
+                            </Link>
+                          </DropdownMenuItem>
+                        </>
+                      )}
                       <DropdownMenuItem asChild>
                         <Link href="/settings" className="cursor-pointer">
                           <Settings className="mr-3 h-4 w-4" />
@@ -451,6 +484,48 @@ const Header = ({ onSidebarChange }: HeaderProps) => {
                         </div>
                       )}
                     </div>
+
+                    {/* Admin Actions */}
+                    {user?.role === "admin" && (
+                      <>
+                        <Separator className="my-6" />
+                        <div className="space-y-2">
+                          <Button
+                            variant="ghost"
+                            className="w-full justify-start h-auto px-4 py-4 text-base rounded-xl"
+                            onClick={closeMobileMenu}
+                            asChild
+                          >
+                            <Link href="/admin/dashboard">
+                              <PanelLeft size={22} className="mr-3" />
+                              Admin Dashboard
+                            </Link>
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            className="w-full justify-start h-auto px-4 py-4 text-base rounded-xl"
+                            onClick={closeMobileMenu}
+                            asChild
+                          >
+                            <Link href="/admin/users">
+                              <Users size={22} className="mr-3" />
+                              User Management
+                            </Link>
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            className="w-full justify-start h-auto px-4 py-4 text-base rounded-xl"
+                            onClick={closeMobileMenu}
+                            asChild
+                          >
+                            <Link href="/admin/activity-logs">
+                              <Activity size={22} className="mr-3" />
+                              Activity Logs
+                            </Link>
+                          </Button>
+                        </div>
+                      </>
+                    )}
                   </div>
                 </SheetContent>
               </Sheet>

@@ -9,13 +9,13 @@ import { useToast } from "@/components/ui/use-toast";
 import { LogIn, Eye, EyeOff, ArrowLeft } from "lucide-react";
 import SocialLoginButtons from "./SocialLoginButtons";
 import { Separator } from "@/components/ui/separator";
-import { useAuthStore } from "@/store/authStore";
 import Link from "next/link";
+import { signIn } from "next-auth/react";
 
 export default function LoginForm() {
   const router = useRouter();
   const { toast } = useToast();
-  const { login, isLoading, error, clearError } = useAuthStore();
+  const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
@@ -32,15 +32,38 @@ export default function LoginForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    clearError();
+    setIsLoading(true);
 
     try {
-      await login(formData.email, formData.password);
+      const result = await signIn("credentials", {
+        email: formData.email,
+        password: formData.password,
+        redirect: false,
+      });
+
+      if (result?.error) {
+        throw new Error(result.error);
+      }
+
+      // Kiểm tra role từ session
+      const response = await fetch("/api/auth/me");
+      const data = await response.json();
+
+      if (!data.user) {
+        throw new Error("Failed to get user data");
+      }
+
       toast({
         title: "Success",
-        description: "Welcome back to CineHub!",
+        description: `Welcome back, ${data.user.name}!`,
       });
-      router.push("/home");
+
+      // Chuyển hướng dựa trên role
+      if (data.user.role === "admin") {
+        router.push("/admin/dashboard");
+      } else {
+        router.push("/home");
+      }
       router.refresh();
     } catch (error) {
       toast({
@@ -48,6 +71,48 @@ export default function LoginForm() {
         description: error instanceof Error ? error.message : "Login failed",
         variant: "destructive",
       });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleSocialLogin = async (provider: string) => {
+    try {
+      setIsLoading(true);
+      const result = await signIn(provider, { redirect: false });
+
+      if (result?.error) {
+        throw new Error(result.error);
+      }
+
+      // Kiểm tra role từ session
+      const response = await fetch("/api/auth/me");
+      const data = await response.json();
+
+      if (!data.user) {
+        throw new Error("Failed to get user data");
+      }
+
+      toast({
+        title: "Success",
+        description: `Welcome back, ${data.user.name}!`,
+      });
+
+      // Chuyển hướng dựa trên role
+      if (data.user.role === "admin") {
+        router.push("/admin/dashboard");
+      } else {
+        router.push("/home");
+      }
+      router.refresh();
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: error instanceof Error ? error.message : "Login failed",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -84,7 +149,7 @@ export default function LoginForm() {
         <div className="space-y-6 animate-fade-in-up">
           {/* Social Login */}
           <div className="animate-fade-in">
-            <SocialLoginButtons />
+            <SocialLoginButtons onLogin={handleSocialLogin} />
           </div>
 
           {/* Divider */}
@@ -216,7 +281,7 @@ export default function LoginForm() {
             </Button>
 
             {/* Register Link */}
-            <div className="text-center  animate-fade-in">
+            <div className="text-center animate-fade-in">
               <span className="text-muted-foreground">
                 Don't have an account?{" "}
               </span>

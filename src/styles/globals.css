@@ -117,6 +117,7 @@
   ::-webkit-scrollbar {
     width: 8px;
     height: 8px;
+    display: block !important;
   }
 
   ::-webkit-scrollbar-track {
@@ -140,25 +141,25 @@
     scrollbar-color: var(--cinehub-accent) var(--bg-card);
   }
 
-  /* Hide scrollbar by default */
+  /* Remove auto-hiding scrollbar styles */
   * {
-    -ms-overflow-style: none;  /* IE and Edge */
-    scrollbar-width: none;  /* Firefox */
+    -ms-overflow-style: auto; /* IE and Edge */
+    scrollbar-width: thin; /* Firefox */
   }
 
   *::-webkit-scrollbar {
-    display: none;  /* Chrome, Safari and Opera */
+    display: block !important; /* Chrome, Safari and Opera */
   }
 
-  /* Show scrollbar on hover for desktop */
+  /* Remove hover-based scrollbar display */
   @media (hover: hover) {
     *:hover {
-      -ms-overflow-style: auto;  /* IE and Edge */
-      scrollbar-width: thin;  /* Firefox */
+      -ms-overflow-style: auto; /* IE and Edge */
+      scrollbar-width: thin; /* Firefox */
     }
 
     *:hover::-webkit-scrollbar {
-      display: block;  /* Chrome, Safari and Opera */
+      display: block !important; /* Chrome, Safari and Opera */
     }
   }
 
@@ -337,8 +338,8 @@
 
   /* Hide scrollbar for IE, Edge and Firefox */
   .scrollbar-thin {
-    -ms-overflow-style: none;  /* IE and Edge */
-    scrollbar-width: thin;  /* Firefox */
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: thin; /* Firefox */
   }
 }
 

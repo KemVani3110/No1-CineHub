@@ -10,119 +10,101 @@ import {
   FacebookAuthProvider,
   signInWithPopup,
 } from "firebase/auth";
-import { Facebook, Github, Apple, Loader2 } from "lucide-react";
+import { Facebook, Loader2 } from "lucide-react";
+import { signIn } from "next-auth/react";
+import { useAuth } from "@/hooks/useAuth";
+import { Icons } from "@/components/ui/icons";
 
-export default function SocialLoginButtons() {
+interface SocialLoginButtonsProps {
+  onLogin?: () => void;
+}
+
+export function SocialLoginButtons({ onLogin }: SocialLoginButtonsProps) {
   const router = useRouter();
   const { toast } = useToast();
-  const [isLoading, setIsLoading] = useState<"google" | "facebook" | null>(
-    null
-  );
+  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
+  const [isFacebookLoading, setIsFacebookLoading] = useState(false);
+  const { socialLogin } = useAuth();
 
   const handleGoogleLogin = async () => {
     try {
-      setIsLoading("google");
+      setIsGoogleLoading(true);
       const provider = new GoogleAuthProvider();
       const result = await signInWithPopup(auth, provider);
+      const token = await result.user.getIdToken();
 
-      const response = await fetch("/api/auth/social-login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          provider: "google",
-          token: await result.user.getIdToken(),
-          user: {
-            email: result.user.email,
-            name: result.user.displayName,
-            avatar: result.user.photoURL,
-          },
-        }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || "Login failed");
+      if (!token) {
+        throw new Error("Failed to get ID token");
       }
 
-      toast({
-        title: "Welcome back!",
-        description: "Successfully signed in with Google",
+      const response = await socialLogin("google", token, {
+        email: result.user.email,
+        name: result.user.displayName,
+        avatar: result.user.photoURL,
+        providerId: result.user.uid,
       });
 
-      router.push("/home");
-      router.refresh();
+      onLogin?.();
+
+      if (response.user.role === "admin") {
+        window.location.href = "/admin/dashboard";
+      } else {
+        window.location.href = "/home";
+      }
     } catch (error) {
+      console.error("Google login error:", error);
       toast({
         title: "Authentication Failed",
         description:
           error instanceof Error
             ? error.message
-            : "Google sign-in failed. Please try again.",
+            : "Failed to authenticate with Google",
         variant: "destructive",
       });
     } finally {
-      setIsLoading(null);
+      setIsGoogleLoading(false);
     }
   };
 
   const handleFacebookLogin = async () => {
     try {
-      setIsLoading("facebook");
+      setIsFacebookLoading(true);
       const provider = new FacebookAuthProvider();
       const result = await signInWithPopup(auth, provider);
+      const token = await result.user.getIdToken();
 
-      const response = await fetch("/api/auth/social-login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          provider: "facebook",
-          token: await result.user.getIdToken(),
-          user: {
-            email: result.user.email,
-            name: result.user.displayName,
-            avatar: result.user.photoURL,
-          },
-        }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || "Login failed");
+      if (!token) {
+        throw new Error("Failed to get ID token");
       }
 
-      toast({
-        title: "Welcome back!",
-        description: "Successfully signed in with Facebook",
+      const response = await socialLogin("facebook", token, {
+        email: result.user.email,
+        name: result.user.displayName,
+        avatar: result.user.photoURL,
+        providerId: result.user.uid,
       });
 
-      router.push("/home");
-      router.refresh();
+      onLogin?.();
+
+      if (response.user.role === "admin") {
+        window.location.href = "/admin/dashboard";
+      } else {
+        window.location.href = "/home";
+      }
     } catch (error) {
+      console.error("Facebook login error:", error);
       toast({
         title: "Authentication Failed",
         description:
           error instanceof Error
             ? error.message
-            : "Facebook sign-in failed. Please try again.",
+            : "Failed to authenticate with Facebook",
         variant: "destructive",
       });
     } finally {
-      setIsLoading(null);
+      setIsFacebookLoading(false);
     }
   };
-
-  // const handleComingSoon = (provider: string) => {
-  //   toast({
-  //     title: "Coming Soon! 🚀",
-  //     description: `${provider} authentication is coming in the next update`,
-  //   });
-  // };
 
   return (
     <div className="space-y-6">
@@ -143,15 +125,16 @@ export default function SocialLoginButtons() {
         {/* Google Button */}
         <Button
           variant="outline"
+          type="button"
+          disabled={isGoogleLoading}
           onClick={handleGoogleLogin}
-          disabled={isLoading !== null}
           className="group relative overflow-hidden h-12 bg-card border-border hover:bg-accent hover:border-primary/50 transition-all duration-300 ease-in-out hover:scale-105 hover:shadow-lg cursor-pointer"
         >
           <div className="absolute inset-0 bg-gradient-to-r from-transparent via-primary/10 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 ease-out" />
 
-          {isLoading === "google" ? (
+          {isGoogleLoading ? (
             <div className="flex items-center justify-center space-x-2">
-              <Loader2 className="h-4 w-4 animate-spin text-primary" />
+              <Icons.spinner className="h-4 w-4 animate-spin text-primary" />
               <span className="text-sm font-medium">Connecting...</span>
             </div>
           ) : (
@@ -190,21 +173,22 @@ export default function SocialLoginButtons() {
         {/* Facebook Button */}
         <Button
           variant="outline"
+          type="button"
+          disabled={isFacebookLoading}
           onClick={handleFacebookLogin}
-          disabled={isLoading !== null}
           className="group relative overflow-hidden h-12 bg-card border-border hover:bg-accent hover:border-primary/50 transition-all duration-300 ease-in-out hover:scale-105 hover:shadow-lg cursor-pointer"
         >
           <div className="absolute inset-0 bg-gradient-to-r from-transparent via-primary/10 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 ease-out" />
 
-          {isLoading === "facebook" ? (
+          {isFacebookLoading ? (
             <div className="flex items-center justify-center space-x-2">
-              <Loader2 className="h-4 w-4 animate-spin text-primary" />
+              <Icons.spinner className="h-4 w-4 animate-spin text-primary" />
               <span className="text-sm font-medium">Connecting...</span>
             </div>
           ) : (
             <div className="flex items-center justify-center space-x-3">
               <div className="flex items-center justify-center w-6 h-6 rounded-full bg-[#1877F2] shadow-sm">
-                <Facebook className="h-4 w-4 text-white" />
+                <Icons.facebook className="h-4 w-4 text-white" />
               </div>
               <span className="text-sm font-medium group-hover:text-primary transition-colors duration-200">
                 Facebook
@@ -212,55 +196,9 @@ export default function SocialLoginButtons() {
             </div>
           )}
         </Button>
-
-        {/* GitHub Button - Coming Soon */}
-        {/* <Button
-          variant="outline"
-          onClick={() => handleComingSoon("GitHub")}
-          disabled={false}
-          className="group relative overflow-hidden h-12 bg-card/50 border-border border-dashed hover:bg-card hover:border-yellow-500/50 transition-all duration-300 ease-in-out cursor-pointer opacity-75 hover:opacity-100"
-        >
-          <div className="flex items-center justify-center space-x-3">
-            <div className="flex items-center justify-center w-6 h-6 rounded-full bg-gray-900 shadow-sm">
-              <Github className="h-4 w-4 text-white" />
-            </div>
-            <span className="text-sm font-medium group-hover:text-yellow-500 transition-colors duration-200">
-              GitHub
-            </span>
-          </div> */}
-
-          {/* Coming Soon Badge */}
-          {/* <div className="absolute -top-2 -right-2">
-            <div className="bg-yellow-500 text-gray-900 text-xs px-2 py-1 rounded-full font-bold shadow-lg animate-pulse">
-              Soon
-            </div>
-          </div>
-        </Button> */}
-
-        {/* Apple Button - Coming Soon */}
-        {/* <Button
-          variant="outline"
-          onClick={() => handleComingSoon("Apple")}
-          disabled={false}
-          className="group relative overflow-hidden h-12 bg-card/50 border-border border-dashed hover:bg-card hover:border-yellow-500/50 transition-all duration-300 ease-in-out cursor-pointer opacity-75 hover:opacity-100"
-        >
-          <div className="flex items-center justify-center space-x-3">
-            <div className="flex items-center justify-center w-6 h-6 rounded-full bg-black shadow-sm">
-              <Apple className="h-4 w-4 text-white" />
-            </div>
-            <span className="text-sm font-medium group-hover:text-yellow-500 transition-colors duration-200">
-              Apple ID
-            </span>
-          </div> */}
-
-          {/* Coming Soon Badge */}
-          {/* <div className="absolute -top-2 -right-2">
-            <div className="bg-yellow-500 text-gray-900 text-xs px-2 py-1 rounded-full font-bold shadow-lg animate-pulse">
-              Soon
-            </div>
-          </div>
-        </Button> */}
       </div>
     </div>
   );
 }
+
+export default SocialLoginButtons;

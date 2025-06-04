@@ -10,11 +10,22 @@ interface AuthResponse {
   token: string;
 }
 
+interface SocialLoginData {
+  provider: 'google' | 'facebook';
+  token: string;
+  user: {
+    email: string;
+    name: string;
+    avatar?: string;
+    providerId: string;
+  };
+}
+
 class AuthService {
   private static instance: AuthService;
   private baseUrl = '/api/auth';
 
-  private constructor() {}
+  private constructor() { }
 
   public static getInstance(): AuthService {
     if (!AuthService.instance) {
@@ -80,22 +91,22 @@ class AuthService {
     }
   }
 
-  async socialLogin(provider: 'google' | 'facebook', token: string): Promise<AuthResponse> {
+  async socialLogin(data: SocialLoginData): Promise<AuthResponse> {
     const response = await fetch(`${this.baseUrl}/social-login`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ provider, token }),
+      body: JSON.stringify(data),
     });
 
-    const data = await response.json();
+    const responseData = await response.json();
 
     if (!response.ok) {
-      throw new Error(data.message || 'Social login failed');
+      throw new Error(responseData.message || 'Social login failed');
     }
 
-    return data;
+    return responseData;
   }
 }
 

@@ -180,7 +180,7 @@ export interface NextAuthSession {
         name?: string | null;
         email?: string | null;
         image?: string | null;
-        role?: UserRole;
+        role?: string;
     };
     expires: string;
 }
@@ -190,8 +190,8 @@ export interface NextAuthToken {
     name?: string | null;
     email?: string | null;
     picture?: string | null;
-    role?: UserRole;
-    provider?: AuthProvider;
+    role?: string;
+    provider?: string;
     iat?: number;
     exp?: number;
     jti?: string;

@@ -1,13 +1,13 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { useToast } from '@/hooks/use-toast';
-import { UserPlus, Eye, EyeOff } from 'lucide-react';
-import Link from 'next/link';
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { useToast } from "@/hooks/use-toast";
+import { UserPlus, Eye, EyeOff } from "lucide-react";
+import Link from "next/link";
 
 export default function RegisterForm() {
   const router = useRouter();
@@ -16,23 +16,23 @@ export default function RegisterForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    password: '',
-    confirmPassword: '',
+    name: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (formData.password !== formData.confirmPassword) {
       toast({
         title: "Error",
@@ -54,10 +54,10 @@ export default function RegisterForm() {
     setIsLoading(true);
 
     try {
-      const response = await fetch('/api/auth/register', {
-        method: 'POST',
+      const response = await fetch("/api/auth/register", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           name: formData.name,
@@ -69,7 +69,7 @@ export default function RegisterForm() {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.message || 'Registration failed');
+        throw new Error(data.message || "Registration failed");
       }
 
       toast({
@@ -77,11 +77,12 @@ export default function RegisterForm() {
         description: "Account created successfully! Welcome to CineHub",
       });
 
-      router.push('/login');
+      router.push("/login");
     } catch (error) {
       toast({
         title: "Error",
-        description: error instanceof Error ? error.message : "Registration failed",
+        description:
+          error instanceof Error ? error.message : "Registration failed",
         variant: "destructive",
       });
     } finally {
@@ -125,13 +126,18 @@ export default function RegisterForm() {
               className="pl-12 h-12 bg-card border-border rounded-lg placeholder:text-muted-foreground focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all duration-200"
             />
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <svg 
-                className="h-5 w-5 text-muted-foreground" 
-                fill="none" 
-                stroke="currentColor" 
+              <svg
+                className="h-5 w-5 text-muted-foreground"
+                fill="none"
+                stroke="currentColor"
                 viewBox="0 0 24 24"
               >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                />
               </svg>
             </div>
           </div>
@@ -139,7 +145,10 @@ export default function RegisterForm() {
 
         {/* Email Field */}
         <div className="space-y-2">
-          <Label htmlFor="email" className="text-sm font-medium text-foreground">
+          <Label
+            htmlFor="email"
+            className="text-sm font-medium text-foreground"
+          >
             Email Address
           </Label>
           <div className="relative">
@@ -154,13 +163,18 @@ export default function RegisterForm() {
               className="pl-12 h-12 bg-card border-border rounded-lg placeholder:text-muted-foreground focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all duration-200"
             />
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <svg 
-                className="h-5 w-5 text-muted-foreground" 
-                fill="none" 
-                stroke="currentColor" 
+              <svg
+                className="h-5 w-5 text-muted-foreground"
+                fill="none"
+                stroke="currentColor"
                 viewBox="0 0 24 24"
               >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207" />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207"
+                />
               </svg>
             </div>
           </div>
@@ -168,14 +182,17 @@ export default function RegisterForm() {
 
         {/* Password Field */}
         <div className="space-y-2">
-          <Label htmlFor="password" className="text-sm font-medium text-foreground">
+          <Label
+            htmlFor="password"
+            className="text-sm font-medium text-foreground"
+          >
             Password
           </Label>
           <div className="relative">
             <Input
               id="password"
               name="password"
-              type={showPassword ? 'text' : 'password'}
+              type={showPassword ? "text" : "password"}
               placeholder="Create a strong password"
               value={formData.password}
               onChange={handleChange}
@@ -184,13 +201,18 @@ export default function RegisterForm() {
               className="pl-12 pr-12 h-12 bg-card border-border rounded-lg placeholder:text-muted-foreground focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all duration-200"
             />
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <svg 
-                className="h-5 w-5 text-muted-foreground" 
-                fill="none" 
-                stroke="currentColor" 
+              <svg
+                className="h-5 w-5 text-muted-foreground"
+                fill="none"
+                stroke="currentColor"
                 viewBox="0 0 24 24"
               >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+                />
               </svg>
             </div>
             <button
@@ -198,21 +220,28 @@ export default function RegisterForm() {
               onClick={() => setShowPassword(!showPassword)}
               className="absolute inset-y-0 right-0 pr-3 flex items-center text-muted-foreground hover:text-foreground transition-colors"
             >
-              {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+              {showPassword ? (
+                <EyeOff className="h-5 w-5" />
+              ) : (
+                <Eye className="h-5 w-5" />
+              )}
             </button>
           </div>
         </div>
 
         {/* Confirm Password Field */}
         <div className="space-y-2">
-          <Label htmlFor="confirmPassword" className="text-sm font-medium text-foreground">
+          <Label
+            htmlFor="confirmPassword"
+            className="text-sm font-medium text-foreground"
+          >
             Confirm Password
           </Label>
           <div className="relative">
             <Input
               id="confirmPassword"
               name="confirmPassword"
-              type={showConfirmPassword ? 'text' : 'password'}
+              type={showConfirmPassword ? "text" : "password"}
               placeholder="Confirm your password"
               value={formData.confirmPassword}
               onChange={handleChange}
@@ -221,13 +250,18 @@ export default function RegisterForm() {
               className="pl-12 pr-12 h-12 bg-card border-border rounded-lg placeholder:text-muted-foreground focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all duration-200"
             />
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <svg 
-                className="h-5 w-5 text-muted-foreground" 
-                fill="none" 
-                stroke="currentColor" 
+              <svg
+                className="h-5 w-5 text-muted-foreground"
+                fill="none"
+                stroke="currentColor"
                 viewBox="0 0 24 24"
               >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
               </svg>
             </div>
             <button
@@ -235,7 +269,11 @@ export default function RegisterForm() {
               onClick={() => setShowConfirmPassword(!showConfirmPassword)}
               className="absolute inset-y-0 right-0 pr-3 flex items-center text-muted-foreground hover:text-foreground transition-colors"
             >
-              {showConfirmPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+              {showConfirmPassword ? (
+                <EyeOff className="h-5 w-5" />
+              ) : (
+                <Eye className="h-5 w-5" />
+              )}
             </button>
           </div>
         </div>
@@ -244,8 +282,18 @@ export default function RegisterForm() {
         {formData.password && (
           <div className="space-y-2 animate-fade-in">
             <div className="flex items-center space-x-2 text-xs">
-              <div className={`w-2 h-2 rounded-full ${formData.password.length >= 6 ? 'bg-success' : 'bg-muted'}`} />
-              <span className={formData.password.length >= 6 ? 'text-success' : 'text-muted-foreground'}>
+              <div
+                className={`w-2 h-2 rounded-full ${
+                  formData.password.length >= 6 ? "bg-success" : "bg-muted"
+                }`}
+              />
+              <span
+                className={
+                  formData.password.length >= 6
+                    ? "text-success"
+                    : "text-muted-foreground"
+                }
+              >
                 At least 6 characters
               </span>
             </div>
@@ -273,7 +321,9 @@ export default function RegisterForm() {
 
         {/* Login Link */}
         <div className="text-center pt-1 animate-fade-in">
-          <span className="text-muted-foreground">Already have an account? </span>
+          <span className="text-muted-foreground">
+            Already have an account?{" "}
+          </span>
           <Link
             href="/login"
             className="text-primary hover:text-primary/80 font-medium transition-colors cursor-pointer hover:underline"
