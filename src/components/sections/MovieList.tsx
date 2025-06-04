@@ -57,11 +57,13 @@ const MovieList = ({ listType }: MovieListProps) => {
     );
   }
 
-  // Combine results from both pages
+  // Combine results from both pages and remove duplicates
   const allMovies = [
     ...(firstPageData?.results || []),
     ...(secondPageData?.results || [])
-  ];
+  ].filter((movie, index, self) => 
+    index === self.findIndex((m) => m.id === movie.id)
+  );
 
   // Filter upcoming movies to show only future releases
   const filteredMovies = listType === 'upcoming' 
