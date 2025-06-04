@@ -1,3 +1,5 @@
+'use client';
+
 import { TMDBVideos } from "@/types/tmdb";
 import { Play, Film, Video, Clock, Eye } from "lucide-react";
 import { useState } from "react";
@@ -54,13 +56,13 @@ export default function MovieMedia({ videos, movieTitle }: MovieMediaProps) {
 
         {/* Play Button Overlay */}
         <div className="absolute inset-0 bg-black/20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300">
-          <div className="w-16 h-16 bg-cinehub-accent rounded-full flex items-center justify-center shadow-lg transform scale-90 group-hover:scale-100 transition-transform duration-300">
-            <Play className="w-6 h-6 text-bg-main ml-1" fill="currentColor" />
+          <div className="w-12 h-12 sm:w-16 sm:h-16 bg-cinehub-accent rounded-full flex items-center justify-center shadow-lg transform scale-90 group-hover:scale-100 transition-transform duration-300">
+            <Play className="w-4 h-4 sm:w-6 sm:h-6 text-bg-main ml-1" fill="currentColor" />
           </div>
         </div>
 
         {/* Video Type Badge */}
-        <div className="absolute top-3 right-3">
+        <div className="absolute top-2 right-2 sm:top-3 sm:right-3">
           <span className="px-2 py-1 bg-black/70 text-text-main text-xs font-medium rounded-full backdrop-blur-sm">
             {video.type}
           </span>
@@ -68,11 +70,11 @@ export default function MovieMedia({ videos, movieTitle }: MovieMediaProps) {
       </div>
 
       {/* Video Info */}
-      <div className="p-4 bg-bg-card">
-        <h4 className="font-semibold text-text-main mb-1 line-clamp-2 group-hover:text-cinehub-accent transition-colors">
+      <div className="p-3 sm:p-4 bg-bg-card">
+        <h4 className="font-semibold text-text-main mb-1 line-clamp-2 group-hover:text-cinehub-accent transition-colors text-sm sm:text-base">
           {video.name}
         </h4>
-        <div className="flex items-center gap-3 text-sm text-text-sub">
+        <div className="flex items-center gap-2 sm:gap-3 text-xs sm:text-sm text-text-sub">
           <div className="flex items-center gap-1">
             <Eye className="w-3 h-3" />
             <span>YouTube</span>
@@ -113,13 +115,13 @@ export default function MovieMedia({ videos, movieTitle }: MovieMediaProps) {
   };
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6 sm:space-y-8">
       {/* Header Section */}
       <div className="text-center">
-        <h2 className="text-2xl font-bold text-text-main mb-3">
+        <h2 className="text-xl sm:text-2xl font-bold text-text-main mb-2 sm:mb-3">
           Videos & Trailers
         </h2>
-        <p className="text-text-sub max-w-2xl mx-auto">
+        <p className="text-sm sm:text-base text-text-sub max-w-2xl mx-auto">
           Watch trailers, teasers, and exclusive clips from{" "}
           {movieTitle || "this movie"}
         </p>
@@ -128,19 +130,19 @@ export default function MovieMedia({ videos, movieTitle }: MovieMediaProps) {
       {/* Tabs Section */}
       <Tabs defaultValue="trailers" className="w-full">
         {/* Custom Tab Navigation */}
-        <div className="flex justify-center mb-8">
-          <TabsList className="inline-flex bg-bg-card border border-border p-1 rounded-xl shadow-sm">
+        <div className="flex justify-center mb-6 sm:mb-8">
+          <TabsList className="inline-flex bg-bg-card border border-border p-1 rounded-xl shadow-sm overflow-x-auto">
             {["trailers", "teasers", "clips"].map((tab) => {
               const { label, count } = getTabData(tab);
               return (
                 <TabsTrigger
                   key={tab}
                   value={tab}
-                  className="flex items-center gap-2 px-6 py-3 rounded-lg text-sm font-medium transition-all duration-200 data-[state=active]:bg-cinehub-accent data-[state=active]:text-bg-main data-[state=active]:shadow-sm text-text-sub hover:text-text-main"
+                  className="flex items-center gap-1 sm:gap-2 px-3 sm:px-6 py-2 sm:py-3 rounded-lg text-xs sm:text-sm font-medium transition-all duration-200 data-[state=active]:bg-cinehub-accent data-[state=active]:text-bg-main data-[state=active]:shadow-sm text-text-sub hover:text-text-main whitespace-nowrap"
                 >
                   {getTabIcon(tab)}
                   <span>{label}</span>
-                  <span className="bg-border data-[state=active]:bg-cinehub-accent-hover px-2 py-0.5 rounded-full text-xs">
+                  <span className="bg-border data-[state=active]:bg-cinehub-accent-hover px-1.5 sm:px-2 py-0.5 rounded-full text-xs">
                     {count}
                   </span>
                 </TabsTrigger>
@@ -155,20 +157,20 @@ export default function MovieMedia({ videos, movieTitle }: MovieMediaProps) {
           return (
             <TabsContent key={tab} value={tab} className="focus:outline-none">
               {videos.length > 0 ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
                   {videos.map((video) => (
                     <VideoCard key={video.id} video={video} />
                   ))}
                 </div>
               ) : (
-                <div className="text-center py-12">
-                  <div className="w-16 h-16 bg-bg-card border border-border rounded-full flex items-center justify-center mx-auto mb-4">
+                <div className="text-center py-8 sm:py-12">
+                  <div className="w-12 h-12 sm:w-16 sm:h-16 bg-bg-card border border-border rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4">
                     <div className="text-text-sub">{getTabIcon(tab)}</div>
                   </div>
-                  <h3 className="text-lg font-semibold text-text-main mb-2">
+                  <h3 className="text-base sm:text-lg font-semibold text-text-main mb-2">
                     No {getTabData(tab).label} Available
                   </h3>
-                  <p className="text-text-sub">
+                  <p className="text-sm sm:text-base text-text-sub">
                     There are no {getTabData(tab).label.toLowerCase()} available
                     for this movie yet.
                   </p>
@@ -180,9 +182,8 @@ export default function MovieMedia({ videos, movieTitle }: MovieMediaProps) {
       </Tabs>
 
       {/* Video Modal */}
-           {/* Video Modal */}
       <Dialog open={!!selectedVideo} onOpenChange={() => setSelectedVideo(null)}>
-        <DialogContent className="max-w-6xl w-[95vw] p-0 bg-black rounded-xl overflow-hidden">
+        <DialogContent className="max-w-[95vw] sm:max-w-4xl w-full p-0 bg-black rounded-xl overflow-hidden">
           <DialogTitle className="sr-only">
             {movieTitle} - {selectedVideo ? "Video Player" : ""}
           </DialogTitle>
