@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap");
 
 @import "tailwindcss";
 @import "tw-animate-css";
@@ -112,9 +112,37 @@
     @apply border-border outline-ring/50;
   }
 
+  /* Custom Scrollbar Styles */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: var(--bg-card);
+    border-radius: 4px;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: var(--cinehub-accent);
+    border-radius: 4px;
+    transition: all 0.3s ease;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--cinehub-accent-hover);
+  }
+
+  /* Firefox Scrollbar */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--cinehub-accent) var(--bg-card);
+  }
+
   body {
     @apply bg-background text-foreground;
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+      sans-serif;
     font-weight: 400;
   }
 
@@ -125,19 +153,31 @@
   h4,
   h5,
   h6 {
-    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-family: "Poppins", -apple-system, BlinkMacSystemFont, "Segoe UI",
+      Roboto, sans-serif;
     font-weight: 600;
+    @apply text-white;
   }
 
   .subheading {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+      sans-serif;
     font-weight: 500;
+    @apply text-gray-400;
+  }
+
+  /* Section titles */
+  .section-title {
+    font-family: "Poppins", -apple-system, BlinkMacSystemFont, "Segoe UI",
+      Roboto, sans-serif;
+    font-weight: 600;
+    @apply text-2xl md:text-3xl text-white;
   }
 
   /* Button styles theo BRD */
   .btn-primary {
     @apply bg-accent text-accent-foreground hover:bg-cinehub-accent-hover;
-    font-family: 'Inter', sans-serif;
+    font-family: "Inter", sans-serif;
     font-weight: 500;
     border-radius: 8px;
     transition: background-color 0.2s ease-in-out;
@@ -201,7 +241,11 @@
   }
 
   .gradient-text {
-    background: linear-gradient(135deg, var(--cinehub-accent) 0%, var(--primary) 100%);
+    background: linear-gradient(
+      135deg,
+      var(--cinehub-accent) 0%,
+      var(--primary) 100%
+    );
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -250,13 +294,17 @@
 }
 
 .nav-item::after {
-  content: '';
+  content: "";
   position: absolute;
   bottom: -4px;
   left: 0;
   width: 0;
   height: 2px;
-  background: linear-gradient(135deg, var(--cinehub-accent) 0%, var(--primary) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--cinehub-accent) 0%,
+    var(--primary) 100%
+  );
   transition: width 0.3s ease;
 }
 

@@ -5,7 +5,6 @@ import { useQuery } from '@tanstack/react-query';
 import { MovieCard } from '@/components/common/MovieCard';
 import { Skeleton } from '@/components/ui/skeleton';
 import { fetchMovies, TMDBMovieListType } from '@/services/tmdb';
-import { format } from 'date-fns';
 
 interface MovieListProps {
   listType: TMDBMovieListType;

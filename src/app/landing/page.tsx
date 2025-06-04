@@ -4,7 +4,15 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { motion } from "framer-motion";
-import { ArrowRight, Play } from "lucide-react";
+import { 
+  ArrowRight, 
+  Play, 
+  Film, 
+  Zap, 
+  Theater, 
+  Smartphone, 
+  RefreshCw 
+} from "lucide-react";
 import Loading from "@/components/common/Loading";
 import { withLazyLoading } from "@/components/lazy";
 
@@ -36,6 +44,14 @@ const LandingPage = () => {
       </div>
     );
   }
+
+  const features = [
+    { icon: Film, text: "50,000+ Movies & Shows" },
+    { icon: Zap, text: "Lightning Fast Streaming" },
+    { icon: Theater, text: "All Genres Available" },
+    { icon: Smartphone, text: "Watch on Any Device" },
+    { icon: RefreshCw, text: "Updated Daily" },
+  ];
 
   return (
     <div className="fixed inset-0 overflow-hidden">
@@ -81,12 +97,12 @@ const LandingPage = () => {
       </div>
 
       {/* Main Content */}
-      <div className="relative z-20 h-full flex items-center justify-center px-4">
+      <div className="relative z-20 h-full flex items-center justify-center px-4 sm:px-6 lg:px-8">
         <motion.div
           initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ duration: 0.8, ease: "easeOut" }}
-          className="text-center max-w-3xl mx-auto"
+          className="text-center max-w-3xl mx-auto w-full"
         >
           {/* Logo */}
           <motion.div
@@ -98,7 +114,7 @@ const LandingPage = () => {
             <div className="flex items-center justify-center mb-4">
               <div className="relative">
                 {/* Logo container with glow effect */}
-                <div className="relative w-20 h-20 mx-auto mb-3">
+                <div className="relative w-16 h-16 sm:w-20 sm:h-20 mx-auto mb-3">
                   <div className="absolute inset-0 bg-cinehub-accent/20 rounded-2xl blur-xl"></div>
                   <div className="relative w-full h-full rounded-2xl flex items-center justify-center">
                     <Image
@@ -113,9 +129,9 @@ const LandingPage = () => {
 
                 {/* Logo text */}
                 <div className="flex items-center justify-center space-x-2">
-                  <h1 className="text-3xl font-bold text-white">CineHub</h1>
+                  <h1 className="text-2xl sm:text-3xl font-bold text-white">CineHub</h1>
                   <div className="h-5 w-px bg-gradient-to-b from-cinehub-accent to-transparent"></div>
-                  <span className="text-text-sub text-base">Movies & Shows</span>
+                  <span className="text-text-sub text-sm sm:text-base">Movies & Shows</span>
                 </div>
               </div>
             </div>
@@ -128,7 +144,7 @@ const LandingPage = () => {
             transition={{ delay: 0.4, duration: 0.8 }}
             className="mb-8"
           >
-            <h2 className="text-2xl md:text-4xl lg:text-5xl font-bold text-white leading-tight mb-4">
+            <h2 className="text-xl sm:text-2xl md:text-4xl lg:text-5xl font-bold text-white leading-tight mb-4">
               Watch Movies & TV Shows
               <br />
               <span className="bg-gradient-to-r from-cinehub-accent to-cinehub-accent-hover bg-clip-text text-transparent">
@@ -139,7 +155,7 @@ const LandingPage = () => {
             </h2>
 
             <motion.p
-              className="text-lg md:text-xl text-text-sub max-w-2xl mx-auto leading-relaxed"
+              className="text-base sm:text-lg md:text-xl text-text-sub max-w-2xl mx-auto leading-relaxed px-4"
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 0.6, duration: 0.8 }}
@@ -158,11 +174,11 @@ const LandingPage = () => {
           >
             <button
               onClick={() => router.push("/home")}
-              className="group relative inline-flex items-center justify-center space-x-2 bg-gradient-to-r from-cinehub-accent to-cinehub-accent-hover hover:from-cinehub-accent-hover hover:to-cinehub-accent text-white px-8 py-4 rounded-full text-base font-semibold transition-all duration-300 transform hover:scale-105 hover:shadow-2xl hover:shadow-cinehub-accent/25 cursor-pointer"
+              className="group relative inline-flex items-center justify-center space-x-2 bg-gradient-to-r from-cinehub-accent to-cinehub-accent-hover hover:from-cinehub-accent-hover hover:to-cinehub-accent text-white px-6 sm:px-8 py-3 sm:py-4 rounded-full text-sm sm:text-base font-semibold transition-all duration-300 transform hover:scale-105 hover:shadow-2xl hover:shadow-cinehub-accent/25 cursor-pointer"
             >
-              <Play className="w-5 h-5 group-hover:scale-110 transition-transform" />
+              <Play className="w-4 h-4 sm:w-5 sm:h-5 group-hover:scale-110 transition-transform" />
               <span>Watch Now</span>
-              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+              <ArrowRight className="w-3 h-3 sm:w-4 sm:h-4 group-hover:translate-x-1 transition-transform" />
 
               {/* Button glow effect */}
               <div className="absolute inset-0 rounded-full bg-gradient-to-r from-cinehub-accent to-cinehub-accent-hover opacity-0 group-hover:opacity-20 blur-xl transition-opacity duration-300"></div>
@@ -174,23 +190,18 @@ const LandingPage = () => {
             initial={{ y: 30, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 1, duration: 0.8 }}
-            className="flex flex-wrap justify-center gap-3 mb-8"
+            className="flex flex-wrap justify-center gap-2 sm:gap-3 mb-8 px-4"
           >
-            {[
-              "🎬 50,000+ Movies & Shows",
-              "⚡ Lightning Fast Streaming",
-              "🎭 All Genres Available",
-              "📱 Watch on Any Device",
-              "🔄 Updated Daily",
-            ].map((feature, index) => (
+            {features.map((feature, index) => (
               <motion.div
                 key={index}
                 initial={{ scale: 0.8, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 transition={{ delay: 1.2 + index * 0.1, duration: 0.5 }}
-                className="bg-bg-card/50 backdrop-blur-sm border border-border/30 rounded-full px-4 py-2 text-sm text-text-main hover:bg-bg-card/70 hover:border-cinehub-accent/30 transition-all duration-300 hover:scale-105"
+                className="bg-bg-card/50 backdrop-blur-sm border border-border/30 rounded-full px-3 sm:px-4 py-2 text-xs sm:text-sm text-text-main hover:bg-bg-card/70 hover:border-cinehub-accent/30 transition-all duration-300 hover:scale-105 flex items-center space-x-2"
               >
-                {feature}
+                <feature.icon className="w-3 h-3 sm:w-4 sm:h-4 text-cinehub-accent" />
+                <span>{feature.text}</span>
               </motion.div>
             ))}
           </motion.div>
