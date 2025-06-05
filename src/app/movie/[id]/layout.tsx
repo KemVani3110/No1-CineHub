@@ -1,7 +1,6 @@
 'use client';
 
-import Header from '@/components/common/Header';
-import Footer from '@/components/common/Footer';
+import { Header, Footer } from '@/components/lazy';
 import BackToTop from '@/components/common/BackToTop';
 
 export default function TVShowLayout({

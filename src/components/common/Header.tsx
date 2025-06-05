@@ -3,7 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Menu,
   User,
@@ -18,6 +18,7 @@ import {
   PanelLeft,
   Users,
   Activity,
+  CircleUser,
 } from "lucide-react";
 import {
   Sheet,
@@ -39,6 +40,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useAuth } from "@/hooks/useAuth";
+import { useProfileStore } from "@/store/profileStore";
 import Sidebar from "./Sidebar";
 
 interface HeaderProps {
@@ -49,7 +51,8 @@ const Header = ({ onSidebarChange }: HeaderProps) => {
   const pathname = usePathname();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const { user, logout } = useAuth();
+  const { user: authUser, logout } = useAuth();
+  const { user: profileUser } = useProfileStore();
 
   const navItems = [
     { name: "Home", path: "/home", icon: Home },
@@ -83,16 +86,21 @@ const Header = ({ onSidebarChange }: HeaderProps) => {
 
   // Get user avatar with fallback
   const getUserAvatar = () => {
-    if (!user) return null;
+    if (!authUser) return null;
 
-    const avatarUrl =
-      user.avatar ||
-      (user as any).picture ||
-      (user as any).photoURL ||
-      (user as any).image ||
-      (user as any).profilePicture;
+    // First check if user has a custom avatar from our system
+    if (profileUser?.avatar) {
+      return profileUser.avatar;
+    }
 
-    return avatarUrl || null;
+    // Then check social auth avatars
+    const socialAvatar = 
+      (authUser as any).picture ||
+      (authUser as any).photoURL ||
+      (authUser as any).image ||
+      (authUser as any).profilePicture;
+
+    return socialAvatar || null;
   };
 
   return (
@@ -165,7 +173,7 @@ const Header = ({ onSidebarChange }: HeaderProps) => {
 
             {/* Right Section */}
             <div className="flex items-center space-x-3">
-              {user ? (
+              {authUser ? (
                 <>
                   {/* Notifications Button */}
                   <div className="relative hidden sm:block ">
@@ -194,12 +202,12 @@ const Header = ({ onSidebarChange }: HeaderProps) => {
                         <Avatar className="h-10 w-10 border-2 border-primary/20">
                           <AvatarImage
                             src={getUserAvatar()}
-                            alt={user.name || user.email || "User"}
+                            alt={authUser.name || authUser.email || "User"}
                             className="object-cover"
                             referrerPolicy="no-referrer"
                           />
                           <AvatarFallback className="bg-primary/10 text-primary font-semibold">
-                            {getUserInitials(user.name || user.email || "User")}
+                            {getUserInitials(authUser.name || authUser.email || "User")}
                           </AvatarFallback>
                         </Avatar>
                       </Button>
@@ -210,22 +218,22 @@ const Header = ({ onSidebarChange }: HeaderProps) => {
                           <Avatar className="h-8 w-8 ">
                             <AvatarImage
                               src={getUserAvatar()}
-                              alt={user.name || user.email || "User"}
+                              alt={authUser.name || authUser.email || "User"}
                               referrerPolicy="no-referrer"
                             />
                             <AvatarFallback className="bg-primary/10 text-primary text-xs">
                               {getUserInitials(
-                                user.name || user.email || "User"
+                                authUser.name || authUser.email || "User"
                               )}
                             </AvatarFallback>
                           </Avatar>
                           <div className="flex flex-col min-w-0 flex-1">
                             <span className="font-medium truncate">
-                              {user.name || user.email}
+                              {authUser.name || authUser.email}
                             </span>
-                            {user.email && user.name && (
+                            {authUser.email && authUser.name && (
                               <span className="text-xs text-muted-foreground truncate">
-                                {user.email}
+                                {authUser.email}
                               </span>
                             )}
                           </div>
@@ -238,7 +246,7 @@ const Header = ({ onSidebarChange }: HeaderProps) => {
                           Profile
                         </Link>
                       </DropdownMenuItem>
-                      {user?.role === "admin" && (
+                      {authUser?.role === "admin" && (
                         <>
                           <DropdownMenuItem asChild>
                             <Link
@@ -355,28 +363,28 @@ const Header = ({ onSidebarChange }: HeaderProps) => {
                     </div>
 
                     {/* User Info */}
-                    {user && (
+                    {authUser && (
                       <div className="p-6 border-b flex-shrink-0">
                         <div className="flex items-center space-x-3">
                           <Avatar className="h-12 w-12 border-2 border-primary/20">
                             <AvatarImage
                               src={getUserAvatar()}
-                              alt={user.name || user.email || "User"}
+                              alt={authUser.name || authUser.email || "User"}
                               referrerPolicy="no-referrer"
                             />
                             <AvatarFallback className="bg-primary/10 text-primary">
                               {getUserInitials(
-                                user.name || user.email || "User"
+                                authUser.name || authUser.email || "User"
                               )}
                             </AvatarFallback>
                           </Avatar>
                           <div className="flex flex-col min-w-0 flex-1">
                             <span className="font-medium text-foreground truncate">
-                              {user.name || user.email}
+                              {authUser.name || authUser.email}
                             </span>
-                            {user.email && user.name && (
+                            {authUser.email && authUser.name && (
                               <span className="text-sm text-muted-foreground truncate">
-                                {user.email}
+                                {authUser.email}
                               </span>
                             )}
                           </div>
@@ -412,7 +420,7 @@ const Header = ({ onSidebarChange }: HeaderProps) => {
                         <Separator className="my-6" />
 
                         {/* Additional Actions */}
-                        {user && (
+                        {authUser && (
                           <div className="space-y-2">
                             <Button
                               variant="ghost"
@@ -447,7 +455,7 @@ const Header = ({ onSidebarChange }: HeaderProps) => {
 
                     {/* Auth Buttons */}
                     <div className="border-t flex-shrink-0">
-                      {user ? (
+                      {authUser ? (
                         <div className="p-6">
                           <Button
                             variant="outline"
@@ -486,7 +494,7 @@ const Header = ({ onSidebarChange }: HeaderProps) => {
                     </div>
 
                     {/* Admin Actions */}
-                    {user?.role === "admin" && (
+                    {authUser?.role === "admin" && (
                       <>
                         <Separator className="my-6" />
                         <div className="space-y-2">

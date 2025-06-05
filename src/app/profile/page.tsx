@@ -1,11 +1,11 @@
 "use client";
 
 import { useEffect } from "react";
+import Image from "next/image";
 import { useToast } from "@/components/ui/use-toast";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
+
 import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
@@ -18,11 +18,8 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { MovieCard } from "@/components/common/MovieCard";
-import { TVShowCard } from "@/components/common/TVShowCard";
+import { MovieCard, TVShowCard } from "@/components/lazy";
 import {
-  User as UserIcon,
-  Lock,
   Image as ImageIcon,
   History,
   ListVideo,
@@ -40,9 +37,16 @@ import {
 import Link from "next/link";
 import { useProfileStore } from "@/store/profileStore";
 import Loading from "@/components/common/Loading";
+import { useAuth } from "@/hooks/useAuth";
+import { useRouter } from "next/navigation";
+import { Settings } from "@/components/lazy";
+
+
 
 export default function ProfilePage() {
+  const router = useRouter();
   const { toast } = useToast();
+  const { user: authUser, loading: authLoading } = useAuth();
   const {
     user,
     isEditing,
@@ -52,7 +56,7 @@ export default function ProfilePage() {
     watchList,
     watchHistory,
     formData,
-    loading,
+    loading: profileLoading,
     setActiveTab,
     setIsEditing,
     setIsAvatarDialogOpen,
@@ -67,9 +71,18 @@ export default function ProfilePage() {
   } = useProfileStore();
 
   useEffect(() => {
+    if (authLoading) return; // Don't do anything while auth is loading
+
+    if (!authUser) {
+      router.push("/login");
+      return;
+    }
+
     fetchUserData();
     fetchAvatars();
-  }, [fetchUserData, fetchAvatars]);
+    // Set Overview tab as default
+    setActiveTab("overview");
+  }, [authUser, authLoading, router, fetchUserData, fetchAvatars, setActiveTab]);
 
   useEffect(() => {
     if (activeTab === "watchlist") {
@@ -121,6 +134,7 @@ export default function ProfilePage() {
   const handleAvatarSelect = async (avatarPath: string) => {
     try {
       await updateAvatar(avatarPath);
+      setIsAvatarDialogOpen(false);
       toast({
         title: "Success",
         description: "Avatar updated successfully",
@@ -144,398 +158,223 @@ export default function ProfilePage() {
       .slice(0, 2);
   };
 
-  if (loading) {
+  if (authLoading || profileLoading) {
     return <Loading message="Loading profile..." />;
   }
 
   return (
     <div className="min-h-screen bg-[var(--bg-main)]">
       {/* Header */}
-      <div className="border-b border-[var(--border)] bg-[var(--bg-card)]/30 backdrop-blur-sm sticky top-0 z-40">
-        <div className="container mx-auto px-4 sm:px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <Button
-                variant="ghost"
-                size="sm"
-                asChild
-                className="hover:bg-[var(--bg-card)]/80 text-[var(--text-main)] hover:text-[var(--cinehub-accent)] cursor-pointer transition-all duration-200"
-              >
-                <Link href="/home">
-                  <ChevronLeft className="h-4 w-4 mr-2" />
-                  Back to Home
-                </Link>
-              </Button>
-              <Separator
-                orientation="vertical"
-                className="h-6 border-[var(--border)]"
-              />
-              <h1 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-[var(--cinehub-accent)] to-[var(--cinehub-accent)]/70 bg-clip-text text-transparent">
-                Profile Settings
-              </h1>
-            </div>
-          </div>
+      <div className="container mx-auto px-4 lg:px-6 py-8">
+        <div className="flex items-center space-x-4 mb-8">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-10 w-10 rounded-full hover:bg-accent/10"
+            asChild
+          >
+            <Link href="/home">
+              <ChevronLeft size={24} />
+            </Link>
+          </Button>
+          <h1 className="text-2xl font-bold gradient-text">Profile</h1>
         </div>
-      </div>
 
-      <div className="container mx-auto px-4 sm:px-6 py-6 sm:py-8">
-        <div className="grid lg:grid-cols-4 gap-6 sm:gap-8 max-w-7xl mx-auto">
-          {/* Profile Overview Card */}
-          <div className="lg:col-span-1 order-2 lg:order-1">
-            <Card className="sticky top-24 border-[var(--border)] bg-gradient-to-br from-[var(--bg-card)] to-[var(--bg-card)]/50">
-              <CardContent className="p-4 sm:p-6">
+        {/* Profile Content */}
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+          {/* Left Column - Profile Info */}
+          <div className="lg:col-span-1 space-y-6">
+            {/* Profile Card */}
+            <Card className="bg-card/50 backdrop-blur-sm border-border/50">
+              <CardContent className="p-6">
                 <div className="flex flex-col items-center space-y-4">
-                  <div className="relative group">
-                    <Avatar className="h-20 sm:h-24 w-20 sm:w-24 border-4 border-[var(--cinehub-accent)]/20 ring-2 ring-[var(--bg-main)] shadow-lg cursor-pointer transition-transform hover:scale-105">
+                  <div className="relative">
+                    <Avatar className="h-24 w-24 border-4 border-primary/20">
                       <AvatarImage
-                        src={formData.avatar || user?.avatar}
+                        src={user?.avatar}
                         alt={user?.name || "User"}
                         className="object-cover"
                       />
-                      <AvatarFallback className="bg-[var(--cinehub-accent)]/10 text-[var(--cinehub-accent)] font-semibold text-xl sm:text-2xl">
+                      <AvatarFallback className="bg-primary/10 text-primary text-2xl">
                         {getUserInitials(user?.name || "User")}
                       </AvatarFallback>
                     </Avatar>
-                    <Dialog
-                      open={isAvatarDialogOpen}
-                      onOpenChange={setIsAvatarDialogOpen}
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="absolute bottom-0 right-0 h-8 w-8 rounded-full bg-background/80 backdrop-blur-sm border border-border/50 hover:bg-accent/50"
+                      onClick={() => setIsAvatarDialogOpen(true)}
                     >
-                      <DialogTrigger asChild>
-                        <Button
-                          size="sm"
-                          className="absolute -bottom-2 -right-2 rounded-full w-8 h-8 shadow-lg bg-[var(--cinehub-accent)] hover:bg-[var(--cinehub-accent-hover)] text-[var(--bg-main)] cursor-pointer transition-all hover:scale-110"
-                        >
-                          <Camera className="h-3 w-3" />
-                        </Button>
-                      </DialogTrigger>
-                      <DialogContent className="max-w-2xl bg-[var(--bg-card)] border-[var(--border)]">
-                        <DialogHeader>
-                          <DialogTitle className="flex items-center gap-2 text-[var(--text-main)]">
-                            <ImageIcon className="h-5 w-5 text-[var(--cinehub-accent)]" />
-                            Choose Your Avatar
-                          </DialogTitle>
-                        </DialogHeader>
-                        <div className="grid grid-cols-3 sm:grid-cols-4 gap-4 max-h-[400px] overflow-y-auto pr-4">
-                          {availableAvatars.map((avatar, index) => (
-                            <div
-                              key={index}
-                              className="cursor-pointer group relative transition-all hover:scale-105"
-                              onClick={() => handleAvatarSelect(avatar)}
-                            >
-                              <Avatar className="h-16 sm:h-20 w-16 sm:w-20 border-2 border-transparent group-hover:border-[var(--cinehub-accent)] transition-all">
-                                <AvatarImage
-                                  src={avatar}
-                                  alt={`Avatar option ${index + 1}`}
-                                />
-                              </Avatar>
-                              <div className="absolute inset-0 bg-[var(--cinehub-accent)]/20 opacity-0 group-hover:opacity-100 transition-opacity rounded-full flex items-center justify-center">
-                                <div className="bg-[var(--cinehub-accent)] text-[var(--bg-main)] rounded-full p-1">
-                                  <UserIcon className="h-3 w-3" />
-                                </div>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      </DialogContent>
-                    </Dialog>
+                      <Camera size={16} />
+                    </Button>
                   </div>
 
-                  <div className="text-center space-y-2">
-                    <h2 className="text-lg sm:text-xl font-semibold text-[var(--text-main)]">
-                      {user?.name || "User"}
-                    </h2>
-                    <div className="flex items-center justify-center gap-2 text-sm text-[var(--text-sub)]">
-                      {user?.email}
-                    </div>
+                  <div className="text-center">
+                    <h2 className="text-xl font-semibold">{user?.name}</h2>
+                    <p className="text-sm text-muted-foreground">{user?.email}</p>
                     <Badge
                       variant="secondary"
-                      className="bg-[var(--cinehub-accent)]/10 text-[var(--cinehub-accent)] border-[var(--cinehub-accent)]/20"
+                      className="mt-2 text-xs px-2 py-0.5 h-5"
                     >
-                      <Shield className="h-3 w-3 mr-1" />
-                      {user?.role || "User"}
+                      <Shield size={8} className="mr-1" />
+                      {user?.role}
                     </Badge>
                   </div>
 
-                  <Separator className="w-full border-[var(--border)]" />
+                  <Separator className="my-2" />
 
-                  {/* Quick Stats */}
-                  <div className="w-full space-y-3">
+                  <div className="w-full space-y-2">
                     <div className="flex items-center justify-between text-sm">
-                      <div className="flex items-center gap-2 text-[var(--text-sub)]">
-                        <ListVideo className="h-4 w-4" />
-                        Watchlist
-                      </div>
-                      <span className="font-medium text-[var(--text-main)]">
-                        {watchList.length}
+                      <span className="text-muted-foreground">Member since</span>
+                      <span className="font-medium">
+                        {new Date(user?.created_at || "").toLocaleDateString()}
                       </span>
                     </div>
                     <div className="flex items-center justify-between text-sm">
-                      <div className="flex items-center gap-2 text-[var(--text-sub)]">
-                        <History className="h-4 w-4" />
-                        Watch History
-                      </div>
-                      <span className="font-medium text-[var(--text-main)]">
-                        {watchHistory.length}
-                      </span>
-                    </div>
-                    <div className="flex items-center justify-between text-sm">
-                      <div className="flex items-center gap-2 text-[var(--text-sub)]">
-                        <Calendar className="h-4 w-4" />
-                        Member Since
-                      </div>
-                      <span className="font-medium text-[var(--text-main)]">
-                        2024
+                      <span className="text-muted-foreground">Last login</span>
+                      <span className="font-medium">
+                        {new Date(user?.last_login_at || "").toLocaleDateString()}
                       </span>
                     </div>
                   </div>
                 </div>
               </CardContent>
             </Card>
+
+            {/* Quick Stats */}
+            <Card className="bg-card/50 backdrop-blur-sm border-border/50">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-lg">Quick Stats</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="flex flex-col items-center p-3 rounded-lg bg-accent/50">
+                    <Film size={20} className="mb-1 text-primary" />
+                    <span className="text-sm font-medium">Movies</span>
+                    <span className="text-lg font-bold">{watchList.filter(item => item.media_type === 'movie').length}</span>
+                  </div>
+                  <div className="flex flex-col items-center p-3 rounded-lg bg-accent/50">
+                    <Tv size={20} className="mb-1 text-primary" />
+                    <span className="text-sm font-medium">TV Shows</span>
+                    <span className="text-lg font-bold">{watchList.filter(item => item.media_type === 'tv').length}</span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           </div>
 
-          {/* Main Content */}
-          <div className="lg:col-span-3 order-1 lg:order-2">
-            <Tabs
-              value={activeTab}
-              onValueChange={setActiveTab}
-              className="space-y-8"
-            >
-              <TabsList className="grid w-full grid-cols-4 bg-[var(--bg-card)]/50 backdrop-blur-sm p-2 h-auto rounded-lg gap-2 border border-[var(--border)]/30">
+          {/* Right Column - Tabs */}
+          <div className="lg:col-span-3">
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+              <TabsList className="w-full justify-start h-auto p-1 bg-accent/50">
                 <TabsTrigger
                   value="overview"
-                  className="flex flex-col items-center gap-2 py-3 px-4 text-xs sm:text-sm cursor-pointer transition-all duration-200 rounded-md
-                    data-[state=active]:bg-[var(--cinehub-accent)]/15 data-[state=active]:text-[var(--cinehub-accent)] data-[state=active]:border data-[state=active]:border-[var(--cinehub-accent)]/30
-                    hover:bg-[var(--bg-main)]/80 hover:text-[var(--text-main)] text-[var(--text-sub)]"
+                  className="data-[state=active]:bg-background data-[state=active]:text-foreground rounded-lg px-4 py-2"
                 >
-                  <UserIcon className="h-4 w-4" />
-                  <span>Overview</span>
-                </TabsTrigger>
-                <TabsTrigger
-                  value="security"
-                  className="flex flex-col items-center gap-2 py-3 px-4 text-xs sm:text-sm cursor-pointer transition-all duration-200 rounded-md
-                    data-[state=active]:bg-[var(--warning)]/15 data-[state=active]:text-[var(--warning)] data-[state=active]:border data-[state=active]:border-[var(--warning)]/30
-                    hover:bg-[var(--bg-main)]/80 hover:text-[var(--text-main)] text-[var(--text-sub)]"
-                >
-                  <Lock className="h-4 w-4" />
-                  <span>Security</span>
+                  Overview
                 </TabsTrigger>
                 <TabsTrigger
                   value="watchlist"
-                  className="flex flex-col items-center gap-2 py-3 px-4 text-xs sm:text-sm cursor-pointer transition-all duration-200 rounded-md
-                    data-[state=active]:bg-[var(--success)]/15 data-[state=active]:text-[var(--success)] data-[state=active]:border data-[state=active]:border-[var(--success)]/30
-                    hover:bg-[var(--bg-main)]/80 hover:text-[var(--text-main)] text-[var(--text-sub)]"
+                  className="data-[state=active]:bg-background data-[state=active]:text-foreground rounded-lg px-4 py-2"
                 >
-                  <ListVideo className="h-4 w-4" />
-                  <span>Watchlist</span>
+                  Watchlist
                 </TabsTrigger>
                 <TabsTrigger
                   value="history"
-                  className="flex flex-col items-center gap-2 py-3 px-4 text-xs sm:text-sm cursor-pointer transition-all duration-200 rounded-md
-                    data-[state=active]:bg-[var(--danger)]/15 data-[state=active]:text-[var(--danger)] data-[state=active]:border data-[state=active]:border-[var(--danger)]/30
-                    hover:bg-[var(--bg-main)]/80 hover:text-[var(--text-main)] text-[var(--text-sub)]"
+                  className="data-[state=active]:bg-background data-[state=active]:text-foreground rounded-lg px-4 py-2"
                 >
-                  <History className="h-4 w-4" />
-                  <span>History</span>
+                  History
+                </TabsTrigger>
+                <TabsTrigger
+                  value="settings"
+                  className="data-[state=active]:bg-background data-[state=active]:text-foreground rounded-lg px-4 py-2"
+                >
+                  Settings
                 </TabsTrigger>
               </TabsList>
 
-              <TabsContent value="overview" className="space-y-6 mt-8">
-                <div className="bg-gradient-to-br from-[var(--bg-card)]/80 to-[var(--bg-card)]/30 backdrop-blur-sm border border-[var(--border)] rounded-lg">
-                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 sm:p-6 border-b border-[var(--border)]/30">
-                    <div className="mb-4 sm:mb-0">
-                      <h3 className="text-lg sm:text-xl font-semibold flex items-center gap-3 text-[var(--text-main)]">
-                        <div className="p-2 bg-[var(--cinehub-accent)]/10 rounded-lg">
-                          <UserIcon className="h-5 w-5 text-[var(--cinehub-accent)]" />
+              {/* Overview Tab */}
+              <TabsContent value="overview" className="space-y-6">
+                <Card className="bg-card/50 backdrop-blur-sm border-border/50">
+                  <CardHeader>
+                    <CardTitle>Recent Activity</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      {watchHistory.slice(0, 5).map((item) => (
+                        <div
+                          key={item.id}
+                          className="flex items-center space-x-4 p-3 rounded-lg bg-accent/50"
+                        >
+                          <div className="relative h-16 w-12 flex-shrink-0">
+                            <Image
+                              src={item.poster_path}
+                              alt={item.title}
+                              fill
+                              className="object-cover rounded-md"
+                            />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <h3 className="font-medium truncate">{item.title}</h3>
+                            <p className="text-sm text-muted-foreground">
+                              {new Date(item.watched_at).toLocaleDateString()}
+                            </p>
+                          </div>
                         </div>
-                        Personal Information
-                      </h3>
-                      <p className="text-sm text-[var(--text-sub)] mt-2">
-                        Manage your personal details and preferences
-                      </p>
-                    </div>
-                    <Button
-                      variant={isEditing ? "destructive" : "outline"}
-                      size="sm"
-                      onClick={() => setIsEditing(!isEditing)}
-                      className={`shrink-0 cursor-pointer transition-all duration-200 ${
-                        isEditing
-                          ? "bg-[var(--danger)] hover:bg-[var(--danger)]/80 text-white border-[var(--danger)]"
-                          : "border-[var(--border)] text-[var(--text-main)] hover:bg-[var(--bg-main)]/80 hover:border-[var(--cinehub-accent)]/50"
-                      }`}
-                    >
-                      {isEditing ? (
-                        <>
-                          <X className="h-4 w-4 mr-2" />
-                          Cancel
-                        </>
-                      ) : (
-                        <>
-                          <Edit3 className="h-4 w-4 mr-2" />
-                          Edit
-                        </>
+                      ))}
+                      {watchHistory.length === 0 && (
+                        <p className="text-center text-muted-foreground py-4">
+                          No recent activity
+                        </p>
                       )}
-                    </Button>
-                  </div>
-                  <div className="p-4 sm:p-6 space-y-6">
-                    <div className="grid md:grid-cols-2 gap-4 sm:gap-6">
-                      <div className="space-y-2">
-                        <Label
-                          htmlFor="name"
-                          className="text-sm font-medium text-[var(--text-main)]"
-                        >
-                          Display Name
-                        </Label>
-                        <Input
-                          id="name"
-                          name="name"
-                          value={formData.name}
-                          onChange={handleInputChange}
-                          disabled={!isEditing}
-                          className="bg-[var(--bg-main)]/50 border-[var(--border)] focus:border-[var(--cinehub-accent)] text-[var(--text-main)] placeholder:text-[var(--text-sub)] transition-colors cursor-text"
-                        />
-                      </div>
-
-                      <div className="space-y-2">
-                        <Label
-                          htmlFor="email"
-                          className="text-sm font-medium text-[var(--text-main)]"
-                        >
-                          Email Address
-                        </Label>
-                        <Input
-                          id="email"
-                          name="email"
-                          type="email"
-                          value={formData.email}
-                          onChange={handleInputChange}
-                          disabled={!isEditing}
-                          className="bg-[var(--bg-main)]/50 border-[var(--border)] focus:border-[var(--cinehub-accent)] text-[var(--text-main)] placeholder:text-[var(--text-sub)] transition-colors cursor-text"
-                        />
-                      </div>
                     </div>
+                  </CardContent>
+                </Card>
 
-                    {isEditing && (
-                      <div className="flex justify-end space-x-3 pt-4 border-t border-[var(--border)]/30">
-                        <Button
-                          variant="outline"
-                          onClick={() => setIsEditing(false)}
-                          className="border-[var(--border)] text-[var(--text-main)] hover:bg-[var(--bg-main)]/80 cursor-pointer transition-colors"
+                <Card className="bg-card/50 backdrop-blur-sm border-border/50">
+                  <CardHeader>
+                    <CardTitle>Watchlist Summary</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      {watchList.slice(0, 5).map((item) => (
+                        <div
+                          key={item.id}
+                          className="flex items-center space-x-4 p-3 rounded-lg bg-accent/50"
                         >
-                          Cancel
-                        </Button>
-                        <Button
-                          onClick={handleUpdateProfile}
-                          className="bg-[var(--cinehub-accent)] hover:bg-[var(--cinehub-accent-hover)] text-[var(--bg-main)] cursor-pointer transition-colors"
-                        >
-                          <Save className="h-4 w-4 mr-2" />
-                          Save Changes
-                        </Button>
-                      </div>
-                    )}
-                  </div>
-                </div>
+                          <div className="relative h-16 w-12 flex-shrink-0">
+                            <Image
+                              src={item.poster_path}
+                              alt={item.title}
+                              fill
+                              className="object-cover rounded-md"
+                            />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <h3 className="font-medium truncate">{item.title}</h3>
+                            <p className="text-sm text-muted-foreground">
+                              Added {new Date(item.added_at).toLocaleDateString()}
+                            </p>
+                          </div>
+                        </div>
+                      ))}
+                      {watchList.length === 0 && (
+                        <p className="text-center text-muted-foreground py-4">
+                          No items in watchlist
+                        </p>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
               </TabsContent>
 
-              <TabsContent value="security" className="space-y-6 mt-8">
-                <div className="bg-gradient-to-br from-[var(--bg-card)]/80 to-[var(--bg-card)]/30 backdrop-blur-sm border border-[var(--border)] rounded-lg">
-                  <div className="p-4 sm:p-6 border-b border-[var(--border)]/30">
-                    <h3 className="text-lg sm:text-xl font-semibold flex items-center gap-3 text-[var(--text-main)]">
-                      <div className="p-2 bg-[var(--warning)]/10 rounded-lg">
-                        <Lock className="h-5 w-5 text-[var(--warning)]" />
-                      </div>
-                      Password & Security
-                    </h3>
-                    <p className="text-sm text-[var(--text-sub)] mt-2">
-                      Keep your account secure with a strong password
-                    </p>
-                  </div>
-                  <div className="p-4 sm:p-6 space-y-4">
-                    <div className="space-y-2">
-                      <Label
-                        htmlFor="currentPassword"
-                        className="text-[var(--text-main)]"
-                      >
-                        Current Password
-                      </Label>
-                      <Input
-                        id="currentPassword"
-                        name="currentPassword"
-                        type="password"
-                        value={formData.currentPassword}
-                        onChange={handleInputChange}
-                        className="bg-[var(--bg-main)]/50 border-[var(--border)] focus:border-[var(--warning)] text-[var(--text-main)] placeholder:text-[var(--text-sub)] transition-colors cursor-text"
-                      />
-                    </div>
-
-                    <div className="grid md:grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <Label
-                          htmlFor="newPassword"
-                          className="text-[var(--text-main)]"
-                        >
-                          New Password
-                        </Label>
-                        <Input
-                          id="newPassword"
-                          name="newPassword"
-                          type="password"
-                          value={formData.newPassword}
-                          onChange={handleInputChange}
-                          className="bg-[var(--bg-main)]/50 border-[var(--border)] focus:border-[var(--warning)] text-[var(--text-main)] placeholder:text-[var(--text-sub)] transition-colors cursor-text"
-                        />
-                      </div>
-
-                      <div className="space-y-2">
-                        <Label
-                          htmlFor="confirmPassword"
-                          className="text-[var(--text-main)]"
-                        >
-                          Confirm New Password
-                        </Label>
-                        <Input
-                          id="confirmPassword"
-                          name="confirmPassword"
-                          type="password"
-                          value={formData.confirmPassword}
-                          onChange={handleInputChange}
-                          className="bg-[var(--bg-main)]/50 border-[var(--border)] focus:border-[var(--warning)] text-[var(--text-main)] placeholder:text-[var(--text-sub)] transition-colors cursor-text"
-                        />
-                      </div>
-                    </div>
-
-                    <div className="flex justify-end pt-4 border-t border-[var(--border)]/30">
-                      <Button
-                        onClick={handleChangePassword}
-                        className="bg-[var(--warning)] hover:bg-[var(--warning)]/80 text-[var(--bg-main)] cursor-pointer transition-colors"
-                      >
-                        <Lock className="h-4 w-4 mr-2" />
-                        Update Password
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-              </TabsContent>
-
-              <TabsContent value="watchlist" className="space-y-6 mt-8">
-                <div className="bg-gradient-to-br from-[var(--bg-card)]/80 to-[var(--bg-card)]/30 backdrop-blur-sm border border-[var(--border)] rounded-lg">
-                  <div className="p-4 sm:p-6 border-b border-[var(--border)]/30">
-                    <h3 className="text-lg sm:text-xl font-semibold flex items-center gap-3 text-[var(--text-main)]">
-                      <div className="p-2 bg-[var(--success)]/10 rounded-lg">
-                        <ListVideo className="h-5 w-5 text-[var(--success)]" />
-                      </div>
-                      My Watchlist
-                      <Badge
-                        variant="secondary"
-                        className="ml-2 bg-[var(--success)]/10 text-[var(--success)] border-[var(--success)]/20"
-                      >
-                        {watchList.length}
-                      </Badge>
-                    </h3>
-                    <p className="text-sm text-[var(--text-sub)] mt-2">
-                      Movies and shows you want to watch
-                    </p>
-                  </div>
-                  <div className="p-4 sm:p-6">
+              {/* Watchlist Tab */}
+              <TabsContent value="watchlist" className="space-y-6">
+                <Card className="bg-card/50 backdrop-blur-sm border-border/50">
+                  <CardHeader>
+                    <CardTitle>Watchlist</CardTitle>
+                  </CardHeader>
+                  <CardContent>
                     {watchList.length > 0 ? (
                       <ScrollArea className="h-[600px] pr-4">
                         <div className="space-y-8">
@@ -599,30 +438,17 @@ export default function ProfilePage() {
                         </Button>
                       </div>
                     )}
-                  </div>
-                </div>
+                  </CardContent>
+                </Card>
               </TabsContent>
 
-              <TabsContent value="history" className="space-y-6 mt-8">
-                <div className="bg-gradient-to-br from-[var(--bg-card)]/80 to-[var(--bg-card)]/30 backdrop-blur-sm border border-[var(--border)] rounded-lg">
-                  <div className="p-4 sm:p-6 border-b border-[var(--border)]/30">
-                    <h3 className="text-lg sm:text-xl font-semibold flex items-center gap-3 text-[var(--text-main)]">
-                      <div className="p-2 bg-[var(--danger)]/10 rounded-lg">
-                        <History className="h-5 w-5 text-[var(--danger)]" />
-                      </div>
-                      Watch History
-                      <Badge
-                        variant="secondary"
-                        className="ml-2 bg-[var(--danger)]/10 text-[var(--danger)] border-[var(--danger)]/20"
-                      >
-                        {watchHistory.length}
-                      </Badge>
-                    </h3>
-                    <p className="text-sm text-[var(--text-sub)] mt-2">
-                      Movies and shows you've watched
-                    </p>
-                  </div>
-                  <div className="p-4 sm:p-6">
+              {/* History Tab */}
+              <TabsContent value="history" className="space-y-6">
+                <Card className="bg-card/50 backdrop-blur-sm border-border/50">
+                  <CardHeader>
+                    <CardTitle>Watch History</CardTitle>
+                  </CardHeader>
+                  <CardContent>
                     {watchHistory.length > 0 ? (
                       <ScrollArea className="h-[600px] pr-4">
                         <div className="space-y-8">
@@ -686,13 +512,49 @@ export default function ProfilePage() {
                         </Button>
                       </div>
                     )}
-                  </div>
-                </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              {/* Settings Tab */}
+              <TabsContent value="settings" className="space-y-6">
+                <Settings />
               </TabsContent>
             </Tabs>
           </div>
         </div>
       </div>
+
+      {/* Avatar Selection Dialog */}
+      <Dialog open={isAvatarDialogOpen} onOpenChange={setIsAvatarDialogOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Choose Avatar</DialogTitle>
+          </DialogHeader>
+          <div className="grid grid-cols-4 gap-4 py-4">
+            {availableAvatars.length === 0 ? (
+              <div className="col-span-full text-center py-8 text-[var(--text-sub)]">
+                No avatars available
+              </div>
+            ) : (
+              availableAvatars.map((avatar) => (
+                <button
+                  key={avatar}
+                  onClick={() => handleAvatarSelect(avatar)}
+                  className="relative aspect-square rounded-lg overflow-hidden hover:ring-2 hover:ring-primary transition-all"
+                >
+                  <Image
+                    src={avatar}
+                    alt="Avatar"
+                    fill
+                    className="object-cover"
+                  />
+                </button>
+              ))
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

@@ -40,9 +40,9 @@ const LandingPage = () => {
   if (isLoading) {
     return (
       <div className="fixed inset-0 flex items-center justify-center bg-gradient-to-br from-gray-900 via-slate-900 to-black">
-        <Loading message="Welcome to CineHub..." />
+          <Loading message="Welcome to CineHub..." />
       </div>
-    );
+    );      
   }
 
   const features = [

@@ -7,16 +7,14 @@ import { TMDBMovieDetails } from "@/types/tmdb";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import MovieOverview from "@/components/movie/MovieOverview";
-import MovieCast from "@/components/movie/MovieCast";
-import MovieReviews from "@/components/movie/MovieReviews";
-import SimilarMovies from "@/components/movie/SimilarMovies";
-import MovieMedia from "@/components/movie/MovieMedia";
 import {
-  Play,
-  Share2,
-  BookmarkPlus,
-} from "lucide-react";
+  MovieOverview,
+  MovieCast,
+  MovieReviews,
+  SimilarMovies,
+  MovieMedia,
+} from "@/components/lazy";
+import { Play, Share2, BookmarkPlus } from "lucide-react";
 import { getImageUrl } from "@/services/tmdb";
 import { TMDBGenre } from "@/types/tmdb";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -27,7 +25,6 @@ export default function MovieDetail() {
   const [movie, setMovie] = useState<TMDBMovieDetails | null>(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("overview");
-  const [selectedVideo, setSelectedVideo] = useState<string | null>(null);
 
   useEffect(() => {
     const loadMovie = async () => {
@@ -55,7 +52,9 @@ export default function MovieDetail() {
           <h1 className="text-xl sm:text-2xl font-bold text-red-500">
             Error loading movie
           </h1>
-          <p className="text-slate-400 text-sm sm:text-base">Please try again later</p>
+          <p className="text-slate-400 text-sm sm:text-base">
+            Please try again later
+          </p>
         </div>
       </div>
     );
@@ -184,8 +183,10 @@ export default function MovieDetail() {
           >
             <div className="mb-8">
               <ScrollArea className="w-full">
-                <TabsList className="w-full bg-[#1b263b] border border-[#2e3c51] rounded-lg p-1 
-                                   flex flex-nowrap">
+                <TabsList
+                  className="w-full bg-[#1b263b] border border-[#2e3c51] rounded-lg p-1 
+                                   flex flex-nowrap"
+                >
                   <TabsTrigger
                     value="overview"
                     className="data-[state=active]:bg-[#4fd1c5] data-[state=active]:text-[#0d1b2a] 
@@ -257,8 +258,8 @@ export default function MovieDetail() {
               </TabsContent>
 
               <TabsContent value="media" className="mt-0">
-                <MovieMedia 
-                  videos={movie.videos || { results: [] }} 
+                <MovieMedia
+                  videos={movie.videos || { results: [] }}
                   movieTitle={movie.title}
                 />
               </TabsContent>
@@ -303,13 +304,16 @@ function MovieDetailSkeleton() {
           </div>
         </div>
       </div>
-      
+
       <div className="container mx-auto px-4 sm:px-6 pt-6 sm:pt-10">
         {/* Fixed skeleton for tabs */}
         <div className="mb-8">
           <div className="flex gap-2 overflow-x-auto sm:grid sm:grid-cols-5 bg-[#1b263b] border border-[#2e3c51] rounded-lg p-1">
             {Array.from({ length: 5 }).map((_, i) => (
-              <Skeleton key={i} className="h-10 min-w-[80px] sm:w-full flex-shrink-0" />
+              <Skeleton
+                key={i}
+                className="h-10 min-w-[80px] sm:w-full flex-shrink-0"
+              />
             ))}
           </div>
         </div>

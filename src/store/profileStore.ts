@@ -2,195 +2,215 @@ import { create } from 'zustand';
 import { authService } from '@/services/auth/authService';
 import { useToast } from '@/components/ui/use-toast';
 
+interface User {
+  id: number;
+  name: string;
+  email: string;
+  avatar: string;
+  role: string;
+  created_at: string;
+  last_login_at: string;
+}
+
+interface FormData {
+  name?: string;
+  email?: string;
+  currentPassword?: string;
+  newPassword?: string;
+  confirmPassword?: string;
+  avatar?: string;
+}
+
 interface ProfileState {
-  // User data
-  user: any | null;
-  loading: boolean;
+  user: User | null;
   isEditing: boolean;
   isAvatarDialogOpen: boolean;
+  availableAvatars: string[];
   activeTab: string;
-  
-  // Lists
   watchList: any[];
   watchHistory: any[];
-  availableAvatars: string[];
-  
-  // Form data
-  formData: {
-    name: string;
-    email: string;
-    currentPassword: string;
-    newPassword: string;
-    confirmPassword: string;
-    avatar: string;
-  };
-
-  // Actions
-  setUser: (user: any) => void;
-  setLoading: (loading: boolean) => void;
+  formData: FormData;
+  loading: boolean;
+  setActiveTab: (tab: string) => void;
   setIsEditing: (isEditing: boolean) => void;
   setIsAvatarDialogOpen: (isOpen: boolean) => void;
-  setActiveTab: (tab: string) => void;
-  setWatchList: (list: any[]) => void;
-  setWatchHistory: (history: any[]) => void;
-  setAvailableAvatars: (avatars: string[]) => void;
-  setFormData: (data: Partial<ProfileState['formData']>) => void;
-  
-  // Async actions
-  fetchUserData: () => Promise<void>;
-  fetchWatchList: () => Promise<void>;
-  fetchWatchHistory: () => Promise<void>;
-  fetchAvatars: () => Promise<void>;
+  setFormData: (data: Partial<FormData>) => void;
   updateProfile: () => Promise<void>;
   changePassword: () => Promise<void>;
   updateAvatar: (avatarPath: string) => Promise<void>;
+  fetchUserData: () => Promise<void>;
+  fetchAvatars: () => Promise<void>;
+  fetchWatchList: () => Promise<void>;
+  fetchWatchHistory: () => Promise<void>;
 }
 
 export const useProfileStore = create<ProfileState>((set, get) => ({
-  // Initial state
   user: null,
-  loading: true,
   isEditing: false,
   isAvatarDialogOpen: false,
-  activeTab: 'overview',
+  availableAvatars: [],
+  activeTab: "overview",
   watchList: [],
   watchHistory: [],
-  availableAvatars: [],
-  formData: {
-    name: '',
-    email: '',
-    currentPassword: '',
-    newPassword: '',
-    confirmPassword: '',
-    avatar: '',
-  },
+  formData: {},
+  loading: true,
 
-  // Setters
-  setUser: (user) => set({ user }),
-  setLoading: (loading) => set({ loading }),
+  setActiveTab: (tab) => set({ activeTab: tab }),
   setIsEditing: (isEditing) => set({ isEditing }),
   setIsAvatarDialogOpen: (isOpen) => set({ isAvatarDialogOpen: isOpen }),
-  setActiveTab: (tab) => set({ activeTab: tab }),
-  setWatchList: (list) => set({ watchList: list }),
-  setWatchHistory: (history) => set({ watchHistory: history }),
-  setAvailableAvatars: (avatars) => set({ availableAvatars: avatars }),
-  setFormData: (data) => set((state) => ({
-    formData: { ...state.formData, ...data }
-  })),
+  setFormData: (data) => set((state) => ({ formData: { ...state.formData, ...data } })),
 
-  // Async actions
-  fetchUserData: async () => {
+  updateProfile: async () => {
+    const { formData } = get();
     try {
-      set({ loading: true });
-      const user = await authService.getCurrentUser();
-      if (!user) return;
-      
+      const response = await fetch("/api/profile", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || "Failed to update profile");
+      }
+
+      const data = await response.json();
       set({ 
-        user,
+        user: data.user, 
+        isEditing: false,
         formData: {
-          name: user.name,
-          email: user.email,
-          currentPassword: '',
-          newPassword: '',
-          confirmPassword: '',
-          avatar: user.avatar || '',
+          name: data.user.name,
+          email: data.user.email,
+          avatar: data.user.avatar
         }
       });
     } catch (error) {
-      console.error('Failed to fetch user data:', error);
-    } finally {
-      set({ loading: false });
-    }
-  },
-
-  fetchWatchList: async () => {
-    try {
-      const response = await fetch('/api/user/watchlist');
-      const data = await response.json();
-      if (response.ok) {
-        set({ watchList: data.items });
-      }
-    } catch (error) {
-      console.error('Failed to fetch watch list:', error);
-    }
-  },
-
-  fetchWatchHistory: async () => {
-    try {
-      const response = await fetch('/api/user/history');
-      const data = await response.json();
-      if (response.ok) {
-        set({ watchHistory: data.items });
-      }
-    } catch (error) {
-      console.error('Failed to fetch watch history:', error);
-    }
-  },
-
-  fetchAvatars: async () => {
-    try {
-      const response = await fetch('/api/avatars');
-      const data = await response.json();
-      if (response.ok) {
-        set({ availableAvatars: data.avatars.map((avatar: any) => avatar.path) });
-      }
-    } catch (error) {
-      console.error('Failed to fetch avatars:', error);
-    }
-  },
-
-  updateProfile: async () => {
-    const { formData, user } = get();
-    try {
-      const updatedUser = await authService.updateProfile({
-        name: formData.name,
-        email: formData.email,
-      });
-      set({ user: updatedUser, isEditing: false });
-    } catch (error) {
-      console.error('Failed to update profile:', error);
       throw error;
     }
   },
 
   changePassword: async () => {
     const { formData } = get();
-    if (formData.newPassword !== formData.confirmPassword) {
-      throw new Error('New passwords do not match');
-    }
-
     try {
-      await authService.updateProfile({
-        currentPassword: formData.currentPassword,
-        newPassword: formData.newPassword,
+      const response = await fetch("/api/profile/password", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          currentPassword: formData.currentPassword,
+          newPassword: formData.newPassword,
+          confirmPassword: formData.confirmPassword,
+        }),
       });
-      set({
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || "Failed to change password");
+      }
+
+      set({ 
         formData: {
           ...formData,
           currentPassword: '',
           newPassword: '',
-          confirmPassword: '',
+          confirmPassword: ''
         }
       });
     } catch (error) {
-      console.error('Failed to change password:', error);
       throw error;
     }
   },
 
   updateAvatar: async (avatarPath: string) => {
     try {
-      await authService.updateProfile({
-        avatar: avatarPath,
+      const response = await fetch("/api/profile/avatar", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ avatar: avatarPath }),
       });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || "Failed to update avatar");
+      }
+
+      const data = await response.json();
       set((state) => ({
-        user: { ...state.user, avatar: avatarPath },
+        user: state.user ? { ...state.user, avatar: avatarPath } : null,
         formData: { ...state.formData, avatar: avatarPath },
         isAvatarDialogOpen: false,
       }));
     } catch (error) {
-      console.error('Failed to update avatar:', error);
       throw error;
+    }
+  },
+
+  fetchUserData: async () => {
+    try {
+      const response = await fetch("/api/profile");
+      if (!response.ok) {
+        throw new Error("Failed to fetch user data");
+      }
+      const data = await response.json();
+      set({ 
+        user: data.user, 
+        formData: {
+          name: data.user.name,
+          email: data.user.email,
+          avatar: data.user.avatar
+        },
+        loading: false 
+      });
+    } catch (error) {
+      set({ loading: false });
+      throw error;
+    }
+  },
+
+  fetchAvatars: async () => {
+    try {
+      const response = await fetch("/api/profile/avatars");
+      if (!response.ok) {
+        throw new Error("Failed to fetch avatars");
+      }
+      const data = await response.json();
+      set({ availableAvatars: data.avatars.map((avatar: any) => avatar.file_path) });
+    } catch (error) {
+      console.error("Error fetching avatars:", error);
+      set({ availableAvatars: [] });
+    }
+  },
+
+  fetchWatchList: async () => {
+    try {
+      const response = await fetch("/api/profile/watchlist");
+      if (!response.ok) {
+        throw new Error("Failed to fetch watchlist");
+      }
+      const data = await response.json();
+      set({ watchList: data.watchlist });
+    } catch (error) {
+      console.error("Error fetching watchlist:", error);
+      set({ watchList: [] });
+    }
+  },
+
+  fetchWatchHistory: async () => {
+    try {
+      const response = await fetch("/api/profile/history");
+      if (!response.ok) {
+        throw new Error("Failed to fetch watch history");
+      }
+      const data = await response.json();
+      set({ watchHistory: data.history });
+    } catch (error) {
+      console.error("Error fetching watch history:", error);
+      set({ watchHistory: [] });
     }
   },
 })); 

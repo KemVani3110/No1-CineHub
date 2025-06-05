@@ -39,12 +39,17 @@ export const TVShowCast = lazy(() => import("@/components/tv/TVShowCast"));
 export const TVShowSeasons = lazy(() => import("@/components/tv/TVShowSeasons"));
 export const TVShowMedia = lazy(() => import("@/components/tv/TVShowMedia"));
 export const SimilarTVShows = lazy(() => import("@/components/tv/SimilarTVShows"));
+export const TVShowReviews = lazy(() => import("@/components/tv/TVShowReviews"));
 
 // Movie components
 export const MovieOverview = lazy(() => import("@/components/movie/MovieOverview"));
 export const MovieCast = lazy(() => import("@/components/movie/MovieCast"));
 export const MovieMedia = lazy(() => import("@/components/movie/MovieMedia"));
 export const SimilarMovies = lazy(() => import("@/components/movie/SimilarMovies"));
+export const MovieReviews = lazy(() => import("@/components/movie/MovieReviews"));
+
+// Profile components
+export const Settings = lazy(() => import("@/components/profile/Settings"));
 
 // Lazy loading wrapper component with custom loading messages
 export const withLazyLoading = (Component: React.ComponentType, loadingMessage?: string) => {

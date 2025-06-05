@@ -62,7 +62,7 @@ const navItems = [
   },
   {
     title: "User Avatar",
-    href: "/admin/avtar",
+    href: "/admin/avatar",
     icon: CircleUser,
     badge: null,
   },
