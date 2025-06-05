@@ -4,6 +4,8 @@ import "@/styles/globals.css";
 import Providers from "@/providers/Providers";
 import QueryProvider from "@/providers/QueryProvider";
 import { Toaster } from "@/components/ui/toaster";
+import { Suspense } from 'react';
+import Loading from '@/components/common/Loading';
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -21,12 +23,14 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <Providers>
-          <QueryProvider>
-            {children}
-            <Toaster />
-          </QueryProvider>
-        </Providers>
+        <Suspense fallback={<Loading message="Loading CineHub..." />}>
+          <Providers>
+            <QueryProvider>
+              {children}
+              <Toaster />
+            </QueryProvider>
+          </Providers>
+        </Suspense>
       </body>
     </html>
   );

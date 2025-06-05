@@ -21,6 +21,14 @@ interface SocialLoginData {
   };
 }
 
+interface UpdateProfileData {
+  name?: string;
+  email?: string;
+  currentPassword?: string;
+  newPassword?: string;
+  avatar?: string;
+}
+
 class AuthService {
   private static instance: AuthService;
   private baseUrl = '/api/auth';
@@ -107,6 +115,35 @@ class AuthService {
     }
 
     return responseData;
+  }
+
+  async updateProfile(data: UpdateProfileData): Promise<User> {
+    const response = await fetch(`${this.baseUrl}/profile`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    });
+
+    const responseData = await response.json();
+
+    if (!response.ok) {
+      throw new Error(responseData.message || 'Failed to update profile');
+    }
+
+    return responseData.user;
+  }
+
+  async getProfile(): Promise<User> {
+    const response = await fetch(`${this.baseUrl}/profile`);
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.message || 'Failed to get profile');
+    }
+
+    return data.user;
   }
 }
 

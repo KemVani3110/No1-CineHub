@@ -189,7 +189,7 @@ const Header = ({ onSidebarChange }: HeaderProps) => {
                     <DropdownMenuTrigger asChild>
                       <Button
                         variant="ghost"
-                        className="hidden sm:flex p-1 rounded-full hover:bg-accent/10 cursor-pointer"
+                        className="hidden sm:flex p-1 rounded-full hover:!bg-transparent focus-visible:ring-0 cursor-pointer"
                       >
                         <Avatar className="h-10 w-10 border-2 border-primary/20">
                           <AvatarImage
@@ -497,7 +497,7 @@ const Header = ({ onSidebarChange }: HeaderProps) => {
                             asChild
                           >
                             <Link href="/admin/dashboard">
-                              <PanelLeft size={22} className="mr-3" />
+                              <PanelLeft size={22} className="mr-3 " />
                               Admin Dashboard
                             </Link>
                           </Button>

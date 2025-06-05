@@ -4,7 +4,7 @@ import pool from '@/lib/db';
 import { compare } from 'bcrypt';
 import { auth } from 'firebase-admin';
 import { initializeApp, getApps, cert } from 'firebase-admin/app';
-import { NextAuthSession, UserRole } from '@/types/auth';
+
 
 declare module 'next-auth' {
   interface Session {
@@ -59,7 +59,7 @@ export const authOptions: NextAuthOptions = {
       },
       async authorize(credentials) {
         if (!credentials?.email) {
-          throw new Error('Email is required');
+          return null;
         }
 
         // Check if this is a social login attempt
@@ -70,7 +70,7 @@ export const authOptions: NextAuthOptions = {
             const email = decodedToken.email;
 
             if (!email) {
-              throw new Error('No email found in token');
+              return null;
             }
 
             // Check if user exists
@@ -81,13 +81,13 @@ export const authOptions: NextAuthOptions = {
             const users = rows as any[];
 
             if (users.length === 0) {
-              throw new Error('User not found');
+              return null;
             }
 
             const user = users[0];
 
             if (!user.is_active) {
-              throw new Error('Account is disabled');
+              return null;
             }
 
             return {
@@ -99,13 +99,13 @@ export const authOptions: NextAuthOptions = {
             };
           } catch (error) {
             console.error('Token verification error:', error);
-            throw new Error('Invalid token');
+            return null;
           }
         }
 
         // Regular email/password login
         if (!credentials?.password) {
-          throw new Error('Password is required');
+          return null;
         }
 
         const [rows] = await pool.query(
@@ -115,23 +115,23 @@ export const authOptions: NextAuthOptions = {
         const users = rows as any[];
 
         if (users.length === 0) {
-          throw new Error('User not found');
+          return null;
         }
 
         const user = users[0];
 
         if (!user.password_hash) {
-          throw new Error('Invalid credentials');
+          return null;
         }
 
         const isValid = await compare(credentials.password, user.password_hash);
 
         if (!isValid) {
-          throw new Error('Invalid credentials');
+          return null;
         }
 
         if (!user.is_active) {
-          throw new Error('Account is disabled');
+          return null;
         }
 
         return {
@@ -141,7 +141,7 @@ export const authOptions: NextAuthOptions = {
           role: user.role,
           image: user.avatar,
         };
-      },
+      }
     }),
   ],
   callbacks: {

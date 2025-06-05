@@ -23,22 +23,23 @@ import {
   UpcomingMovies,
   PopularTVShows,
   TopRatedTVShows,
-  withLazyLoading,
-  LazyUpcomingTVShows,
+  UpcomingTVShows,
+  withLazyLoading
 } from "@/components/lazy";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import BackToTop from "@/components/common/BackToTop";
 
 // Wrap components with lazy loading
-const LazyHeader = withLazyLoading(Header);
-const LazyFooter = withLazyLoading(Footer);
-const LazyHeroSection = withLazyLoading(HeroSection);
-const LazyPopularMovies = withLazyLoading(PopularMovies);
-const LazyTopRatedMovies = withLazyLoading(TopRatedMovies);
-const LazyNowPlayingMovies = withLazyLoading(NowPlayingMovies);
-const LazyUpcomingMovies = withLazyLoading(UpcomingMovies);
-const LazyPopularTVShows = withLazyLoading(PopularTVShows);
-const LazyTopRatedTVShows = withLazyLoading(TopRatedTVShows);
+const LazyHeader = withLazyLoading(Header, "Loading header...");
+const LazyFooter = withLazyLoading(Footer, "Loading footer...");
+const LazyHeroSection = withLazyLoading(HeroSection, "Loading hero section...");
+const LazyPopularMovies = withLazyLoading(PopularMovies, "Loading popular movies...");
+const LazyTopRatedMovies = withLazyLoading(TopRatedMovies, "Loading top rated movies...");
+const LazyNowPlayingMovies = withLazyLoading(NowPlayingMovies, "Loading now playing movies...");
+const LazyUpcomingMovies = withLazyLoading(UpcomingMovies, "Loading upcoming movies...");
+const LazyPopularTVShows = withLazyLoading(PopularTVShows, "Loading popular TV shows...");
+const LazyTopRatedTVShows = withLazyLoading(TopRatedTVShows, "Loading top rated TV shows...");
+const LazyUpcomingTVShows = withLazyLoading(UpcomingTVShows, "Loading upcoming TV shows...");
 
 const queryClient = new QueryClient({
   defaultOptions: {

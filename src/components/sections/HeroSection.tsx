@@ -17,8 +17,10 @@ import {
   fetchTVShows,
   getImageUrl,
   fetchGenres,
+  fetchMovieDetails,
+  fetchTVShowDetails,
 } from "@/services/tmdb";
-import { TMDBMovie, TMDBTVShow, TMDBGenre } from "@/types/tmdb";
+import { TMDBMovie, TMDBTVShow, TMDBGenre, TMDBMovieDetails, TMDBTVDetails } from "@/types/tmdb";
 import { motion} from "framer-motion";
 import { Skeleton } from "@/components/ui/skeleton";
 import useEmblaCarousel from "embla-carousel-react";
@@ -58,6 +60,16 @@ const HeroSection = () => {
       : tvData?.results?.slice(0, MAX_ITEMS);
 
   const currentItem = items?.[currentIndex];
+
+  // Fetch detailed information for the current item
+  const { data: currentItemDetails } = useQuery({
+    queryKey: [activeTab, currentItem?.id, "details"],
+    queryFn: () => 
+      activeTab === "movies"
+        ? fetchMovieDetails(currentItem?.id as number)
+        : fetchTVShowDetails(currentItem?.id as number),
+    enabled: !!currentItem?.id,
+  });
 
   const scrollPrev = useCallback(() => {
     if (emblaApi) emblaApi.scrollPrev();
@@ -161,23 +173,6 @@ const HeroSection = () => {
       </div>
     );
   }
-
-  const slideVariants = {
-    enter: (direction: number) => ({
-      x: direction > 0 ? 1000 : -1000,
-      opacity: 0,
-    }),
-    center: {
-      zIndex: 1,
-      x: 0,
-      opacity: 1,
-    },
-    exit: (direction: number) => ({
-      zIndex: 0,
-      x: direction < 0 ? 1000 : -1000,
-      opacity: 0,
-    }),
-  };
 
   const contentVariants = {
     hidden: { opacity: 0 },
@@ -305,7 +300,9 @@ const HeroSection = () => {
                       <div className="flex items-center gap-1.5 sm:gap-2 bg-bg-card/50 backdrop-blur-sm px-2 py-1 sm:px-3 sm:py-1.5 rounded-full border border-border">
                         <Clock className="w-3 h-3 sm:w-4 sm:h-4 text-text-sub" />
                         <span className="text-text-main font-medium text-xs sm:text-sm">
-                          {activeTab === "movies" ? "120 min" : "TV Series"}
+                          {activeTab === "movies" 
+                            ? `${(currentItemDetails as TMDBMovieDetails)?.runtime || 0} min`
+                            : `${(currentItemDetails as TMDBTVDetails)?.episode_run_time?.[0] || 0} min/ep`}
                         </span>
                       </div>
 
