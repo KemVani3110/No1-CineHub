@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
-import Loading from "./Loading";
+import CompilingOverlay from "./CompilingOverlay";
 
 interface CompilingContextType {
   isCompiling: boolean;
@@ -32,11 +32,7 @@ export function CompilingProvider({ children }: { children: React.ReactNode }) {
   return (
     <CompilingContext.Provider value={{ isCompiling }}>
       {children}
-      {isCompiling && (
-        <div className="fixed inset-0 z-50">
-          <Loading message="Loading..." />
-        </div>
-      )}
+      {isCompiling && <CompilingOverlay />}
     </CompilingContext.Provider>
   );
 } 

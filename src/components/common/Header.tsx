@@ -57,7 +57,6 @@ const Header = ({ onSidebarChange }: HeaderProps) => {
   const navItems = [
     { name: "Home", path: "/home", icon: Home },
     { name: "Explore", path: "/explore", icon: Compass },
-    { name: "Search", path: "/search", icon: Search },
   ];
 
   const closeMobileMenu = () => {
@@ -169,6 +168,17 @@ const Header = ({ onSidebarChange }: HeaderProps) => {
                   </Link>
                 );
               })}
+              <Link
+                href="/search"
+                className={`nav-item flex items-center space-x-2 px-4 py-2 mx-1 rounded-full text-sm font-medium transition-all duration-200 ${
+                  pathname === '/search'
+                    ? "text-white bg-primary shadow-lg shadow-primary/25"
+                    : "text-muted-foreground hover:text-primary hover:bg-accent/10"
+                }`}
+              >
+                <Search size={20} />
+                <span>Search</span>
+              </Link>
             </nav>
 
             {/* Right Section */}
@@ -325,214 +335,84 @@ const Header = ({ onSidebarChange }: HeaderProps) => {
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="md:hidden h-10 w-10 rounded-full"
+                    className="md:hidden h-10 w-10 rounded-full hover:bg-accent/10"
                   >
-                    <Menu size={22} />
+                    <Menu size={24} />
                   </Button>
                 </SheetTrigger>
-
-                <SheetContent
-                  side="left"
-                  className="w-80 p-0 flex flex-col max-h-screen"
-                >
-                  <SheetHeader className="sr-only">
-                    <SheetTitle>Navigation Menu</SheetTitle>
+                <SheetContent side="right" className="w-[300px] sm:w-[400px]">
+                  <SheetHeader>
+                    <SheetTitle>Menu</SheetTitle>
                   </SheetHeader>
-
-                  <div className="flex flex-col h-full overflow-hidden">
-                    {/* Header inside sidebar */}
-                    <div className="p-6 border-b flex-shrink-0">
-                      <div className="flex items-center space-x-3">
-                        <div className="relative w-12 h-12">
-                          <Image
-                            src="/logo.png"
-                            alt="CineHub Logo"
-                            fill
-                            className="object-contain rounded-full"
-                          />
-                        </div>
-                        <div className="flex flex-col">
-                          <span className="text-xl font-bold gradient-text">
-                            CineHub
-                          </span>
-                          <span className="text-sm text-muted-foreground">
-                            Cinema Experience
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* User Info */}
-                    {authUser && (
-                      <div className="p-6 border-b flex-shrink-0">
-                        <div className="flex items-center space-x-3">
-                          <Avatar className="h-12 w-12 border-2 border-primary/20">
-                            <AvatarImage
-                              src={getUserAvatar()}
-                              alt={authUser.name || authUser.email || "User"}
-                              referrerPolicy="no-referrer"
-                            />
-                            <AvatarFallback className="bg-primary/10 text-primary">
-                              {getUserInitials(
-                                authUser.name || authUser.email || "User"
-                              )}
-                            </AvatarFallback>
-                          </Avatar>
-                          <div className="flex flex-col min-w-0 flex-1">
-                            <span className="font-medium text-foreground truncate">
-                              {authUser.name || authUser.email}
-                            </span>
-                            {authUser.email && authUser.name && (
-                              <span className="text-sm text-muted-foreground truncate">
-                                {authUser.email}
-                              </span>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Navigation Items */}
-                    <div className="flex-1 overflow-y-auto">
-                      <div className="p-6">
-                        <nav className="space-y-2">
-                          {navItems.map((item) => {
-                            const Icon = item.icon;
-                            const isActive = pathname === item.path;
-                            return (
-                              <Link
-                                key={item.path}
-                                href={item.path}
-                                onClick={closeMobileMenu}
-                                className={`flex items-center space-x-3 px-4 py-4 rounded-xl text-base font-medium transition-all ${
-                                  isActive
-                                    ? "text-white bg-primary shadow-lg"
-                                    : "text-muted-foreground hover:text-primary hover:bg-accent/10"
-                                }`}
-                              >
-                                <Icon size={22} />
-                                <span>{item.name}</span>
-                              </Link>
-                            );
-                          })}
-                        </nav>
-
-                        <Separator className="my-6" />
-
-                        {/* Additional Actions */}
-                        {authUser && (
-                          <div className="space-y-2">
-                            <Button
-                              variant="ghost"
-                              className="w-full justify-start h-auto px-4 py-4 text-base rounded-xl relative"
-                              onClick={closeMobileMenu}
-                            >
-                              <Bell size={22} className="mr-3" />
-                              Notifications
-                              <Badge
-                                variant="destructive"
-                                className="ml-auto h-5 w-5 flex items-center justify-center p-0 text-xs"
-                              >
-                                3
-                              </Badge>
-                            </Button>
-
-                            <Button
-                              variant="ghost"
-                              className="w-full justify-start h-auto px-4 py-4 text-base rounded-xl"
-                              onClick={closeMobileMenu}
-                              asChild
-                            >
-                              <Link href="/settings">
-                                <Settings size={22} className="mr-3" />
-                                Settings
-                              </Link>
-                            </Button>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* Auth Buttons */}
-                    <div className="border-t flex-shrink-0">
-                      {authUser ? (
-                        <div className="p-6">
-                          <Button
-                            variant="outline"
-                            className="w-full justify-start h-12 text-base text-destructive border-destructive hover:bg-destructive hover:text-destructive-foreground rounded-xl"
-                            onClick={handleLogout}
-                          >
-                            <LogOut size={20} className="mr-3" />
-                            Logout
-                          </Button>
-                        </div>
-                      ) : (
-                        <div className="p-6 space-y-3">
-                          <Button
-                            variant="outline"
-                            className="w-full justify-start h-12 text-base rounded-xl"
-                            onClick={closeMobileMenu}
-                            asChild
-                          >
-                            <Link href="/login">
-                              <LogIn size={20} className="mr-3" />
-                              Sign In
-                            </Link>
-                          </Button>
-                          <Button
-                            className="w-full justify-start h-12 text-base rounded-xl"
-                            onClick={closeMobileMenu}
-                            asChild
-                          >
-                            <Link href="/register">
-                              <User size={20} className="mr-3" />
-                              Sign Up
-                            </Link>
-                          </Button>
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Admin Actions */}
-                    {authUser?.role === "admin" && (
+                  <div className="flex flex-col space-y-4 mt-4">
+                    {navItems.map((item) => {
+                      const Icon = item.icon;
+                      const isActive = pathname === item.path;
+                      return (
+                        <Link
+                          key={item.path}
+                          href={item.path}
+                          onClick={closeMobileMenu}
+                          className={`flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                            isActive
+                              ? "text-white bg-primary shadow-lg shadow-primary/25"
+                              : "text-muted-foreground hover:text-primary hover:bg-accent/10"
+                          }`}
+                        >
+                          <Icon size={20} />
+                          <span>{item.name}</span>
+                        </Link>
+                      );
+                    })}
+                    <Link
+                      href="/search"
+                      onClick={closeMobileMenu}
+                      className={`flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                        pathname === '/search'
+                          ? "text-white bg-primary shadow-lg shadow-primary/25"
+                          : "text-muted-foreground hover:text-primary hover:bg-accent/10"
+                      }`}
+                    >
+                      <Search size={20} />
+                      <span>Search</span>
+                    </Link>
+                    <Separator />
+                    {authUser ? (
                       <>
-                        <Separator className="my-6" />
-                        <div className="space-y-2">
-                          <Button
-                            variant="ghost"
-                            className="w-full justify-start h-auto px-4 py-4 text-base rounded-xl"
-                            onClick={closeMobileMenu}
-                            asChild
-                          >
-                            <Link href="/admin/dashboard">
-                              <PanelLeft size={22} className="mr-3 " />
-                              Admin Dashboard
-                            </Link>
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            className="w-full justify-start h-auto px-4 py-4 text-base rounded-xl"
-                            onClick={closeMobileMenu}
-                            asChild
-                          >
-                            <Link href="/admin/users">
-                              <Users size={22} className="mr-3" />
-                              User Management
-                            </Link>
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            className="w-full justify-start h-auto px-4 py-4 text-base rounded-xl"
-                            onClick={closeMobileMenu}
-                            asChild
-                          >
-                            <Link href="/admin/activity-logs">
-                              <Activity size={22} className="mr-3" />
-                              Activity Logs
-                            </Link>
-                          </Button>
-                        </div>
+                        <Link
+                          href="/profile"
+                          onClick={closeMobileMenu}
+                          className="flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-medium text-muted-foreground hover:text-primary hover:bg-accent/10"
+                        >
+                          <User size={20} />
+                          <span>Profile</span>
+                        </Link>
+                        <Link
+                          href="/settings"
+                          onClick={closeMobileMenu}
+                          className="flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-medium text-muted-foreground hover:text-primary hover:bg-accent/10"
+                        >
+                          <Settings size={20} />
+                          <span>Settings</span>
+                        </Link>
+                        <Button
+                          variant="ghost"
+                          onClick={handleLogout}
+                          className="flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-medium text-red-500 hover:text-red-600 hover:bg-red-500/10"
+                        >
+                          <LogOut size={20} />
+                          <span>Logout</span>
+                        </Button>
                       </>
+                    ) : (
+                      <Link
+                        href="/auth/login"
+                        onClick={closeMobileMenu}
+                        className="flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-medium text-muted-foreground hover:text-primary hover:bg-accent/10"
+                      >
+                        <LogIn size={20} />
+                        <span>Login</span>
+                      </Link>
                     )}
                   </div>
                 </SheetContent>

@@ -6,10 +6,10 @@ import { Star, Clock, Play, Calendar, Film } from "lucide-react";
 import { getImageUrl } from "@/services/tmdb";
 import { useRouter } from "next/navigation";
 import { format } from "date-fns";
-import { TMDBTVShow } from "@/types/tmdb";
+import { TMDBTV } from "@/types/tmdb";
 
 interface TVShowCardProps {
-  show: TMDBTVShow;
+  show: TMDBTV;
 }
 
 const ImageWithFallback = ({ src, alt }: { src: string; alt: string }) => (

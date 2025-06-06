@@ -131,4 +131,40 @@ export const fetchSeasonDetails = async (tvShowId: number, seasonNumber: number)
     console.error('Error fetching season details:', error);
     throw error;
   }
+};
+
+export const searchMulti = async (query: string, page: number = 1) => {
+  try {
+    const { data } = await tmdbApi.get('/search/multi', {
+      params: { query, page },
+    });
+    return data;
+  } catch (error) {
+    console.error('Error searching:', error);
+    return { results: [], page: 1, total_pages: 1, total_results: 0 };
+  }
+};
+
+export const searchMovies = async (query: string, page: number = 1) => {
+  try {
+    const { data } = await tmdbApi.get('/search/movie', {
+      params: { query, page },
+    });
+    return data;
+  } catch (error) {
+    console.error('Error searching movies:', error);
+    return { results: [], page: 1, total_pages: 1, total_results: 0 };
+  }
+};
+
+export const searchTVShows = async (query: string, page: number = 1) => {
+  try {
+    const { data } = await tmdbApi.get('/search/tv', {
+      params: { query, page },
+    });
+    return data;
+  } catch (error) {
+    console.error('Error searching TV shows:', error);
+    return { results: [], page: 1, total_pages: 1, total_results: 0 };
+  }
 }; 
