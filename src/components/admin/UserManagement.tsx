@@ -27,16 +27,11 @@ import {
   Search, 
   UserCheck, 
   UserX, 
-  Key, 
   Shield, 
   Mail,
-  Calendar,
   Filter,
   RefreshCw,
-  CheckCircle2,
-  XCircle
 } from "lucide-react";
-import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 
 interface UserManagementProps {
@@ -50,10 +45,6 @@ export function UserManagement({ users: propUsers, initialUsers, onUsersChange }
   const [searchTerm, setSearchTerm] = useState("");
   const [roleFilter, setRoleFilter] = useState<UserRole | "all">("all");
   const [statusFilter, setStatusFilter] = useState<string>("all");
-  const [selectedUser, setSelectedUser] = useState<User | null>(null);
-  const [isChangingPassword, setIsChangingPassword] = useState(false);
-  const [newPassword, setNewPassword] = useState("");
-  const [adminPassword, setAdminPassword] = useState("");
   const [loading, setLoading] = useState<{ [key: string]: boolean }>({});
   const { toast } = useToast();
 
@@ -163,50 +154,6 @@ export function UserManagement({ users: propUsers, initialUsers, onUsersChange }
       });
     } finally {
       setLoading((prev) => ({ ...prev, [`status-${userId}`]: false }));
-    }
-  };
-
-  const handlePasswordChange = async () => {
-    if (!selectedUser) return;
-
-    try {
-      setLoading((prev) => ({ ...prev, password: true }));
-
-      const response = await fetch("/api/admin/users/password", {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          userId: selectedUser.id,
-          newPassword,
-          adminPassword,
-        }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || "Failed to change password");
-      }
-
-      toast({
-        title: "Success",
-        description: "Password changed successfully",
-        className: "bg-green-600/10 border-green-500/20 text-green-400"
-      });
-
-      setSelectedUser(null);
-      setIsChangingPassword(false);
-      setNewPassword("");
-      setAdminPassword("");
-    } catch (error) {
-      console.error("Error changing password:", error);
-      toast({
-        title: "Error",
-        description: error instanceof Error ? error.message : "Failed to change password",
-        variant: "destructive"
-      });
-    } finally {
-      setLoading((prev) => ({ ...prev, password: false }));
     }
   };
 
@@ -382,83 +329,6 @@ export function UserManagement({ users: propUsers, initialUsers, onUsersChange }
           </TableBody>
         </Table>
       </div>
-
-      {/* Password Change Modal */}
-      {/* {isChangingPassword && selectedUser && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 ">
-          <div className="bg-[var(--bg-card)]/95 backdrop-blur-sm p-8 rounded-lg shadow-2xl w-full max-w-md border border-[var(--border)] cursor-pointer">
-            <div className="space-y-6">
-              <div className="text-center">
-                <div className="w-16 h-16 bg-gradient-to-r from-[var(--cinehub-accent)] to-[var(--cinehub-accent-hover)] rounded-full flex items-center justify-center mx-auto mb-4 ">
-                  <Key className="h-8 w-8 text-[var(--bg-main)] " />
-                </div>
-                <h3 className="text-2xl font-bold text-[var(--text-main)] mb-2">
-                  Change Password
-                </h3>
-                <p className="text-[var(--text-sub)]">
-                  Updating password for <span className="font-semibold text-[var(--cinehub-accent)]">{selectedUser.name}</span>
-                </p>
-              </div>
-
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <label className="text-sm font-semibold text-[var(--text-main)]">New Password</label>
-                  <Input
-                    type="password"
-                    placeholder="Enter new password"
-                    value={newPassword}
-                    onChange={(e) => setNewPassword(e.target.value)}
-                    className="bg-[var(--bg-main)]/80 backdrop-blur-sm border-[var(--border)] focus:border-[var(--cinehub-accent)] text-[var(--text-main)] placeholder:text-[var(--text-sub)]"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-semibold text-[var(--text-main)]">Admin Password</label>
-                  <Input
-                    type="password"
-                    placeholder="Enter your admin password"
-                    value={adminPassword}
-                    onChange={(e) => setAdminPassword(e.target.value)}
-                    className="bg-[var(--bg-main)]/80 backdrop-blur-sm border-[var(--border)] focus:border-[var(--cinehub-accent)] text-[var(--text-main)] placeholder:text-[var(--text-sub)]"
-                  />
-                </div>
-              </div>
-
-              <div className="flex justify-end space-x-3 pt-6 border-t border-[var(--border)]">
-                <Button
-                  variant="outline"
-                  onClick={() => {
-                    setIsChangingPassword(false);
-                    setSelectedUser(null);
-                    setNewPassword("");
-                    setAdminPassword("");
-                  }}
-                  disabled={loading.password}
-                  className="bg-[var(--bg-main)]/80 backdrop-blur-sm border-[var(--border)] hover:bg-[var(--cinehub-accent)]/10 hover:text-[var(--cinehub-accent)] text-[var(--text-main)] cursor-pointer"
-                >
-                  Cancel
-                </Button>
-                <Button
-                  onClick={handlePasswordChange}
-                  disabled={loading.password || !newPassword || !adminPassword}
-                  className="bg-gradient-to-r from-[var(--cinehub-accent)] to-[var(--cinehub-accent-hover)] hover:from-[var(--cinehub-accent-hover)] hover:to-[var(--cinehub-accent)] text-[var(--bg-main)] shadow-lg font-medium cursor-pointer"
-                >
-                  {loading.password ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Changing...
-                    </>
-                  ) : (
-                    <>
-                      <Key className="mr-2 h-4 w-4" />
-                      Change Password
-                    </>
-                  )}
-                </Button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )} */}
 
       {/* Empty State */}
       {filteredUsers.length === 0 && (

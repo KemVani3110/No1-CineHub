@@ -1,6 +1,6 @@
 "use client";
 
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { fetchMovieDetails } from "@/services/tmdb";
 import { TMDBMovieDetails } from "@/types/tmdb";
@@ -22,6 +22,7 @@ import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 
 export default function MovieDetail() {
   const { id } = useParams();
+  const router = useRouter();
   const [movie, setMovie] = useState<TMDBMovieDetails | null>(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("overview");
@@ -143,6 +144,7 @@ export default function MovieDetail() {
                 <Button
                   size="default"
                   className="bg-[#4fd1c5] hover:bg-[#38b2ac] text-[#0d1b2a] px-6 sm:px-8 py-2 sm:py-3 rounded-full font-semibold cursor-pointer transition-all duration-300 hover:scale-105 w-full sm:w-auto"
+                  onClick={() => router.push(`/watch/${id}`)}
                 >
                   <Play className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
                   WATCH

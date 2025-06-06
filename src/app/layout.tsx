@@ -1,3 +1,4 @@
+// "use client";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "@/styles/globals.css";
@@ -6,6 +7,7 @@ import QueryProvider from "@/providers/QueryProvider";
 import { Toaster } from "@/components/ui/toaster";
 import { Suspense } from 'react';
 import Loading from '@/components/common/Loading';
+import { CompilingProvider } from '@/components/common/CompilingProvider';
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -23,13 +25,15 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <Suspense fallback={<Loading message="Loading CineHub..." />}>
-          <Providers>
-            <QueryProvider>
-              {children}
-              <Toaster />
-            </QueryProvider>
-          </Providers>
+        <Suspense fallback={<Loading message="Loading CineHub..." showBackdrop={true} />}>
+          <CompilingProvider>
+            <Providers>
+              <QueryProvider>
+                {children}
+                <Toaster />
+              </QueryProvider>
+            </Providers>
+          </CompilingProvider>
         </Suspense>
       </body>
     </html>

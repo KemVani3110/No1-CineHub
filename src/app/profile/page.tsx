@@ -25,12 +25,7 @@ import {
   ListVideo,
   ChevronLeft,
   Shield,
-  Edit3,
   Camera,
-  Save,
-  X,
-  Calendar,
-  Mail,
   Film,
   Tv,
 } from "lucide-react";
@@ -39,9 +34,7 @@ import { useProfileStore } from "@/store/profileStore";
 import Loading from "@/components/common/Loading";
 import { useAuth } from "@/hooks/useAuth";
 import { useRouter } from "next/navigation";
-import { Settings } from "@/components/lazy";
-
-
+import Settings from "@/components/profile/Settings";
 
 export default function ProfilePage() {
   const router = useRouter();
@@ -49,7 +42,7 @@ export default function ProfilePage() {
   const { user: authUser, loading: authLoading } = useAuth();
   const {
     user,
-    isEditing,
+
     isAvatarDialogOpen,
     availableAvatars,
     activeTab,
@@ -58,7 +51,6 @@ export default function ProfilePage() {
     formData,
     loading: profileLoading,
     setActiveTab,
-    setIsEditing,
     setIsAvatarDialogOpen,
     setFormData,
     updateProfile,
@@ -82,7 +74,14 @@ export default function ProfilePage() {
     fetchAvatars();
     // Set Overview tab as default
     setActiveTab("overview");
-  }, [authUser, authLoading, router, fetchUserData, fetchAvatars, setActiveTab]);
+  }, [
+    authUser,
+    authLoading,
+    router,
+    fetchUserData,
+    fetchAvatars,
+    setActiveTab,
+  ]);
 
   useEffect(() => {
     if (activeTab === "watchlist") {
@@ -91,45 +90,6 @@ export default function ProfilePage() {
       fetchWatchHistory();
     }
   }, [activeTab, fetchWatchList, fetchWatchHistory]);
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData({ [name]: value });
-  };
-
-  const handleUpdateProfile = async () => {
-    try {
-      await updateProfile();
-      toast({
-        title: "Success",
-        description: "Profile updated successfully",
-      });
-    } catch (error) {
-      toast({
-        title: "Error",
-        description:
-          error instanceof Error ? error.message : "Failed to update profile",
-        variant: "destructive",
-      });
-    }
-  };
-
-  const handleChangePassword = async () => {
-    try {
-      await changePassword();
-      toast({
-        title: "Success",
-        description: "Password changed successfully",
-      });
-    } catch (error) {
-      toast({
-        title: "Error",
-        description:
-          error instanceof Error ? error.message : "Failed to change password",
-        variant: "destructive",
-      });
-    }
-  };
 
   const handleAvatarSelect = async (avatarPath: string) => {
     try {
@@ -211,7 +171,9 @@ export default function ProfilePage() {
 
                   <div className="text-center">
                     <h2 className="text-xl font-semibold">{user?.name}</h2>
-                    <p className="text-sm text-muted-foreground">{user?.email}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {user?.email}
+                    </p>
                     <Badge
                       variant="secondary"
                       className="mt-2 text-xs px-2 py-0.5 h-5"
@@ -225,7 +187,9 @@ export default function ProfilePage() {
 
                   <div className="w-full space-y-2">
                     <div className="flex items-center justify-between text-sm">
-                      <span className="text-muted-foreground">Member since</span>
+                      <span className="text-muted-foreground">
+                        Member since
+                      </span>
                       <span className="font-medium">
                         {new Date(user?.created_at || "").toLocaleDateString()}
                       </span>
@@ -233,7 +197,9 @@ export default function ProfilePage() {
                     <div className="flex items-center justify-between text-sm">
                       <span className="text-muted-foreground">Last login</span>
                       <span className="font-medium">
-                        {new Date(user?.last_login_at || "").toLocaleDateString()}
+                        {new Date(
+                          user?.last_login_at || ""
+                        ).toLocaleDateString()}
                       </span>
                     </div>
                   </div>
@@ -251,12 +217,22 @@ export default function ProfilePage() {
                   <div className="flex flex-col items-center p-3 rounded-lg bg-accent/50">
                     <Film size={20} className="mb-1 text-primary" />
                     <span className="text-sm font-medium">Movies</span>
-                    <span className="text-lg font-bold">{watchList.filter(item => item.media_type === 'movie').length}</span>
+                    <span className="text-lg font-bold">
+                      {
+                        watchList.filter((item) => item.media_type === "movie")
+                          .length
+                      }
+                    </span>
                   </div>
                   <div className="flex flex-col items-center p-3 rounded-lg bg-accent/50">
                     <Tv size={20} className="mb-1 text-primary" />
                     <span className="text-sm font-medium">TV Shows</span>
-                    <span className="text-lg font-bold">{watchList.filter(item => item.media_type === 'tv').length}</span>
+                    <span className="text-lg font-bold">
+                      {
+                        watchList.filter((item) => item.media_type === "tv")
+                          .length
+                      }
+                    </span>
                   </div>
                 </div>
               </CardContent>
@@ -265,7 +241,11 @@ export default function ProfilePage() {
 
           {/* Right Column - Tabs */}
           <div className="lg:col-span-3">
-            <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+            <Tabs
+              value={activeTab}
+              onValueChange={setActiveTab}
+              className="space-y-6"
+            >
               <TabsList className="w-full justify-start h-auto p-1 bg-accent/50">
                 <TabsTrigger
                   value="overview"
@@ -315,7 +295,9 @@ export default function ProfilePage() {
                             />
                           </div>
                           <div className="flex-1 min-w-0">
-                            <h3 className="font-medium truncate">{item.title}</h3>
+                            <h3 className="font-medium truncate">
+                              {item.title}
+                            </h3>
                             <p className="text-sm text-muted-foreground">
                               {new Date(item.watched_at).toLocaleDateString()}
                             </p>
@@ -351,9 +333,12 @@ export default function ProfilePage() {
                             />
                           </div>
                           <div className="flex-1 min-w-0">
-                            <h3 className="font-medium truncate">{item.title}</h3>
+                            <h3 className="font-medium truncate">
+                              {item.title}
+                            </h3>
                             <p className="text-sm text-muted-foreground">
-                              Added {new Date(item.added_at).toLocaleDateString()}
+                              Added{" "}
+                              {new Date(item.added_at).toLocaleDateString()}
                             </p>
                           </div>
                         </div>
