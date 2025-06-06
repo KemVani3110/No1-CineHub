@@ -197,7 +197,7 @@ export function VideoPlayer({ videoUrl, posterUrl, title, duration }: VideoPlaye
             <Button
               variant="ghost"
               size="icon"
-              className="text-white hover:text-[#4fd1c5] hover:bg-white/10"
+              className="text-white hover:text-[#4fd1c5] hover:bg-white/10 cursor-pointer"
               onClick={togglePlay}
             >
               {isPlaying ? (
@@ -211,7 +211,7 @@ export function VideoPlayer({ videoUrl, posterUrl, title, duration }: VideoPlaye
               <Button
                 variant="ghost"
                 size="icon"
-                className="text-white hover:text-[#4fd1c5] hover:bg-white/10"
+                className="text-white hover:text-[#4fd1c5] hover:bg-white/10 cursor-pointer"
                 onClick={toggleMute}
               >
                 {isMuted ? (
@@ -236,7 +236,7 @@ export function VideoPlayer({ videoUrl, posterUrl, title, duration }: VideoPlaye
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="text-white hover:text-[#4fd1c5] hover:bg-white/10"
+                  className="text-white hover:text-[#4fd1c5] hover:bg-white/10 cursor-pointer"
                 >
                   <Settings className="h-5 w-5" />
                 </Button>
@@ -275,7 +275,7 @@ export function VideoPlayer({ videoUrl, posterUrl, title, duration }: VideoPlaye
             <Button
               variant="ghost"
               size="icon"
-              className="text-white hover:text-[#4fd1c5] hover:bg-white/10"
+              className="text-white hover:text-[#4fd1c5] hover:bg-white/10 cursor-pointer"
               onClick={toggleFullscreen}
             >
               <Maximize className="h-5 w-5" />

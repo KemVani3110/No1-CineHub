@@ -2,7 +2,13 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
-export function Comments() {
+interface CommentsProps {
+  mediaId: number;
+  mediaType: string;
+  mediaTitle: string;
+}
+
+export function Comments({ mediaId, mediaType, mediaTitle }: CommentsProps) {
   return (
     <div className="space-y-6">
       <h2 className="text-xl font-semibold">Comments</h2>

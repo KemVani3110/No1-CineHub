@@ -14,6 +14,8 @@ import { Facebook, Loader2 } from "lucide-react";
 import { signIn } from "next-auth/react";
 import { useAuth } from "@/hooks/useAuth";
 import { Icons } from "@/components/ui/icons";
+import { FcGoogle } from "react-icons/fc";
+import { FaGithub } from "react-icons/fa";
 
 interface SocialLoginButtonsProps {
   onLogin?: () => void;

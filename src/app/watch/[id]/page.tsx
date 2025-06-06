@@ -5,13 +5,14 @@ import { useEffect, useState } from "react";
 import { fetchMovieDetails } from "@/services/tmdb";
 import { TMDBMovieDetails } from "@/types/tmdb";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Share2, BookmarkPlus } from "lucide-react";
 import { VideoPlayer } from "@/components/common/VideoPlayer";
 import { MovieInfo } from "@/components/watch/MovieInfo";
 import { MovieActions } from "@/components/watch/MovieActions";
 import { SimilarMovies } from "@/components/watch/SimilarMovies";
 import { Comments } from "@/components/watch/Comments";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Badge } from "@/components/ui/badge";
 
 export default function WatchPage() {
   const { id } = useParams();
@@ -39,7 +40,7 @@ export default function WatchPage() {
     try {
       await navigator.share({
         title: movie.title,
-        text: `Check out ${movie.title} on CineHub!`,
+        text: `Watch ${movie.title} on CineHub!`,
         url: window.location.href,
       });
     } catch (error) {
@@ -73,8 +74,8 @@ export default function WatchPage() {
         <Button
           variant="ghost"
           size="icon"
-          className="text-white hover:text-[#4fd1c5] hover:bg-white/10"
-          onClick={() => router.back()}
+          className="text-white hover:text-[#4fd1c5] hover:bg-white/10 cursor-pointer"
+          onClick={() => router.push(`/movie/${id}`)}
         >
           <ArrowLeft className="h-5 w-5" />
         </Button>
@@ -86,7 +87,7 @@ export default function WatchPage() {
           {/* Video Player */}
           <div className="w-full">
             <VideoPlayer
-              videoUrl={`/api/stream/${id}`}
+              videoUrl={`/api/stream/movie/${id}`}
               posterUrl={movie.backdrop_path ? `https://image.tmdb.org/t/p/original${movie.backdrop_path}` : undefined}
               title={movie.title}
               duration={movie.runtime}
@@ -98,7 +99,11 @@ export default function WatchPage() {
             <div className="flex-1 space-y-6">
               <MovieInfo movie={movie} />
               <MovieActions title={movie.title} onShare={handleShare} />
-              <Comments />
+              <Comments
+                mediaId={movie.id}
+                mediaType="movie"
+                mediaTitle={movie.title}
+              />
             </div>
           </div>
 

@@ -24,12 +24,14 @@ import {
   SimilarTVShows,
 } from '@/components/lazy';
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
+import { useRouter } from 'next/navigation';
 
 export default function TVShowDetail() {
   const { id } = useParams();
   const [tvShow, setTVShow] = useState<TMDBTVDetails | null>(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("overview");
+  const router = useRouter();
 
   useEffect(() => {
     const loadTVShow = async () => {
@@ -138,6 +140,7 @@ export default function TVShowDetail() {
                 <Button
                   size="default"
                   className="bg-[#4fd1c5] hover:bg-[#38b2ac] text-[#0d1b2a] px-6 sm:px-8 py-2 sm:py-3 rounded-full font-semibold cursor-pointer transition-all duration-300 hover:scale-105 w-full sm:w-auto"
+                  onClick={() => router.push(`/watch/tv/${id}/season/1/episode/1`)}
                 >
                   <Play className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
                   WATCH

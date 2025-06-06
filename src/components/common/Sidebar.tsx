@@ -12,13 +12,18 @@ import {
   Search,
   User,
   LogIn,
-  PanelLeftClose
+  PanelLeftClose,
+  ChevronRight,
+  ChevronLeft,
+  Film,
+  Tv
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/hooks/useAuth';
+import { useRouter } from 'next/navigation';
 
 interface SidebarProps {
   isOpen: boolean;
@@ -28,6 +33,7 @@ interface SidebarProps {
 const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
   const pathname = usePathname();
   const { user, logout } = useAuth();
+  const router = useRouter();
 
   const navItems = [
     { name: 'Home', path: '/home', icon: Home },
@@ -89,7 +95,7 @@ const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
             <Button
               variant="ghost"
               size="icon"
-              className="h-8 w-8 rounded-full hover:bg-accent/10"
+              className="text-white hover:text-[#4fd1c5] hover:bg-white/10 cursor-pointer"
               onClick={onClose}
             >
               <PanelLeftClose size={18} />

@@ -29,7 +29,7 @@ const TVShowSeasons = ({ tvShow }: TVShowSeasonsProps) => {
   };
 
   const handlePlayEpisode = (episode: TMDBEpisode, seasonNumber: number) => {
-    console.log(`Playing Season ${seasonNumber}, Episode ${episode.episode_number}: ${episode.name}`);
+    window.location.href = `/watch/tv/${tvShow.id}/season/${seasonNumber}/episode/${episode.episode_number}`;
   };
 
   const { data: seasonDetails, isLoading } = useQuery({

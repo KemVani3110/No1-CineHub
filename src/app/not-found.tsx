@@ -52,7 +52,7 @@ export default function NotFound() {
         setProgressValue(newCountdown * 10);
 
         if (newCountdown === 0) {
-          router.push("/");
+          router.push("/home");
         }
       }, 1000);
     }
@@ -193,12 +193,12 @@ export default function NotFound() {
               {isHovering ? (
                 <>
                   <Zap className="w-3 h-3 mr-1.5" />
-                  Tạm dừng
+                  Paused
                 </>
               ) : (
                 <>
                   <Film className="w-3 h-3 mr-1.5 animate-spin" />
-                  Đang tua...
+                  Redirecting...
                 </>
               )}
             </Badge>
@@ -254,7 +254,7 @@ export default function NotFound() {
 
             <h2 className="text-base font-semibold mb-2 text-text-main animate-fade-in-down flex items-center justify-center gap-2">
               <Star className="w-4 h-4 text-warning" />
-              Không Tìm Thấy Trang
+              Page Not Found
               <Star className="w-4 h-4 text-warning" />
             </h2>
 
@@ -267,11 +267,11 @@ export default function NotFound() {
                   </div>
                   <div className="space-y-1">
                     <h3 className="font-semibold text-danger text-sm">
-                      Trang Không Tồn Tại - 404
+                      Page Not Found - 404
                     </h3>
                     <p className="text-xs text-text-sub leading-relaxed">
-                      Trang phim bạn tìm không tồn tại hoặc đã bị gỡ khỏi web.
-                      Có thể link đã cũ hoặc nội dung đã được di chuyển.
+                      The page you're looking for doesn't exist or has been removed.
+                      The link might be outdated or the content has been moved.
                     </p>
                   </div>
                 </div>
@@ -291,15 +291,15 @@ export default function NotFound() {
                   {isHovering ? (
                     <span className="flex items-center gap-1.5 animate-fade-in text-warning">
                       <Zap className="w-3 h-3" />
-                      <span className="font-medium">Đã tạm dừng</span>
+                      <span className="font-medium">Paused</span>
                       <span className="hidden sm:inline text-xs">
-                        - di chuột ra để tiếp tục
+                        - move mouse away to continue
                       </span>
                     </span>
                   ) : (
                     <span className="animate-pulse flex items-center gap-1.5">
                       <Film className="w-3 h-3 text-cinehub-accent" />
-                      Tự động về trang chủ sau{" "}
+                      Redirecting to home in{" "}
                       <Badge
                         variant="outline"
                         className="text-cinehub-accent border-cinehub-accent/50 px-1.5 py-0"
@@ -315,7 +315,7 @@ export default function NotFound() {
                   size="sm"
                   className="h-6 w-6 p-0 text-cinehub-accent hover:text-cinehub-accent-hover hover:bg-cinehub-accent/10 hover-scale cursor-pointer"
                   onClick={resetCountdown}
-                  title="Đặt lại bộ đếm"
+                  title="Reset countdown"
                 >
                   <Undo2 className="h-3 w-3" />
                 </Button>
@@ -331,16 +331,16 @@ export default function NotFound() {
                 onClick={() => router.back()}
               >
                 <ArrowLeft className="mr-1.5 h-3 w-3" />
-                Quay lại
+                Go Back
               </Button>
 
-              <Link href="/" className="flex-1">
+              <Link href="/home" className="flex-1">
                 <Button
                   size="sm"
                   className="w-full bg-cinehub-accent hover:bg-cinehub-accent-hover text-bg-main font-semibold hover-lift shadow-cinehub-accent/20 cursor-pointer"
                 >
                   <Home className="mr-1.5 h-3 w-3" />
-                  Trang Chủ
+                  Home
                 </Button>
               </Link>
             </div>
@@ -352,7 +352,7 @@ export default function NotFound() {
                   variant="ghost"
                   size="sm"
                   className="text-text-sub hover:text-cinehub-accent hover-scale cursor-pointer p-1"
-                  title="Tìm kiếm"
+                  title="Search"
                 >
                   <Search className="h-4 w-4" />
                 </Button>
@@ -363,7 +363,7 @@ export default function NotFound() {
                   variant="ghost"
                   size="sm"
                   className="text-text-sub hover:text-cinehub-accent hover-scale cursor-pointer p-1"
-                  title="Danh sách phim"
+                  title="Movie list"
                 >
                   <Play className="h-4 w-4" />
                 </Button>
@@ -371,12 +371,12 @@ export default function NotFound() {
 
               <div className="text-xs text-text-sub flex items-center gap-1">
                 <Sparkles className="w-3 h-3" />
-                Cần hỗ trợ?{" "}
+                Need help?{" "}
                 <Link
                   href="/contact"
                   className="text-cinehub-accent hover:underline hover:text-cinehub-accent-hover transition-colors duration-200 font-medium cursor-pointer"
                 >
-                  Liên hệ
+                  Contact us
                 </Link>
               </div>
             </div>

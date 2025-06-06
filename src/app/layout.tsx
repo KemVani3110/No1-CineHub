@@ -8,6 +8,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Suspense } from 'react';
 import Loading from '@/components/common/Loading';
 import { CompilingProvider } from '@/components/common/CompilingProvider';
+import { LoadingProvider } from '@/providers/LoadingProvider';
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -29,8 +30,10 @@ export default function RootLayout({
           <CompilingProvider>
             <Providers>
               <QueryProvider>
-                {children}
-                <Toaster />
+                <LoadingProvider>
+                  {children}
+                  <Toaster />
+                </LoadingProvider>
               </QueryProvider>
             </Providers>
           </CompilingProvider>
