@@ -21,7 +21,6 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { MovieCard, TVShowCard } from "@/components/lazy";
 import {
   Image as ImageIcon,
-  History,
   ListVideo,
   ChevronLeft,
   Shield,
@@ -43,12 +42,10 @@ export default function ProfilePage() {
   const { user: authUser, loading: authLoading } = useAuth();
   const {
     user,
-
     isAvatarDialogOpen,
     availableAvatars,
     activeTab,
     watchList,
-    watchHistory,
     formData,
     loading: profileLoading,
     setActiveTab,
@@ -60,7 +57,6 @@ export default function ProfilePage() {
     fetchUserData,
     fetchAvatars,
     fetchWatchList,
-    fetchWatchHistory,
   } = useProfileStore();
 
   const [ratings, setRatings] = useState<Record<string, number>>({});
@@ -105,8 +101,6 @@ export default function ProfilePage() {
         setIsLoading(true);
         if (activeTab === "watchlist") {
           await fetchWatchList();
-        } else if (activeTab === "history") {
-          await fetchWatchHistory();
         }
       } catch (error) {
         console.error('Error loading profile data:', error);
@@ -121,7 +115,7 @@ export default function ProfilePage() {
     };
 
     loadData();
-  }, [user, router, activeTab, fetchWatchList, fetchWatchHistory, toast]);
+  }, [user, router, activeTab, fetchWatchList, toast]);
 
   useEffect(() => {
     if (!user) {
@@ -281,7 +275,7 @@ export default function ProfilePage() {
                 <div className="grid grid-cols-2 gap-3">
                   {isLoading ? (
                     <>
-                      {[...Array(4)].map((_, index) => (
+                      {[...Array(2)].map((_, index) => (
                         <div key={index} className="flex flex-col items-center p-3 rounded-lg bg-[#1B263B] border border-[#2e3c51] animate-pulse">
                           <div className="w-5 h-5 bg-[#2e3c51] rounded-full mb-2" />
                           <div className="w-24 h-4 bg-[#2e3c51] rounded mb-1" />
@@ -305,20 +299,6 @@ export default function ProfilePage() {
                           {watchList.filter((item) => item.mediaType === "tv").length}
                         </span>
                       </div>
-                      <div className="flex flex-col items-center p-3 rounded-lg bg-[#1B263B] border border-[#2e3c51] hover:border-[#4fd1c5] transition-colors duration-300 cursor-pointer">
-                        <Film size={20} className="mb-2 text-[#4fd1c5]" />
-                        <span className="text-[13px] font-medium text-[#e0e6ed]">Movies Watched</span>
-                        <span className="text-[15px] font-bold text-[#4fd1c5]">
-                          {watchHistory.filter((item) => item.mediaType === "movie").length}
-                        </span>
-                      </div>
-                      <div className="flex flex-col items-center p-3 rounded-lg bg-[#1B263B] border border-[#2e3c51] hover:border-[#4fd1c5] transition-colors duration-300 cursor-pointer">
-                        <Tv size={20} className="mb-2 text-[#4fd1c5]" />
-                        <span className="text-[13px] font-medium text-[#e0e6ed]">TV Shows Watched</span>
-                        <span className="text-[15px] font-bold text-[#4fd1c5]">
-                          {watchHistory.filter((item) => item.mediaType === "tv").length}
-                        </span>
-                      </div>
                     </>
                   )}
                 </div>
@@ -333,27 +313,20 @@ export default function ProfilePage() {
               onValueChange={setActiveTab}
               className="space-y-4 lg:space-y-6"
             >
-              <TabsList className="w-full justify-start h-auto p-1 bg-accent/50 overflow-x-auto flex-nowrap">
+              <TabsList className="w-full justify-center h-auto p-1 bg-accent/50">
                 <TabsTrigger
                   value="overview"
-                  className="flex items-center space-x-2 whitespace-nowrap"
+                  className="flex items-center space-x-2 px-6"
                 >
                   <ImageIcon size={16} className="lg:w-5 lg:h-5" />
                   <span className="text-xs lg:text-sm">Overview</span>
                 </TabsTrigger>
                 <TabsTrigger
                   value="watchlist"
-                  className="flex items-center space-x-2 whitespace-nowrap"
+                  className="flex items-center space-x-2 px-6"
                 >
                   <ListVideo size={16} className="lg:w-5 lg:h-5" />
                   <span className="text-xs lg:text-sm">Watchlist</span>
-                </TabsTrigger>
-                <TabsTrigger
-                  value="history"
-                  className="flex items-center space-x-2 whitespace-nowrap"
-                >
-                  <History size={16} className="lg:w-5 lg:h-5" />
-                  <span className="text-xs lg:text-sm">History</span>
                 </TabsTrigger>
               </TabsList>
 
@@ -442,65 +415,6 @@ export default function ProfilePage() {
                   )}
                 </div>
               </TabsContent>
-
-              <TabsContent value="history" className="mt-4">
-                <div className="space-y-8">
-                  {/* Movies Section */}
-                  <div>
-                    <h4 className="text-lg font-semibold text-[var(--text-main)] mb-4 flex items-center gap-2">
-                      <Film className="h-5 w-5 text-[var(--cinehub-accent)]" />
-                      Movies ({watchHistory.filter(item => item.media_type === 'movie').length})
-                    </h4>
-                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 lg:gap-4">
-                      {watchHistory
-                        .filter((item) => item.media_type === 'movie')
-                        .map((item) => (
-                          <div key={item.id} className="transform scale-90 hover:scale-95 transition-transform duration-200">
-                            <MovieCard movie={item} />
-                          </div>
-                        ))}
-                    </div>
-                  </div>
-
-                  {/* TV Shows Section */}
-                  <div>
-                    <h4 className="text-lg font-semibold text-[var(--text-main)] mb-4 flex items-center gap-2">
-                      <Tv className="h-5 w-5 text-[var(--cinehub-accent)]" />
-                      TV Shows ({watchHistory.filter(item => item.media_type === 'tv').length})
-                    </h4>
-                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 lg:gap-4">
-                      {watchHistory
-                        .filter((item) => item.media_type === 'tv')
-                        .map((item) => (
-                          <div key={item.id} className="transform scale-90 hover:scale-95 transition-transform duration-200">
-                            <TVShowCard show={item} />
-                          </div>
-                        ))}
-                    </div>
-                  </div>
-
-                  {watchHistory.filter(item => item.media_type === 'movie').length === 0 && 
-                   watchHistory.filter(item => item.media_type === 'tv').length === 0 && (
-                    <div className="flex flex-col items-center justify-center min-h-[200px] gap-4">
-                      <div className="w-16 h-16 bg-[var(--danger)]/10 rounded-full flex items-center justify-center">
-                        <History className="h-8 w-8 text-[var(--danger)]" />
-                      </div>
-                      <h3 className="text-lg font-medium text-[var(--text-main)]">
-                        No watch history yet
-                      </h3>
-                      <p className="text-[var(--text-sub)] text-center">
-                        Start watching movies and shows to build your history
-                      </p>
-                      <Button
-                        asChild
-                        className="bg-[var(--danger)] hover:bg-[var(--danger)]/80 text-white"
-                      >
-                        <Link href="/home">Browse Movies</Link>
-                      </Button>
-                    </div>
-                  )}
-                </div>
-              </TabsContent>
             </Tabs>
           </div>
         </div>
@@ -512,13 +426,9 @@ export default function ProfilePage() {
           <DialogHeader>
             <DialogTitle>Choose Avatar</DialogTitle>
           </DialogHeader>
-          <div className="grid grid-cols-4 gap-4 py-4">
-            {availableAvatars.length === 0 ? (
-              <div className="col-span-full text-center py-8 text-[var(--text-sub)]">
-                No avatars available
-              </div>
-            ) : (
-              availableAvatars.map((avatar) => (
+          <ScrollArea className="h-[400px] pr-4">
+            <div className="grid grid-cols-3 gap-4">
+              {availableAvatars.map((avatar) => (
                 <button
                   key={avatar}
                   onClick={() => handleAvatarSelect(avatar)}
@@ -531,9 +441,9 @@ export default function ProfilePage() {
                     className="object-cover"
                   />
                 </button>
-              ))
-            )}
-          </div>
+              ))}
+            </div>
+          </ScrollArea>
         </DialogContent>
       </Dialog>
     </div>

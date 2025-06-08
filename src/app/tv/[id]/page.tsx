@@ -25,6 +25,8 @@ import {
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { useRouter } from 'next/navigation';
 import { WatchlistButton } from "@/components/common/WatchlistButton";
+import { WatchButton } from "@/components/common/WatchButton";
+import Image from 'next/image';
 
 export default function TVShowDetail() {
   const { id } = useParams();
@@ -102,9 +104,10 @@ export default function TVShowDetail() {
             {/* TV Show Poster */}
             <div className="flex-shrink-0 mx-auto sm:mx-0 mt-4 sm:mt-0">
               <div className="relative w-40 sm:w-56 lg:w-80 h-60 sm:h-84 lg:h-[480px] rounded-xl lg:rounded-2xl overflow-hidden shadow-2xl border border-[#2e3c51] hover:border-[#4fd1c5] transition-all duration-300">
-                <img
-                  src={getImageUrl(tvShow.poster_path || null, "w500")}
+                <Image
+                  src={`https://image.tmdb.org/t/p/w500${tvShow.poster_path}`}
                   alt={tvShow.name}
+                  fill
                   className="w-full h-full object-cover"
                 />
               </div>
@@ -137,14 +140,16 @@ export default function TVShowDetail() {
 
               {/* Action Buttons */}
               <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 px-2 sm:px-0">
-                <Button
-                  size="default"
-                  className="bg-[#4fd1c5] hover:bg-[#38b2ac] text-[#0d1b2a] px-6 sm:px-8 py-2 sm:py-3 rounded-full font-semibold cursor-pointer transition-all duration-300 hover:scale-105 w-full sm:w-auto"
-                  onClick={() => router.push(`/watch/tv/${id}/season/1/episode/1`)}
-                >
-                  <Play className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
-                  WATCH
-                </Button>
+                <WatchButton
+                  mediaType="tv"
+                  movieId={null}
+                  tvId={tvShow.id}
+                  title={tvShow.name}
+                  posterPath={tvShow.poster_path || ""}
+                  className="bg-[#4fd1c5] hover:bg-[#38b2ac] text-[#0d1b2a] px-6 sm:px-8 py-2 sm:py-3 rounded-full font-semibold cursor-pointer transition-all duration-300 hover:scale-105 w-full sm:w-auto flex items-center justify-center"
+                  isUpcoming={tvShow.next_episode_to_air && tvShow.next_episode_to_air.air_date ? new Date(tvShow.next_episode_to_air.air_date) > new Date() : false}
+                  isDetailView={true}
+                />
                 <div className="flex gap-2 sm:gap-4">
                   <Button
                     variant="outline"
@@ -169,8 +174,8 @@ export default function TVShowDetail() {
       </div>
 
       {/* Content Section */}
-      <div className="relative z-10 -mt-4 sm:mt-0">
-        <div className="container mx-auto px-4 sm:px-6 pb-16 sm:pb-24">
+      <div className="relative z-10">
+        <div className="container mx-auto px-4 sm:px-6 pb-16 sm:pb-24 pt-4">
           {/* Tabs Section */}
           <Tabs
             value={activeTab}

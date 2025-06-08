@@ -18,6 +18,7 @@ import {
   Users,
   Activity,
   BookmarkPlus,
+  History,
 } from "lucide-react";
 import {
   Sheet,
@@ -42,6 +43,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useProfileStore } from "@/store/profileStore";
 import { useToast } from "@/components/ui/use-toast";
 import { useRouter } from "next/navigation";
+import { useHistoryStore } from "@/store/historyStore";
 
 interface HeaderProps {
   onSidebarChange?: (isOpen: boolean) => void;
@@ -55,11 +57,14 @@ const Header = ({ onSidebarChange }: HeaderProps) => {
   const { user: profileUser } = useProfileStore();
   const { toast } = useToast();
   const router = useRouter();
+  const { getRecentHistory } = useHistoryStore();
+  const recentHistory = getRecentHistory(5);
 
   const navItems = [
     { name: "Home", path: "/home", icon: Home },
     { name: "Explore", path: "/explore", icon: Compass },
     { name: "Watchlist", path: "/watchlist", icon: BookmarkPlus, requiresAuth: true },
+    { name: "History", path: "/history", icon: History, requiresAuth: true },
     { name: "Search", path: "/search", icon: Search },
   ];
 
@@ -213,18 +218,16 @@ const Header = ({ onSidebarChange }: HeaderProps) => {
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="w-56">
-                      <DropdownMenuLabel className="pb-2 ">
+                      <DropdownMenuLabel className="pb-2">
                         <div className="flex items-center space-x-3">
-                          <Avatar className="h-8 w-8 ">
+                          <Avatar className="h-8 w-8">
                             <AvatarImage
                               src={getUserAvatar()}
                               alt={authUser.name || authUser.email || "User"}
                               referrerPolicy="no-referrer"
                             />
                             <AvatarFallback className="bg-primary/10 text-primary text-xs">
-                              {getUserInitials(
-                                authUser.name || authUser.email || "User"
-                              )}
+                              {getUserInitials(authUser.name || authUser.email || "User")}
                             </AvatarFallback>
                           </Avatar>
                           <div className="flex flex-col min-w-0 flex-1">
@@ -244,6 +247,12 @@ const Header = ({ onSidebarChange }: HeaderProps) => {
                         <Link href="/profile" className="cursor-pointer">
                           <User className="mr-3 h-4 w-4" />
                           Profile
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <Link href="/history" className="cursor-pointer">
+                          <History className="mr-3 h-4 w-4" />
+                          Watch History
                         </Link>
                       </DropdownMenuItem>
                       {authUser?.role === "admin" && (

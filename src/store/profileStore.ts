@@ -28,7 +28,6 @@ interface ProfileState {
   availableAvatars: string[];
   activeTab: string;
   watchList: any[];
-  watchHistory: any[];
   formData: FormData;
   loading: boolean;
   setActiveTab: (tab: string) => void;
@@ -41,7 +40,6 @@ interface ProfileState {
   fetchUserData: () => Promise<void>;
   fetchAvatars: () => Promise<void>;
   fetchWatchList: () => Promise<void>;
-  fetchWatchHistory: () => Promise<void>;
 }
 
 export const useProfileStore = create<ProfileState>((set, get) => ({
@@ -51,7 +49,6 @@ export const useProfileStore = create<ProfileState>((set, get) => ({
   availableAvatars: [],
   activeTab: "overview",
   watchList: [],
-  watchHistory: [],
   formData: {},
   loading: true,
 
@@ -99,11 +96,7 @@ export const useProfileStore = create<ProfileState>((set, get) => ({
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          currentPassword: formData.currentPassword,
-          newPassword: formData.newPassword,
-          confirmPassword: formData.confirmPassword,
-        }),
+        body: JSON.stringify(formData),
       });
 
       if (!response.ok) {
@@ -112,11 +105,11 @@ export const useProfileStore = create<ProfileState>((set, get) => ({
       }
 
       set({ 
+        isEditing: false,
         formData: {
-          ...formData,
-          currentPassword: '',
-          newPassword: '',
-          confirmPassword: ''
+          name: get().user?.name || "",
+          email: get().user?.email || "",
+          avatar: get().user?.avatar || ""
         }
       });
     } catch (error) {
@@ -140,11 +133,7 @@ export const useProfileStore = create<ProfileState>((set, get) => ({
       }
 
       const data = await response.json();
-      set((state) => ({
-        user: state.user ? { ...state.user, avatar: avatarPath } : null,
-        formData: { ...state.formData, avatar: avatarPath },
-        isAvatarDialogOpen: false,
-      }));
+      set({ user: data.user });
     } catch (error) {
       throw error;
     }
@@ -197,21 +186,6 @@ export const useProfileStore = create<ProfileState>((set, get) => ({
     } catch (error) {
       console.error("Error fetching watchlist:", error);
       set({ watchList: [] });
-      throw error;
-    }
-  },
-
-  fetchWatchHistory: async () => {
-    try {
-      const response = await fetch("/api/profile/history");
-      if (!response.ok) {
-        throw new Error("Failed to fetch watch history");
-      }
-      const data = await response.json();
-      set({ watchHistory: data.history });
-    } catch (error) {
-      console.error("Error fetching watch history:", error);
-      set({ watchHistory: [] });
       throw error;
     }
   },
