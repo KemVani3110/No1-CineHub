@@ -14,11 +14,12 @@ import {
   SimilarMovies,
   MovieMedia,
 } from "@/components/lazy";
-import { Play, Share2, BookmarkPlus } from "lucide-react";
+import { Play, Share2 } from "lucide-react";
 import { getImageUrl } from "@/services/tmdb";
 import { TMDBGenre } from "@/types/tmdb";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
+import { WatchlistButton } from "@/components/common/WatchlistButton";
 
 export default function MovieDetail() {
   const { id } = useParams();
@@ -159,14 +160,12 @@ export default function MovieDetail() {
                     <Share2 className="w-4 h-4 sm:w-5 sm:h-5 mr-1 sm:mr-2" />
                     <span className="hidden sm:inline">Share</span>
                   </Button>
-                  <Button
-                    variant="outline"
-                    size="default"
-                    className="border-[#2e3c51] text-[#e0e6ed] hover:bg-[#1b263b] hover:border-[#4fd1c5] hover:text-[#4fd1c5] px-4 sm:px-6 py-2 sm:py-3 rounded-full cursor-pointer transition-all duration-300 hover:scale-105 flex-1 sm:flex-none"
-                  >
-                    <BookmarkPlus className="w-4 h-4 sm:w-5 sm:h-5 mr-1 sm:mr-2" />
-                    <span className="hidden sm:inline">Watchlist</span>
-                  </Button>
+                  <WatchlistButton
+                    id={movie.id}
+                    mediaType="movie"
+                    title={movie.title}
+                    posterPath={movie.poster_path || ""}
+                  />
                 </div>
               </div>
             </div>

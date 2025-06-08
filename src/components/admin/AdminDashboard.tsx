@@ -49,7 +49,7 @@ export function AdminDashboard() {
         throw new Error(data.error || "Failed to fetch users");
       }
 
-      console.log("Fetched users:", data.users);
+      ("Fetched users:", data.users);
       setUsers(data.users);
       setLastRefresh(new Date());
 

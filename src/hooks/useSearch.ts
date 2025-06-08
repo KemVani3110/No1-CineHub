@@ -25,6 +25,8 @@ export const useSearch = (page: number = 1) => {
     staleTime: 1000 * 60 * 5, // 5 minutes
   });
 
+  //check lại param trên url
+
   return {
     ...searchQuery,
     query: debouncedQuery,

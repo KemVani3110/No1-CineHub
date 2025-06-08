@@ -15,7 +15,7 @@ export async function GET(
     const { searchParams } = new URL(request.url);
     const page = searchParams.get('page') || '1';
 
-    console.log('Fetching movies:', {
+    ('Fetching movies:', {
       listType: params.listType,
       page,
       url: `${TMDB_BASE_URL}/movie/${params.listType}`

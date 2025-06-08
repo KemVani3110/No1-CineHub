@@ -3,7 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { useState, useEffect } from "react";
+import { useState} from "react";
 import {
   Menu,
   User,
@@ -14,11 +14,10 @@ import {
   Settings,
   LogOut,
   Search,
-  PanelLeftClose,
   PanelLeft,
   Users,
   Activity,
-  CircleUser,
+  BookmarkPlus,
 } from "lucide-react";
 import {
   Sheet,
@@ -41,7 +40,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useAuth } from "@/hooks/useAuth";
 import { useProfileStore } from "@/store/profileStore";
-import Sidebar from "./Sidebar";
+import { useToast } from "@/components/ui/use-toast";
+import { useRouter } from "next/navigation";
 
 interface HeaderProps {
   onSidebarChange?: (isOpen: boolean) => void;
@@ -53,10 +53,14 @@ const Header = ({ onSidebarChange }: HeaderProps) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const { user: authUser, logout } = useAuth();
   const { user: profileUser } = useProfileStore();
+  const { toast } = useToast();
+  const router = useRouter();
 
   const navItems = [
     { name: "Home", path: "/home", icon: Home },
     { name: "Explore", path: "/explore", icon: Compass },
+    { name: "Watchlist", path: "/watchlist", icon: BookmarkPlus, requiresAuth: true },
+    { name: "Search", path: "/search", icon: Search },
   ];
 
   const closeMobileMenu = () => {
@@ -68,9 +72,17 @@ const Header = ({ onSidebarChange }: HeaderProps) => {
     closeMobileMenu();
   };
 
-  const handleSidebarToggle = (open: boolean) => {
-    setIsSidebarOpen(open);
-    onSidebarChange?.(open);
+  const handleNavClick = (item: typeof navItems[0]) => {
+    if (item.requiresAuth && !authUser) {
+      toast({
+        title: "Authentication Required",
+        description: "Please sign in to access this feature",
+        variant: "destructive",
+      });
+      router.push("/login");
+      return;
+    }
+    router.push(item.path);
   };
 
   // Get user initials for avatar fallback
@@ -104,8 +116,6 @@ const Header = ({ onSidebarChange }: HeaderProps) => {
 
   return (
     <>
-      {/* <Sidebar isOpen={isSidebarOpen} onClose={() => handleSidebarToggle(false)} /> */}
-
       <header
         className={`w-full bg-background/80 backdrop-blur-md border-b border-border/50 sticky top-0 z-40 transition-all duration-300 ${
           isSidebarOpen ? "hidden" : "block"
@@ -113,20 +123,11 @@ const Header = ({ onSidebarChange }: HeaderProps) => {
       >
         <div className="container mx-auto px-4 lg:px-6 py-4">
           <div className="flex items-center justify-between">
-            {/* Logo Section - Simplified */}
+            {/* Logo Section */}
             <div className="flex items-center space-x-4">
-              {/* <Button
-                variant="ghost"
-                size="icon"
-                className="h-10 w-10 rounded-full hover:bg-accent/10"
-                onClick={() => handleSidebarToggle(!isSidebarOpen)}
-              >
-                {isSidebarOpen ? <PanelLeftClose size={22} /> : <PanelLeft size={22} />}
-              </Button> */}
-
               <Link
                 href="/home"
-                className="flex items-center space-x-3 hover:opacity-90 transition-opacity"
+                className="flex items-center space-x-3 hover:opacity-90 transition-opacity cursor-pointer"
               >
                 <div className="relative w-12 h-12 lg:w-14 lg:h-14">
                   <Image
@@ -154,10 +155,10 @@ const Header = ({ onSidebarChange }: HeaderProps) => {
                 const Icon = item.icon;
                 const isActive = pathname === item.path;
                 return (
-                  <Link
+                  <button
                     key={item.path}
-                    href={item.path}
-                    className={`nav-item flex items-center space-x-2 px-4 py-2 mx-1 rounded-full text-sm font-medium transition-all duration-200 ${
+                    onClick={() => handleNavClick(item)}
+                    className={`nav-item flex items-center space-x-2 px-4 py-2 mx-1 rounded-full text-sm font-medium transition-all duration-200 cursor-pointer ${
                       isActive
                         ? "text-white bg-primary shadow-lg shadow-primary/25"
                         : "text-muted-foreground hover:text-primary hover:bg-accent/10"
@@ -165,20 +166,9 @@ const Header = ({ onSidebarChange }: HeaderProps) => {
                   >
                     <Icon size={20} />
                     <span>{item.name}</span>
-                  </Link>
+                  </button>
                 );
               })}
-              <Link
-                href="/search"
-                className={`nav-item flex items-center space-x-2 px-4 py-2 mx-1 rounded-full text-sm font-medium transition-all duration-200 ${
-                  pathname === '/search'
-                    ? "text-white bg-primary shadow-lg shadow-primary/25"
-                    : "text-muted-foreground hover:text-primary hover:bg-accent/10"
-                }`}
-              >
-                <Search size={20} />
-                <span>Search</span>
-              </Link>
             </nav>
 
             {/* Right Section */}
@@ -364,18 +354,6 @@ const Header = ({ onSidebarChange }: HeaderProps) => {
                         </Link>
                       );
                     })}
-                    <Link
-                      href="/search"
-                      onClick={closeMobileMenu}
-                      className={`flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
-                        pathname === '/search'
-                          ? "text-white bg-primary shadow-lg shadow-primary/25"
-                          : "text-muted-foreground hover:text-primary hover:bg-accent/10"
-                      }`}
-                    >
-                      <Search size={20} />
-                      <span>Search</span>
-                    </Link>
                     <Separator />
                     {authUser ? (
                       <>
@@ -406,7 +384,7 @@ const Header = ({ onSidebarChange }: HeaderProps) => {
                       </>
                     ) : (
                       <Link
-                        href="/auth/login"
+                        href="/login"
                         onClick={closeMobileMenu}
                         className="flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-medium text-muted-foreground hover:text-primary hover:bg-accent/10"
                       >

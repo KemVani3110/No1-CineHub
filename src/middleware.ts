@@ -4,7 +4,7 @@ import { getToken } from 'next-auth/jwt';
 
 export async function middleware(request: NextRequest) {
   // Log the current path
-  console.log('Middleware - Current path:', request.nextUrl.pathname);
+  ('Middleware - Current path:', request.nextUrl.pathname);
 
   const token = await getToken({
     req: request,
@@ -12,7 +12,7 @@ export async function middleware(request: NextRequest) {
   });
 
   // Log token for debugging
-  console.log('Middleware - Token:', token);
+  ('Middleware - Token:', token);
 
   const isAdminRoute = request.nextUrl.pathname.startsWith('/admin');
   const isAuthRoute = request.nextUrl.pathname.startsWith('/login') ||
@@ -20,23 +20,23 @@ export async function middleware(request: NextRequest) {
 
   // Handle auth routes - redirect to home if already logged in
   if (token && isAuthRoute) {
-    console.log('Middleware - User already logged in, redirecting to home');
+    ('Middleware - User already logged in, redirecting to home');
     return NextResponse.redirect(new URL('/home', request.url));
   }
 
   // Handle admin routes
   if (isAdminRoute) {
     if (!token) {
-      console.log('Middleware - No token found, redirecting to login');
+      ('Middleware - No token found, redirecting to login');
       return NextResponse.redirect(new URL('/login', request.url));
     }
 
     if (token.role !== 'admin') {
-      console.log('Middleware - User is not admin, redirecting to home');
+      ('Middleware - User is not admin, redirecting to home');
       return NextResponse.redirect(new URL('/home', request.url));
     }
 
-    console.log('Middleware - Admin access granted');
+    ('Middleware - Admin access granted');
   }
 
   return NextResponse.next();

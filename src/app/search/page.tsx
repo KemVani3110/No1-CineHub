@@ -278,40 +278,11 @@ export default function SearchPage() {
         {/* Pagination */}
         {data?.total_pages && data.total_pages > 1 && (
           <div className="flex justify-center">
-            <Pagination>
-              <PaginationContent>
-                <PaginationItem>
-                  <PaginationPrevious 
-                    className={`cursor-pointer ${currentPage === 1 ? 'pointer-events-none opacity-50' : 'hover:bg-accent/10'}`}
-                    onClick={() => currentPage > 1 && setCurrentPage(currentPage - 1)}
-                  />
-                </PaginationItem>
-                
-                {generatePaginationItems(data.total_pages, currentPage).map((item, index) => (
-                  <PaginationItem key={index}>
-                    {item === '...' ? (
-                      <PaginationEllipsis />
-                    ) : (
-                      <PaginationLink
-                        className={`cursor-pointer hover:bg-accent/10 ${
-                          currentPage === item ? 'bg-accent text-accent-foreground' : ''
-                        }`}
-                        onClick={() => setCurrentPage(item as number)}
-                      >
-                        {item}
-                      </PaginationLink>
-                    )}
-                  </PaginationItem>
-                ))}
-                
-                <PaginationItem>
-                  <PaginationNext 
-                    className={`cursor-pointer ${currentPage === data.total_pages ? 'pointer-events-none opacity-50' : 'hover:bg-accent/10'}`}
-                    onClick={() => currentPage < data.total_pages && setCurrentPage(currentPage + 1)}
-                  />
-                </PaginationItem>
-              </PaginationContent>
-            </Pagination>
+            <Pagination
+              currentPage={currentPage}
+              totalPages={data?.total_pages || 1}
+              onPageChange={setCurrentPage}
+            />
           </div>
         )}
       </div>
