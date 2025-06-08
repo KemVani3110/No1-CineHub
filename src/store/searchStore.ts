@@ -13,6 +13,8 @@ interface SearchState {
   clearHistory: () => void;
 }
 
+const MIN_SEARCH_LENGTH = 2;
+
 export const useSearchStore = create<SearchState>()(
   persist(
     (set) => ({
@@ -23,6 +25,10 @@ export const useSearchStore = create<SearchState>()(
       setType: (type) => set({ type }),
       addToHistory: (query) =>
         set((state) => {
+          // Only add to history if query meets minimum length
+          if (query.length < MIN_SEARCH_LENGTH) return state;
+          
+          // Remove duplicates and keep only last 10 searches
           const newHistory = [query, ...state.searchHistory.filter((q) => q !== query)].slice(0, 10);
           return { searchHistory: newHistory };
         }),

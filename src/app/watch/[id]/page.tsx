@@ -98,7 +98,12 @@ export default function WatchPage() {
           <div className="flex flex-col lg:flex-row gap-8">
             <div className="flex-1 space-y-6">
               <MovieInfo movie={movie} />
-              <MovieActions title={movie.title} onShare={handleShare} />
+              <MovieActions 
+                title={movie.title} 
+                onShare={handleShare}
+                id={movie.id}
+                posterPath={movie.poster_path || ""}
+              />
               <Comments
                 mediaId={movie.id}
                 mediaType="movie"

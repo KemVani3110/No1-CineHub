@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { fetchTVShowDetails, fetchSeasonDetails } from "@/services/tmdb";
 import { TMDBTVDetails, TMDBSeasonDetails } from "@/types/tmdb";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, ChevronLeft, ChevronRight, Share2, BookmarkPlus } from "lucide-react";
+import { ArrowLeft, ChevronLeft, ChevronRight, Share2 } from "lucide-react";
 import { VideoPlayer } from "@/components/common/VideoPlayer";
 import { EpisodesList } from "@/components/watch/EpisodesList";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -18,6 +18,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Comments } from "@/components/watch/Comments";
+import { WatchlistButton } from "@/components/common/WatchlistButton";
 
 export default function WatchTVEpisode() {
   const { id, seasonNumber, episodeNumber } = useParams();
@@ -166,7 +167,7 @@ export default function WatchTVEpisode() {
                   value={(seasonNumber as string).toString()}
                   onValueChange={handleSeasonChange}
                 >
-                  <SelectTrigger className="w-full sm:w-[120px] bg-slate-900 border-slate-800">
+                  <SelectTrigger className="w-full sm:w-[120px] bg-slate-900 border-slate-800 cursor-pointer">
                     <SelectValue placeholder="Select season" />
                   </SelectTrigger>
                   <SelectContent className="bg-slate-900 border-slate-800">
@@ -174,7 +175,7 @@ export default function WatchTVEpisode() {
                       <SelectItem
                         key={s.season_number}
                         value={s.season_number.toString()}
-                        className="text-white hover:bg-slate-800"
+                        className="text-white hover:bg-slate-800 cursor-pointer"
                       >
                         Season {s.season_number}
                       </SelectItem>
@@ -218,7 +219,7 @@ export default function WatchTVEpisode() {
                 <Badge
                   key={genre.id}
                   variant="outline"
-                  className="px-2 sm:px-3 py-1 text-xs sm:text-sm font-medium bg-[#1b263b] border-[#4fd1c5]/30 text-[#4fd1c5] hover:bg-[#4fd1c5]/10"
+                  className="px-2 sm:px-3 py-1 text-xs sm:text-sm font-medium bg-[#1b263b] border-[#4fd1c5]/30 text-[#4fd1c5] hover:bg-[#4fd1c5]/10 cursor-pointer"
                 >
                   {genre.name.toUpperCase()}
                 </Badge>
@@ -236,14 +237,12 @@ export default function WatchTVEpisode() {
                 <Share2 className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
                 Share
               </Button>
-              <Button
-                variant="outline"
-                size="default"
-                className="border-[#2e3c51] text-[#e0e6ed] hover:bg-[#1b263b] hover:border-[#4fd1c5] hover:text-[#4fd1c5] px-3 sm:px-4 py-2 rounded-full cursor-pointer transition-all duration-300 hover:scale-105 text-xs sm:text-sm lg:text-base"
-              >
-                <BookmarkPlus className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
-                Watchlist
-              </Button>
+              <WatchlistButton
+                id={show.id}
+                mediaType="tv"
+                title={show.name}
+                posterPath={show.poster_path || ""}
+              />
             </div>
           </div>
 

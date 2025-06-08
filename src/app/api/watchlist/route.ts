@@ -6,17 +6,13 @@ import { db } from '@/lib/db';
 export async function GET() {
   try {
     const session = await getServerSession(authOptions);
-    ('Session:', session);
     
     if (!session?.user) {
       return new NextResponse('Unauthorized', { status: 401 });
     }
 
-    ('User ID:', session.user.id);
-
     const [rows] = await db.query(
       `SELECT 
-        id,
         CASE 
           WHEN movie_id IS NOT NULL THEN movie_id 
           ELSE tv_id 
@@ -30,8 +26,6 @@ export async function GET() {
        ORDER BY added_at DESC`,
       [session.user.id]
     );
-
-    ('Watchlist rows:', rows);
 
     return NextResponse.json(rows);
   } catch (error) {

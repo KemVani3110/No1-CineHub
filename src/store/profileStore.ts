@@ -188,15 +188,16 @@ export const useProfileStore = create<ProfileState>((set, get) => ({
 
   fetchWatchList: async () => {
     try {
-      const response = await fetch("/api/profile/watchlist");
+      const response = await fetch("/api/watchlist");
       if (!response.ok) {
         throw new Error("Failed to fetch watchlist");
       }
       const data = await response.json();
-      set({ watchList: data.watchlist });
+      set({ watchList: data });
     } catch (error) {
       console.error("Error fetching watchlist:", error);
       set({ watchList: [] });
+      throw error;
     }
   },
 
@@ -211,6 +212,7 @@ export const useProfileStore = create<ProfileState>((set, get) => ({
     } catch (error) {
       console.error("Error fetching watch history:", error);
       set({ watchHistory: [] });
+      throw error;
     }
   },
 })); 

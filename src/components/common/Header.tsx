@@ -129,7 +129,7 @@ const Header = ({ onSidebarChange }: HeaderProps) => {
                 href="/home"
                 className="flex items-center space-x-3 hover:opacity-90 transition-opacity cursor-pointer"
               >
-                <div className="relative w-12 h-12 lg:w-14 lg:h-14">
+                <div className="relative w-10 h-10 sm:w-12 sm:h-12 lg:w-14 lg:h-14">
                   <Image
                     src="/logo.png"
                     alt="CineHub Logo"
@@ -139,10 +139,10 @@ const Header = ({ onSidebarChange }: HeaderProps) => {
                   />
                 </div>
                 <div className="flex flex-col">
-                  <span className="text-2xl lg:text-3xl font-bold gradient-text">
+                  <span className="text-xl sm:text-2xl lg:text-3xl font-bold gradient-text">
                     CineHub
                   </span>
-                  <span className="text-sm text-muted-foreground -mt-1 hidden lg:block">
+                  <span className="text-xs sm:text-sm text-muted-foreground -mt-1 hidden sm:block">
                     Cinema Experience
                   </span>
                 </div>
@@ -172,11 +172,11 @@ const Header = ({ onSidebarChange }: HeaderProps) => {
             </nav>
 
             {/* Right Section */}
-            <div className="flex items-center space-x-3">
+            <div className="flex items-center space-x-2 sm:space-x-3">
               {authUser ? (
                 <>
                   {/* Notifications Button */}
-                  <div className="relative hidden sm:block ">
+                  <div className="relative hidden sm:block">
                     <Button
                       variant="ghost"
                       size="icon"
@@ -325,73 +325,142 @@ const Header = ({ onSidebarChange }: HeaderProps) => {
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="md:hidden h-10 w-10 rounded-full hover:bg-accent/10"
+                    className="md:hidden h-9 w-9 rounded-full hover:bg-accent/10 relative"
                   >
-                    <Menu size={24} />
+                    <Menu size={22} />
+                    {authUser && (
+                      <Badge
+                        variant="destructive"
+                        className="absolute -top-1 -right-1 h-4 w-4 flex items-center justify-center p-0 text-[10px]"
+                      >
+                        3
+                      </Badge>
+                    )}
                   </Button>
                 </SheetTrigger>
-                <SheetContent side="right" className="w-[300px] sm:w-[400px]">
-                  <SheetHeader>
-                    <SheetTitle>Menu</SheetTitle>
+                <SheetContent side="right" className="w-[300px] sm:w-[400px] p-0">
+                  <SheetHeader className="sr-only">
+                    <SheetTitle>Navigation Menu</SheetTitle>
                   </SheetHeader>
-                  <div className="flex flex-col space-y-4 mt-4">
-                    {navItems.map((item) => {
-                      const Icon = item.icon;
-                      const isActive = pathname === item.path;
-                      return (
-                        <Link
-                          key={item.path}
-                          href={item.path}
-                          onClick={closeMobileMenu}
-                          className={`flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
-                            isActive
-                              ? "text-white bg-primary shadow-lg shadow-primary/25"
-                              : "text-muted-foreground hover:text-primary hover:bg-accent/10"
-                          }`}
-                        >
-                          <Icon size={20} />
-                          <span>{item.name}</span>
-                        </Link>
-                      );
-                    })}
-                    <Separator />
-                    {authUser ? (
-                      <>
-                        <Link
-                          href="/profile"
-                          onClick={closeMobileMenu}
-                          className="flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-medium text-muted-foreground hover:text-primary hover:bg-accent/10"
-                        >
-                          <User size={20} />
-                          <span>Profile</span>
-                        </Link>
-                        <Link
-                          href="/settings"
-                          onClick={closeMobileMenu}
-                          className="flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-medium text-muted-foreground hover:text-primary hover:bg-accent/10"
-                        >
-                          <Settings size={20} />
-                          <span>Settings</span>
-                        </Link>
-                        <Button
-                          variant="ghost"
-                          onClick={handleLogout}
-                          className="flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-medium text-red-500 hover:text-red-600 hover:bg-red-500/10"
-                        >
-                          <LogOut size={20} />
-                          <span>Logout</span>
-                        </Button>
-                      </>
-                    ) : (
-                      <Link
-                        href="/login"
-                        onClick={closeMobileMenu}
-                        className="flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-medium text-muted-foreground hover:text-primary hover:bg-accent/10"
-                      >
-                        <LogIn size={20} />
-                        <span>Login</span>
-                      </Link>
-                    )}
+                  <div className="flex flex-col h-full">
+                    {/* Header */}
+                    <div className="p-6 border-b border-border/50">
+                      <div className="flex items-center space-x-4">
+                        <div className="relative w-12 h-12">
+                          <Image
+                            src="/logo.png"
+                            alt="CineHub Logo"
+                            fill
+                            className="object-contain rounded-full"
+                          />
+                        </div>
+                        <div>
+                          <h2 className="text-xl font-bold gradient-text">CineHub</h2>
+                          <p className="text-sm text-muted-foreground">Cinema Experience</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Navigation */}
+                    <div className="flex-1 overflow-y-auto p-4">
+                      <div className="space-y-2">
+                        {navItems.map((item) => {
+                          const Icon = item.icon;
+                          const isActive = pathname === item.path;
+                          return (
+                            <Link
+                              key={item.path}
+                              href={item.path}
+                              onClick={closeMobileMenu}
+                              className={`flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 ${
+                                isActive
+                                  ? "text-white bg-primary shadow-lg shadow-primary/25"
+                                  : "text-muted-foreground hover:text-primary hover:bg-accent/10"
+                              }`}
+                            >
+                              <Icon size={20} className="flex-shrink-0" />
+                              <span>{item.name}</span>
+                            </Link>
+                          );
+                        })}
+                      </div>
+
+                      <Separator className="my-4" />
+
+                      {/* User Section */}
+                      {authUser ? (
+                        <div className="space-y-2">
+                          <div className="flex items-center space-x-3 px-4 py-3">
+                            <Avatar className="h-10 w-10">
+                              <AvatarImage
+                                src={getUserAvatar()}
+                                alt={authUser.name || authUser.email || "User"}
+                                referrerPolicy="no-referrer"
+                              />
+                              <AvatarFallback className="bg-primary/10 text-primary">
+                                {getUserInitials(authUser.name || authUser.email || "User")}
+                              </AvatarFallback>
+                            </Avatar>
+                            <div className="flex-1 min-w-0">
+                              <p className="font-medium truncate">
+                                {authUser.name || authUser.email}
+                              </p>
+                              {authUser.email && authUser.name && (
+                                <p className="text-xs text-muted-foreground truncate">
+                                  {authUser.email}
+                                </p>
+                              )}
+                            </div>
+                          </div>
+
+                          <Link
+                            href="/profile"
+                            onClick={closeMobileMenu}
+                            className="flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium text-muted-foreground hover:text-primary hover:bg-accent/10"
+                          >
+                            <User size={20} className="flex-shrink-0" />
+                            <span>Profile</span>
+                          </Link>
+
+                          <Link
+                            href="/settings"
+                            onClick={closeMobileMenu}
+                            className="flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium text-muted-foreground hover:text-primary hover:bg-accent/10"
+                          >
+                            <Settings size={20} className="flex-shrink-0" />
+                            <span>Settings</span>
+                          </Link>
+
+                          <Button
+                            variant="ghost"
+                            onClick={handleLogout}
+                            className="w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium text-red-500 hover:text-red-600 hover:bg-red-500/10"
+                          >
+                            <LogOut size={20} className="flex-shrink-0" />
+                            <span>Logout</span>
+                          </Button>
+                        </div>
+                      ) : (
+                        <div className="space-y-2">
+                          <Link
+                            href="/login"
+                            onClick={closeMobileMenu}
+                            className="flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium text-muted-foreground hover:text-primary hover:bg-accent/10"
+                          >
+                            <LogIn size={20} className="flex-shrink-0" />
+                            <span>Login</span>
+                          </Link>
+                          <Link
+                            href="/register"
+                            onClick={closeMobileMenu}
+                            className="flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium text-muted-foreground hover:text-primary hover:bg-accent/10"
+                          >
+                            <User size={20} className="flex-shrink-0" />
+                            <span>Register</span>
+                          </Link>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </SheetContent>
               </Sheet>

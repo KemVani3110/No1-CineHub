@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import { useToast } from "@/components/ui/use-toast";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -35,6 +35,7 @@ import Loading from "@/components/common/Loading";
 import { useAuth } from "@/hooks/useAuth";
 import { useRouter } from "next/navigation";
 import Settings from "@/components/profile/Settings";
+import { fetchMovieDetails, fetchTVShowDetails } from "@/services/tmdb";
 
 export default function ProfilePage() {
   const router = useRouter();
@@ -62,34 +63,98 @@ export default function ProfilePage() {
     fetchWatchHistory,
   } = useProfileStore();
 
+  const [ratings, setRatings] = useState<Record<string, number>>({});
+  const [isLoading, setIsLoading] = useState(true);
+
   useEffect(() => {
-    if (authLoading) return; // Don't do anything while auth is loading
+    if (authLoading) {
+      return; // Don't do anything while auth is loading
+    }
 
     if (!authUser) {
       router.push("/login");
       return;
     }
 
-    fetchUserData();
-    fetchAvatars();
-    // Set Overview tab as default
-    setActiveTab("overview");
-  }, [
-    authUser,
-    authLoading,
-    router,
-    fetchUserData,
-    fetchAvatars,
-    setActiveTab,
-  ]);
+    const initializeProfile = async () => {
+      try {
+        await fetchUserData();
+        await fetchAvatars();
+        setActiveTab("overview");
+      } catch (error) {
+        console.error('Error initializing profile:', error);
+        toast({
+          title: "Error",
+          description: "Failed to load profile data. Please try again.",
+          variant: "destructive",
+        });
+      }
+    };
+
+    initializeProfile();
+  }, [authUser, authLoading, router, fetchUserData, fetchAvatars, setActiveTab, toast]);
 
   useEffect(() => {
-    if (activeTab === "watchlist") {
-      fetchWatchList();
-    } else if (activeTab === "history") {
-      fetchWatchHistory();
+    if (!user) {
+      router.push("/login");
+      return;
     }
-  }, [activeTab, fetchWatchList, fetchWatchHistory]);
+
+    const loadData = async () => {
+      try {
+        setIsLoading(true);
+        if (activeTab === "watchlist") {
+          await fetchWatchList();
+        } else if (activeTab === "history") {
+          await fetchWatchHistory();
+        }
+      } catch (error) {
+        console.error('Error loading profile data:', error);
+        toast({
+          title: "Error",
+          description: `Failed to load ${activeTab}. Please try again.`,
+          variant: "destructive",
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadData();
+  }, [user, router, activeTab, fetchWatchList, fetchWatchHistory, toast]);
+
+  useEffect(() => {
+    if (!user) {
+      router.push("/login");
+      return;
+    }
+
+    const fetchRatings = async () => {
+      const newRatings: Record<string, number> = {};
+      
+      for (const item of watchList) {
+        const key = `${item.mediaType}-${item.id}`;
+        try {
+          if (item.mediaType === 'movie') {
+            const details = await fetchMovieDetails(item.id);
+            newRatings[key] = details.vote_average;
+          } else {
+            const details = await fetchTVShowDetails(item.id);
+            newRatings[key] = details.vote_average;
+          }
+        } catch (error) {
+          console.error(`Error fetching rating for ${key}:`, error);
+          newRatings[key] = 0;
+        }
+      }
+      
+      setRatings(newRatings);
+    };
+
+    if (watchList.length > 0) {
+      fetchRatings();
+    }
+  }, [watchList, user, router]);
 
   const handleAvatarSelect = async (avatarPath: string) => {
     try {
@@ -125,53 +190,53 @@ export default function ProfilePage() {
   return (
     <div className="min-h-screen bg-[var(--bg-main)]">
       {/* Header */}
-      <div className="container mx-auto px-4 lg:px-6 py-8">
-        <div className="flex items-center space-x-4 mb-8">
+      <div className="container mx-auto px-4 lg:px-6 py-4 lg:py-8">
+        <div className="flex items-center space-x-4 mb-4 lg:mb-8">
           <Button
             variant="ghost"
             size="icon"
-            className="h-10 w-10 rounded-full hover:bg-accent/10"
+            className="h-8 w-8 lg:h-10 lg:w-10 rounded-full hover:bg-accent/10"
             asChild
           >
             <Link href="/home">
-              <ChevronLeft size={24} />
+              <ChevronLeft size={20} className="lg:w-6 lg:h-6" />
             </Link>
           </Button>
-          <h1 className="text-2xl font-bold gradient-text">Profile</h1>
+          <h1 className="text-xl lg:text-2xl font-bold gradient-text">Profile</h1>
         </div>
 
         {/* Profile Content */}
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 lg:gap-6">
           {/* Left Column - Profile Info */}
-          <div className="lg:col-span-1 space-y-6">
+          <div className="lg:col-span-1 space-y-4 lg:space-y-6">
             {/* Profile Card */}
             <Card className="bg-card/50 backdrop-blur-sm border-border/50">
-              <CardContent className="p-6">
-                <div className="flex flex-col items-center space-y-4">
+              <CardContent className="p-4 lg:p-6">
+                <div className="flex flex-col items-center space-y-3 lg:space-y-4">
                   <div className="relative">
-                    <Avatar className="h-24 w-24 border-4 border-primary/20">
+                    <Avatar className="h-20 w-20 lg:h-24 lg:w-24 border-4 border-primary/20">
                       <AvatarImage
                         src={user?.avatar}
                         alt={user?.name || "User"}
                         className="object-cover"
                       />
-                      <AvatarFallback className="bg-primary/10 text-primary text-2xl">
+                      <AvatarFallback className="bg-primary/10 text-primary text-xl lg:text-2xl">
                         {getUserInitials(user?.name || "User")}
                       </AvatarFallback>
                     </Avatar>
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="absolute bottom-0 right-0 h-8 w-8 rounded-full bg-background/80 backdrop-blur-sm border border-border/50 hover:bg-accent/50"
+                      className="absolute bottom-0 right-0 h-6 w-6 lg:h-8 lg:w-8 rounded-full bg-background/80 backdrop-blur-sm border border-border/50 hover:bg-accent/50"
                       onClick={() => setIsAvatarDialogOpen(true)}
                     >
-                      <Camera size={16} />
+                      <Camera size={14} className="lg:w-4 lg:h-4" />
                     </Button>
                   </div>
 
                   <div className="text-center">
-                    <h2 className="text-xl font-semibold">{user?.name}</h2>
-                    <p className="text-sm text-muted-foreground">
+                    <h2 className="text-lg lg:text-xl font-semibold">{user?.name}</h2>
+                    <p className="text-xs lg:text-sm text-muted-foreground">
                       {user?.email}
                     </p>
                     <Badge
@@ -186,7 +251,7 @@ export default function ProfilePage() {
                   <Separator className="my-2" />
 
                   <div className="w-full space-y-2">
-                    <div className="flex items-center justify-between text-sm">
+                    <div className="flex items-center justify-between text-xs lg:text-sm">
                       <span className="text-muted-foreground">
                         Member since
                       </span>
@@ -194,7 +259,7 @@ export default function ProfilePage() {
                         {new Date(user?.created_at || "").toLocaleDateString()}
                       </span>
                     </div>
-                    <div className="flex items-center justify-between text-sm">
+                    <div className="flex items-center justify-between text-xs lg:text-sm">
                       <span className="text-muted-foreground">Last login</span>
                       <span className="font-medium">
                         {new Date(
@@ -210,30 +275,52 @@ export default function ProfilePage() {
             {/* Quick Stats */}
             <Card className="bg-card/50 backdrop-blur-sm border-border/50">
               <CardHeader className="pb-2">
-                <CardTitle className="text-lg">Quick Stats</CardTitle>
+                <CardTitle className="text-base lg:text-lg">Quick Stats</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="flex flex-col items-center p-3 rounded-lg bg-accent/50">
-                    <Film size={20} className="mb-1 text-primary" />
-                    <span className="text-sm font-medium">Movies</span>
-                    <span className="text-lg font-bold">
-                      {
-                        watchList.filter((item) => item.media_type === "movie")
-                          .length
-                      }
-                    </span>
-                  </div>
-                  <div className="flex flex-col items-center p-3 rounded-lg bg-accent/50">
-                    <Tv size={20} className="mb-1 text-primary" />
-                    <span className="text-sm font-medium">TV Shows</span>
-                    <span className="text-lg font-bold">
-                      {
-                        watchList.filter((item) => item.media_type === "tv")
-                          .length
-                      }
-                    </span>
-                  </div>
+              <CardContent>
+                <div className="grid grid-cols-2 gap-3">
+                  {isLoading ? (
+                    <>
+                      {[...Array(4)].map((_, index) => (
+                        <div key={index} className="flex flex-col items-center p-3 rounded-lg bg-[#1B263B] border border-[#2e3c51] animate-pulse">
+                          <div className="w-5 h-5 bg-[#2e3c51] rounded-full mb-2" />
+                          <div className="w-24 h-4 bg-[#2e3c51] rounded mb-1" />
+                          <div className="w-8 h-6 bg-[#2e3c51] rounded" />
+                        </div>
+                      ))}
+                    </>
+                  ) : (
+                    <>
+                      <div className="flex flex-col items-center p-3 rounded-lg bg-[#1B263B] border border-[#2e3c51] hover:border-[#4fd1c5] transition-colors duration-300 cursor-pointer">
+                        <Film size={20} className="mb-2 text-[#4fd1c5]" />
+                        <span className="text-[13px] font-medium text-[#e0e6ed]">Movies in Watchlist</span>
+                        <span className="text-[15px] font-bold text-[#4fd1c5]">
+                          {watchList.filter((item) => item.mediaType === "movie").length}
+                        </span>
+                      </div>
+                      <div className="flex flex-col items-center p-3 rounded-lg bg-[#1B263B] border border-[#2e3c51] hover:border-[#4fd1c5] transition-colors duration-300 cursor-pointer">
+                        <Tv size={20} className="mb-2 text-[#4fd1c5]" />
+                        <span className="text-[13px] font-medium text-[#e0e6ed]">TV Shows in Watchlist</span>
+                        <span className="text-[15px] font-bold text-[#4fd1c5]">
+                          {watchList.filter((item) => item.mediaType === "tv").length}
+                        </span>
+                      </div>
+                      <div className="flex flex-col items-center p-3 rounded-lg bg-[#1B263B] border border-[#2e3c51] hover:border-[#4fd1c5] transition-colors duration-300 cursor-pointer">
+                        <Film size={20} className="mb-2 text-[#4fd1c5]" />
+                        <span className="text-[13px] font-medium text-[#e0e6ed]">Movies Watched</span>
+                        <span className="text-[15px] font-bold text-[#4fd1c5]">
+                          {watchHistory.filter((item) => item.mediaType === "movie").length}
+                        </span>
+                      </div>
+                      <div className="flex flex-col items-center p-3 rounded-lg bg-[#1B263B] border border-[#2e3c51] hover:border-[#4fd1c5] transition-colors duration-300 cursor-pointer">
+                        <Tv size={20} className="mb-2 text-[#4fd1c5]" />
+                        <span className="text-[13px] font-medium text-[#e0e6ed]">TV Shows Watched</span>
+                        <span className="text-[15px] font-bold text-[#4fd1c5]">
+                          {watchHistory.filter((item) => item.mediaType === "tv").length}
+                        </span>
+                      </div>
+                    </>
+                  )}
                 </div>
               </CardContent>
             </Card>
@@ -244,266 +331,175 @@ export default function ProfilePage() {
             <Tabs
               value={activeTab}
               onValueChange={setActiveTab}
-              className="space-y-6"
+              className="space-y-4 lg:space-y-6"
             >
-              <TabsList className="w-full justify-start h-auto p-1 bg-accent/50">
+              <TabsList className="w-full justify-start h-auto p-1 bg-accent/50 overflow-x-auto flex-nowrap">
                 <TabsTrigger
                   value="overview"
-                  className="data-[state=active]:bg-background data-[state=active]:text-foreground rounded-lg px-4 py-2"
+                  className="flex items-center space-x-2 whitespace-nowrap"
                 >
-                  Overview
+                  <ImageIcon size={16} className="lg:w-5 lg:h-5" />
+                  <span className="text-xs lg:text-sm">Overview</span>
                 </TabsTrigger>
                 <TabsTrigger
                   value="watchlist"
-                  className="data-[state=active]:bg-background data-[state=active]:text-foreground rounded-lg px-4 py-2"
+                  className="flex items-center space-x-2 whitespace-nowrap"
                 >
-                  Watchlist
+                  <ListVideo size={16} className="lg:w-5 lg:h-5" />
+                  <span className="text-xs lg:text-sm">Watchlist</span>
                 </TabsTrigger>
                 <TabsTrigger
                   value="history"
-                  className="data-[state=active]:bg-background data-[state=active]:text-foreground rounded-lg px-4 py-2"
+                  className="flex items-center space-x-2 whitespace-nowrap"
                 >
-                  History
-                </TabsTrigger>
-                <TabsTrigger
-                  value="settings"
-                  className="data-[state=active]:bg-background data-[state=active]:text-foreground rounded-lg px-4 py-2"
-                >
-                  Settings
+                  <History size={16} className="lg:w-5 lg:h-5" />
+                  <span className="text-xs lg:text-sm">History</span>
                 </TabsTrigger>
               </TabsList>
 
-              {/* Overview Tab */}
-              <TabsContent value="overview" className="space-y-6">
-                <Card className="bg-card/50 backdrop-blur-sm border-border/50">
-                  <CardHeader>
-                    <CardTitle>Recent Activity</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-4">
-                      {watchHistory.slice(0, 5).map((item) => (
-                        <div
-                          key={item.id}
-                          className="flex items-center space-x-4 p-3 rounded-lg bg-accent/50"
-                        >
-                          <div className="relative h-16 w-12 flex-shrink-0">
-                            <Image
-                              src={item.poster_path}
-                              alt={item.title}
-                              fill
-                              className="object-cover rounded-md"
-                            />
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <h3 className="font-medium truncate">
-                              {item.title}
-                            </h3>
-                            <p className="text-sm text-muted-foreground">
-                              {new Date(item.watched_at).toLocaleDateString()}
-                            </p>
-                          </div>
-                        </div>
-                      ))}
-                      {watchHistory.length === 0 && (
-                        <p className="text-center text-muted-foreground py-4">
-                          No recent activity
-                        </p>
-                      )}
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <Card className="bg-card/50 backdrop-blur-sm border-border/50">
-                  <CardHeader>
-                    <CardTitle>Watchlist Summary</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-4">
-                      {watchList.slice(0, 5).map((item) => (
-                        <div
-                          key={item.id}
-                          className="flex items-center space-x-4 p-3 rounded-lg bg-accent/50"
-                        >
-                          <div className="relative h-16 w-12 flex-shrink-0">
-                            <Image
-                              src={item.poster_path}
-                              alt={item.title}
-                              fill
-                              className="object-cover rounded-md"
-                            />
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <h3 className="font-medium truncate">
-                              {item.title}
-                            </h3>
-                            <p className="text-sm text-muted-foreground">
-                              Added{" "}
-                              {new Date(item.added_at).toLocaleDateString()}
-                            </p>
-                          </div>
-                        </div>
-                      ))}
-                      {watchList.length === 0 && (
-                        <p className="text-center text-muted-foreground py-4">
-                          No items in watchlist
-                        </p>
-                      )}
-                    </div>
-                  </CardContent>
-                </Card>
-              </TabsContent>
-
-              {/* Watchlist Tab */}
-              <TabsContent value="watchlist" className="space-y-6">
-                <Card className="bg-card/50 backdrop-blur-sm border-border/50">
-                  <CardHeader>
-                    <CardTitle>Watchlist</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    {watchList.length > 0 ? (
-                      <ScrollArea className="h-[600px] pr-4">
-                        <div className="space-y-8">
-                          {/* Movies Section */}
-                          <div>
-                            <h4 className="text-lg font-semibold text-[var(--text-main)] mb-4 flex items-center gap-2">
-                              <Film className="h-5 w-5 text-[var(--cinehub-accent)]" />
-                              Movies
-                            </h4>
-                            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
-                              {watchList
-                                .filter((item) => item.media_type === "movie")
-                                .map((item) => (
-                                  <div
-                                    key={item.id}
-                                    className="transform transition-all duration-300 hover:scale-105 hover:shadow-lg"
-                                  >
-                                    <MovieCard movie={item} />
-                                  </div>
-                                ))}
-                            </div>
-                          </div>
-
-                          {/* TV Shows Section */}
-                          <div>
-                            <h4 className="text-lg font-semibold text-[var(--text-main)] mb-4 flex items-center gap-2">
-                              <Tv className="h-5 w-5 text-[var(--cinehub-accent)]" />
-                              TV Shows
-                            </h4>
-                            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
-                              {watchList
-                                .filter((item) => item.media_type === "tv")
-                                .map((item) => (
-                                  <div
-                                    key={item.id}
-                                    className="transform transition-all duration-300 hover:scale-105 hover:shadow-lg"
-                                  >
-                                    <TVShowCard show={item} />
-                                  </div>
-                                ))}
-                            </div>
-                          </div>
-                        </div>
-                      </ScrollArea>
-                    ) : (
-                      <div className="text-center py-8 sm:py-12">
-                        <div className="mx-auto w-16 h-16 bg-[var(--success)]/10 rounded-full flex items-center justify-center mb-4">
-                          <ListVideo className="h-8 w-8 text-[var(--success)]" />
-                        </div>
-                        <h3 className="text-lg font-medium mb-2 text-[var(--text-main)]">
-                          No items in your watchlist
-                        </h3>
-                        <p className="text-[var(--text-sub)] mb-4">
-                          Start adding movies and shows you want to watch
-                        </p>
-                        <Button
-                          asChild
-                          className="bg-[var(--success)] hover:bg-[var(--success)]/80 text-white cursor-pointer transition-colors"
-                        >
-                          <Link href="/home">Browse Movies</Link>
-                        </Button>
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
-              </TabsContent>
-
-              {/* History Tab */}
-              <TabsContent value="history" className="space-y-6">
-                <Card className="bg-card/50 backdrop-blur-sm border-border/50">
-                  <CardHeader>
-                    <CardTitle>Watch History</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    {watchHistory.length > 0 ? (
-                      <ScrollArea className="h-[600px] pr-4">
-                        <div className="space-y-8">
-                          {/* Movies Section */}
-                          <div>
-                            <h4 className="text-lg font-semibold text-[var(--text-main)] mb-4 flex items-center gap-2">
-                              <Film className="h-5 w-5 text-[var(--cinehub-accent)]" />
-                              Movies
-                            </h4>
-                            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
-                              {watchHistory
-                                .filter((item) => item.media_type === "movie")
-                                .map((item) => (
-                                  <div
-                                    key={item.id}
-                                    className="transform transition-all duration-300 hover:scale-105 hover:shadow-lg"
-                                  >
-                                    <MovieCard movie={item} />
-                                  </div>
-                                ))}
-                            </div>
-                          </div>
-
-                          {/* TV Shows Section */}
-                          <div>
-                            <h4 className="text-lg font-semibold text-[var(--text-main)] mb-4 flex items-center gap-2">
-                              <Tv className="h-5 w-5 text-[var(--cinehub-accent)]" />
-                              TV Shows
-                            </h4>
-                            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
-                              {watchHistory
-                                .filter((item) => item.media_type === "tv")
-                                .map((item) => (
-                                  <div
-                                    key={item.id}
-                                    className="transform transition-all duration-300 hover:scale-105 hover:shadow-lg"
-                                  >
-                                    <TVShowCard show={item} />
-                                  </div>
-                                ))}
-                            </div>
-                          </div>
-                        </div>
-                      </ScrollArea>
-                    ) : (
-                      <div className="text-center py-8 sm:py-12">
-                        <div className="mx-auto w-16 h-16 bg-[var(--danger)]/10 rounded-full flex items-center justify-center mb-4">
-                          <History className="h-8 w-8 text-[var(--danger)]" />
-                        </div>
-                        <h3 className="text-lg font-medium mb-2 text-[var(--text-main)]">
-                          No watch history yet
-                        </h3>
-                        <p className="text-[var(--text-sub)] mb-4">
-                          Start watching movies and shows to build your history
-                        </p>
-                        <Button
-                          asChild
-                          className="bg-[var(--danger)] hover:bg-[var(--danger)]/80 text-white cursor-pointer transition-colors"
-                        >
-                          <Link href="/home">Browse Movies</Link>
-                        </Button>
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
-              </TabsContent>
-
-              {/* Settings Tab */}
-              <TabsContent value="settings" className="space-y-6">
+              <TabsContent value="overview" className="mt-4">
                 <Settings />
+              </TabsContent>
+
+              <TabsContent value="watchlist" className="mt-4">
+                <div className="space-y-8">
+                  {/* Movies Section */}
+                  <div>
+                    <h4 className="text-lg font-semibold text-[var(--text-main)] mb-4 flex items-center gap-2">
+                      <Film className="h-5 w-5 text-[var(--cinehub-accent)]" />
+                      Movies ({watchList.filter(item => item.mediaType === 'movie').length})
+                    </h4>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4">
+                      {watchList
+                        .filter((item) => item.mediaType === 'movie')
+                        .map((item) => (
+                          <div key={`${item.mediaType}-${item.id}-${item.addedAt}`} className="transform scale-90 hover:scale-95 transition-transform duration-200">
+                            <MovieCard
+                              movie={{
+                                id: item.id,
+                                title: item.title,
+                                poster_path: item.posterPath,
+                                vote_average: ratings[`movie-${item.id}`] || 0,
+                                release_date: new Date(item.addedAt).toISOString().split('T')[0]
+                              }}
+                            />
+                          </div>
+                        ))}
+                    </div>
+                  </div>
+
+                  {/* TV Shows Section */}
+                  <div>
+                    <h4 className="text-lg font-semibold text-[var(--text-main)] mb-4 flex items-center gap-2">
+                      <Tv className="h-5 w-5 text-[var(--cinehub-accent)]" />
+                      TV Shows ({watchList.filter(item => item.mediaType === 'tv').length})
+                    </h4>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4">
+                      {watchList
+                        .filter((item) => item.mediaType === 'tv')
+                        .map((item) => (
+                          <div key={`${item.mediaType}-${item.id}-${item.addedAt}`} className="transform scale-90 hover:scale-95 transition-transform duration-200">
+                            <TVShowCard
+                              show={{
+                                id: item.id,
+                                name: item.title,
+                                original_name: item.title,
+                                overview: "",
+                                first_air_date: new Date(item.addedAt).toISOString().split('T')[0],
+                                poster_path: item.posterPath,
+                                backdrop_path: undefined,
+                                genre_ids: [],
+                                original_language: "en",
+                                popularity: 0,
+                                vote_count: 0,
+                                vote_average: ratings[`tv-${item.id}`] || 0,
+                                origin_country: []
+                              }}
+                            />
+                          </div>
+                        ))}
+                    </div>
+                  </div>
+
+                  {watchList.length === 0 && (
+                    <div className="flex flex-col items-center justify-center min-h-[200px] gap-4">
+                      <div className="w-16 h-16 bg-[var(--success)]/10 rounded-full flex items-center justify-center">
+                        <ListVideo className="h-8 w-8 text-[var(--success)]" />
+                      </div>
+                      <h3 className="text-lg font-medium text-[var(--text-main)]">
+                        No items in your watchlist
+                      </h3>
+                      <p className="text-[var(--text-sub)] text-center">
+                        Start adding movies and shows you want to watch
+                      </p>
+                      <Button
+                        asChild
+                        className="bg-[var(--success)] hover:bg-[var(--success)]/80 text-white"
+                      >
+                        <Link href="/home">Browse Movies</Link>
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              </TabsContent>
+
+              <TabsContent value="history" className="mt-4">
+                <div className="space-y-8">
+                  {/* Movies Section */}
+                  <div>
+                    <h4 className="text-lg font-semibold text-[var(--text-main)] mb-4 flex items-center gap-2">
+                      <Film className="h-5 w-5 text-[var(--cinehub-accent)]" />
+                      Movies ({watchHistory.filter(item => item.media_type === 'movie').length})
+                    </h4>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 lg:gap-4">
+                      {watchHistory
+                        .filter((item) => item.media_type === 'movie')
+                        .map((item) => (
+                          <div key={item.id} className="transform scale-90 hover:scale-95 transition-transform duration-200">
+                            <MovieCard movie={item} />
+                          </div>
+                        ))}
+                    </div>
+                  </div>
+
+                  {/* TV Shows Section */}
+                  <div>
+                    <h4 className="text-lg font-semibold text-[var(--text-main)] mb-4 flex items-center gap-2">
+                      <Tv className="h-5 w-5 text-[var(--cinehub-accent)]" />
+                      TV Shows ({watchHistory.filter(item => item.media_type === 'tv').length})
+                    </h4>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 lg:gap-4">
+                      {watchHistory
+                        .filter((item) => item.media_type === 'tv')
+                        .map((item) => (
+                          <div key={item.id} className="transform scale-90 hover:scale-95 transition-transform duration-200">
+                            <TVShowCard show={item} />
+                          </div>
+                        ))}
+                    </div>
+                  </div>
+
+                  {watchHistory.filter(item => item.media_type === 'movie').length === 0 && 
+                   watchHistory.filter(item => item.media_type === 'tv').length === 0 && (
+                    <div className="flex flex-col items-center justify-center min-h-[200px] gap-4">
+                      <div className="w-16 h-16 bg-[var(--danger)]/10 rounded-full flex items-center justify-center">
+                        <History className="h-8 w-8 text-[var(--danger)]" />
+                      </div>
+                      <h3 className="text-lg font-medium text-[var(--text-main)]">
+                        No watch history yet
+                      </h3>
+                      <p className="text-[var(--text-sub)] text-center">
+                        Start watching movies and shows to build your history
+                      </p>
+                      <Button
+                        asChild
+                        className="bg-[var(--danger)] hover:bg-[var(--danger)]/80 text-white"
+                      >
+                        <Link href="/home">Browse Movies</Link>
+                      </Button>
+                    </div>
+                  )}
+                </div>
               </TabsContent>
             </Tabs>
           </div>

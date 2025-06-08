@@ -1,8 +1,9 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useSearchStore } from '@/store/searchStore';
+import { useSearchStore, SearchType } from '@/store/searchStore';
 import { useSearch } from '@/hooks/useSearch';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -16,34 +17,32 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { 
-  Pagination,
-  PaginationContent,
   PaginationItem,
   PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
   PaginationEllipsis,
 } from '@/components/ui/pagination';
 import { MovieCard } from '@/components/common/MovieCard';
 import { TVShowCard } from '@/components/common/TVShowCard';
 import { 
   Search as SearchIcon, 
-  Filter,
   Clock,
   TrendingUp,
   X,
   Grid3X3,
   List,
   SortAsc,
-  SortDesc
+  SortDesc,
+  ChevronLeft,
+  ChevronRight
 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { TMDBMovie, TMDBTV, TMDBSearchResult } from '@/types/tmdb';
 import Header from '@/components/common/Header';
-import Loading from '@/components/common/Loading';
-import CompilingOverlay from '@/components/common/CompilingOverlay';
+import Image from 'next/image';
 
 export default function SearchPage() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const { query, type, setQuery, setType, searchHistory, addToHistory, clearHistory } = useSearchStore();
   const [currentPage, setCurrentPage] = useState(1);
   const { data, isLoading, isError } = useSearch(currentPage);
@@ -53,6 +52,28 @@ export default function SearchPage() {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [sortBy, setSortBy] = useState<'popularity' | 'rating' | 'date' | 'title'>('popularity');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
+
+  // Initialize from URL params
+  useEffect(() => {
+    const urlQuery = searchParams.get('query');
+    const urlType = searchParams.get('type') as SearchType;
+    const urlPage = searchParams.get('page');
+
+    if (urlQuery) setQuery(urlQuery);
+    if (urlType && ['all', 'movie', 'tv'].includes(urlType)) setType(urlType);
+    if (urlPage) setCurrentPage(parseInt(urlPage));
+  }, [searchParams, setQuery, setType]);
+
+  // Update URL when search changes
+  useEffect(() => {
+    const params = new URLSearchParams();
+    if (query) params.set('query', query);
+    if (type !== 'all') params.set('type', type);
+    if (currentPage > 1) params.set('page', currentPage.toString());
+    
+    const newUrl = params.toString() ? `?${params.toString()}` : '';
+    router.push(`/search${newUrl}`, { scroll: false });
+  }, [query, type, currentPage, router]);
 
   useEffect(() => {
     if (query && user) {
@@ -64,8 +85,8 @@ export default function SearchPage() {
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    if (query && user) {
-      addToHistory(query);
+    if (query.trim() && user) {
+      addToHistory(query.trim());
     }
     setCurrentPage(1);
   };
@@ -108,10 +129,46 @@ export default function SearchPage() {
   }
 
   const renderResults = () => {
+    if (!query) {
+      return (
+        <Card className="border-accent/20 bg-accent/5">
+          <CardContent className="flex items-center justify-center py-12">
+            <div className="text-center">
+              <TrendingUp className="h-12 w-12 text-accent mx-auto mb-4" />
+              <div className="text-lg font-medium mb-2">Discover Amazing Content</div>
+              <p className="text-muted-foreground">
+                Search for movies and TV shows to get started
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+      );
+    }
+
     if (isLoading) {
       return (
-        <div className="flex items-center justify-center py-12">
-          <Loading message="Searching for amazing content..." showBackdrop={false} />
+        <div className="min-h-[400px] flex items-center justify-center">
+          <div className="flex flex-col items-center justify-center gap-6">
+            <div className="relative">
+              {/* Spinner ring outside */}
+              <div className="w-16 h-16 rounded-full border-4 border-primary/30 border-t-primary animate-spin"></div>
+              
+              {/* Middle Logo*/}
+              <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+                <Image
+                  src="/logo.png"
+                  alt="CineHub Logo"
+                  width={40}
+                  height={40}
+                  className="animate-pulse rounded-full"
+                />
+              </div>
+            </div>
+            
+            <p className="text-text-sub text-base font-medium animate-pulse">
+              Searching for amazing content...
+            </p>
+          </div>
         </div>
       );
     }
@@ -140,7 +197,7 @@ export default function SearchPage() {
       );
     }
 
-    if (!sortedResults.length && query) {
+    if (!data?.results?.length) {
       return (
         <Card className="border-muted bg-muted/5">
           <CardContent className="flex items-center justify-center py-12">
@@ -157,22 +214,6 @@ export default function SearchPage() {
               >
                 Clear Search
               </Button>
-            </div>
-          </CardContent>
-        </Card>
-      );
-    }
-
-    if (!query) {
-      return (
-        <Card className="border-accent/20 bg-accent/5">
-          <CardContent className="flex items-center justify-center py-12">
-            <div className="text-center">
-              <TrendingUp className="h-12 w-12 text-accent mx-auto mb-4" />
-              <div className="text-lg font-medium mb-2">Discover Amazing Content</div>
-              <p className="text-muted-foreground">
-                Search for movies and TV shows to get started
-              </p>
             </div>
           </CardContent>
         </Card>
@@ -240,19 +281,22 @@ export default function SearchPage() {
         {/* Results grid */}
         <div className={
           viewMode === 'grid' 
-            ? "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6"
+            ? "grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 md:gap-4"
             : "space-y-4"
         }>
           {sortedResults.map((item: TMDBSearchResult) => {
             // Handle movie results
             if (type === 'movie' || (item.media_type === 'movie' && type === 'all')) {
               const movie = item as TMDBMovie;
-              return <MovieCard key={movie.id} movie={movie} />;
+              return (
+                <div key={movie.id} className="transform scale-95 hover:scale-100 transition-transform duration-200">
+                  <MovieCard movie={movie} />
+                </div>
+              );
             }
             
             // Handle TV show results
             if (type === 'tv' || (item.media_type === 'tv' && type === 'all')) {
-              // Convert TMDBSearchResult to TMDBTV
               const tvShow: TMDBTV = {
                 id: item.id,
                 name: item.name || '',
@@ -266,47 +310,110 @@ export default function SearchPage() {
                 popularity: item.popularity,
                 vote_count: item.vote_count || 0,
                 vote_average: item.vote_average || 0,
-                origin_country: [] // Default empty array since it's not in TMDBSearchResult
+                origin_country: []
               };
-              return <TVShowCard key={tvShow.id} show={tvShow} />;
+              return (
+                <div key={tvShow.id} className="transform scale-95 hover:scale-100 transition-transform duration-200">
+                  <TVShowCard show={tvShow} />
+                </div>
+              );
             }
             
             return null;
           })}
         </div>
-
-        {/* Pagination */}
-        {data?.total_pages && data.total_pages > 1 && (
-          <div className="flex justify-center">
-            <Pagination
-              currentPage={currentPage}
-              totalPages={data?.total_pages || 1}
-              onPageChange={setCurrentPage}
-            />
-          </div>
-        )}
       </div>
     );
   };
 
   const generatePaginationItems = (totalPages: number, currentPage: number) => {
     const items = [];
-    const maxVisible = 5;
-    
-    if (totalPages <= maxVisible) {
-      for (let i = 1; i <= totalPages; i++) {
-        items.push(i);
-      }
-    } else {
-      if (currentPage <= 3) {
-        items.push(1, 2, 3, 4, '...', totalPages);
-      } else if (currentPage >= totalPages - 2) {
-        items.push(1, '...', totalPages - 3, totalPages - 2, totalPages - 1, totalPages);
-      } else {
-        items.push(1, '...', currentPage - 1, currentPage, currentPage + 1, '...', totalPages);
-      }
+    const maxVisiblePages = window.innerWidth < 640 ? 3 : 5;
+    const halfVisible = Math.floor(maxVisiblePages / 2);
+
+    // Always show first page
+    items.push(
+      <PaginationItem key="first">
+        <PaginationLink
+          href="#"
+          onClick={(e) => {
+            e.preventDefault();
+            setCurrentPage(1);
+          }}
+          isActive={currentPage === 1}
+        >
+          1
+        </PaginationLink>
+      </PaginationItem>
+    );
+
+    // Calculate start and end of visible pages
+    let startPage = Math.max(2, currentPage - halfVisible);
+    let endPage = Math.min(totalPages - 1, currentPage + halfVisible);
+
+    // Adjust if we're near the start
+    if (currentPage <= halfVisible + 1) {
+      endPage = Math.min(totalPages - 1, maxVisiblePages);
     }
-    
+    // Adjust if we're near the end
+    if (currentPage >= totalPages - halfVisible) {
+      startPage = Math.max(2, totalPages - maxVisiblePages + 1);
+    }
+
+    // Add ellipsis after first page if needed
+    if (startPage > 2) {
+      items.push(
+        <PaginationItem key="ellipsis-1">
+          <PaginationEllipsis />
+        </PaginationItem>
+      );
+    }
+
+    // Add visible page numbers
+    for (let i = startPage; i <= endPage; i++) {
+      items.push(
+        <PaginationItem key={i}>
+          <PaginationLink
+            href="#"
+            onClick={(e) => {
+              e.preventDefault();
+              setCurrentPage(i);
+            }}
+            isActive={currentPage === i}
+          >
+            {i}
+          </PaginationLink>
+        </PaginationItem>
+      );
+    }
+
+    // Add ellipsis before last page if needed
+    if (endPage < totalPages - 1) {
+      items.push(
+        <PaginationItem key="ellipsis-2">
+          <PaginationEllipsis />
+        </PaginationItem>
+      );
+    }
+
+    // Always show last page if there is more than one page
+    if (totalPages > 1) {
+      items.push(
+        <PaginationItem key="last">
+          <PaginationLink
+            href="#"
+            onClick={(e) => {
+              e.preventDefault();
+              setCurrentPage(totalPages);
+            }}
+            isActive={currentPage === totalPages}
+          >
+            {totalPages}
+          </PaginationLink>
+        </PaginationItem>
+      );
+    }
+
     return items;
   };
 
@@ -422,10 +529,93 @@ export default function SearchPage() {
         </div>
 
         {/* Results section */}
-        {renderResults()}
+        <div className="space-y-6">
+          {renderResults()}
+
+          {/* Pagination */}
+          {!isLoading && data?.total_pages && data.total_pages > 1 && (
+            <div className="flex justify-center mt-8">
+              <div className="flex items-center gap-1 sm:gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setCurrentPage(currentPage - 1)}
+                  disabled={currentPage === 1}
+                  className="h-8 w-8 p-0"
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                </Button>
+
+                {/* First page */}
+                <Button
+                  variant={currentPage === 1 ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setCurrentPage(1)}
+                  className="h-8 w-8 p-0 hidden sm:flex"
+                >
+                  1
+                </Button>
+
+                {/* Ellipsis if needed */}
+                {currentPage > 3 && (
+                  <span className="hidden sm:flex items-center justify-center h-8 w-8">
+                    ...
+                  </span>
+                )}
+
+                {/* Current page and neighbors */}
+                {Array.from({ length: 3 }, (_, i) => currentPage - 1 + i)
+                  .filter(page => {
+                    // Filter out pages that are already shown (1 and last page)
+                    if (page === 1 || page === data.total_pages) return false;
+                    // Only show pages that exist
+                    return page > 0 && page <= data.total_pages;
+                  })
+                  .map(page => (
+                    <Button
+                      key={page}
+                      variant={currentPage === page ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => setCurrentPage(page)}
+                      className="h-8 w-8 p-0"
+                    >
+                      {page}
+                    </Button>
+                  ))}
+
+                {/* Ellipsis if needed */}
+                {currentPage < data.total_pages - 2 && (
+                  <span className="hidden sm:flex items-center justify-center h-8 w-8">
+                    ...
+                  </span>
+                )}
+
+                {/* Last page */}
+                {data.total_pages > 1 && (
+                  <Button
+                    variant={currentPage === data.total_pages ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setCurrentPage(data.total_pages)}
+                    className="h-8 w-8 p-0 hidden sm:flex"
+                  >
+                    {data.total_pages}
+                  </Button>
+                )}
+
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setCurrentPage(currentPage + 1)}
+                  disabled={currentPage === data.total_pages}
+                  className="h-8 w-8 p-0"
+                >
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+          )}
+        </div>
       </main>
-      
-      {isLoading && <CompilingOverlay />}
     </div>
   );
 }

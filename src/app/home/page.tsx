@@ -26,8 +26,9 @@ import {
   UpcomingTVShows,
   withLazyLoading
 } from "@/components/lazy";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { QueryClient, QueryClientProvider, useQuery } from "@tanstack/react-query";
 import BackToTop from "@/components/common/BackToTop";
+import Loading from "@/components/common/Loading";
 
 // Wrap components with lazy loading
 const LazyHeader = withLazyLoading(Header, "Loading header...");
@@ -211,7 +212,9 @@ export default function HomePage() {
                   >
                     Trending Movies
                   </SectionTitle>
-                  <LazyPopularMovies />
+                  <React.Suspense fallback={<Loading message="Loading trending movies..." />}>
+                    <LazyPopularMovies />
+                  </React.Suspense>
                 </section>
 
                 <section>
@@ -221,7 +224,9 @@ export default function HomePage() {
                   >
                     Top Rated Movies
                   </SectionTitle>
-                  <LazyTopRatedMovies />
+                  <React.Suspense fallback={<Loading message="Loading top rated movies..." />}>
+                    <LazyTopRatedMovies />
+                  </React.Suspense>
                 </section>
 
                 <section>
@@ -231,7 +236,9 @@ export default function HomePage() {
                   >
                     Now Playing
                   </SectionTitle>
-                  <LazyNowPlayingMovies />
+                  <React.Suspense fallback={<Loading message="Loading now playing movies..." />}>
+                    <LazyNowPlayingMovies />
+                  </React.Suspense>
                 </section>
 
                 <section>
@@ -241,7 +248,9 @@ export default function HomePage() {
                   >
                     Upcoming Releases
                   </SectionTitle>
-                  <LazyUpcomingMovies />
+                  <React.Suspense fallback={<Loading message="Loading upcoming movies..." />}>
+                    <LazyUpcomingMovies />
+                  </React.Suspense>
                 </section>
               </div>
             )}
@@ -252,31 +261,37 @@ export default function HomePage() {
                 <section>
                   <SectionTitle
                     icon={TrendingUp}
-                    subtitle="Most popular series this week"
+                    subtitle="Discover what everyone's watching right now"
                   >
                     Trending TV Shows
                   </SectionTitle>
-                  <LazyPopularTVShows />
+                  <React.Suspense fallback={<Loading message="Loading trending TV shows..." />}>
+                    <LazyPopularTVShows />
+                  </React.Suspense>
                 </section>
 
                 <section>
                   <SectionTitle
                     icon={Star}
-                    subtitle="Highest rated series of all time"
+                    subtitle="Critically acclaimed and audience favorites"
                   >
-                    Top Rated Series
+                    Top Rated TV Shows
                   </SectionTitle>
-                  <LazyTopRatedTVShows />
+                  <React.Suspense fallback={<Loading message="Loading top rated TV shows..." />}>
+                    <LazyTopRatedTVShows />
+                  </React.Suspense>
                 </section>
 
                 <section>
                   <SectionTitle
                     icon={Calendar}
-                    subtitle="Coming soon to theaters"
+                    subtitle="Coming soon to your screens"
                   >
-                    Upcoming Releases
+                    Upcoming TV Shows
                   </SectionTitle>
-                  <LazyUpcomingTVShows />
+                  <React.Suspense fallback={<Loading message="Loading upcoming TV shows..." />}>
+                    <LazyUpcomingTVShows />
+                  </React.Suspense>
                 </section>
               </div>
             )}

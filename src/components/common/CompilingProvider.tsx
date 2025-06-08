@@ -10,24 +10,24 @@ interface CompilingContextType {
 
 const CompilingContext = createContext<CompilingContextType>({ isCompiling: false });
 
-export const useCompilingState = () => useContext(CompilingContext);
+export const useCompiling = () => useContext(CompilingContext);
 
 export function CompilingProvider({ children }: { children: React.ReactNode }) {
-  const [isCompiling, setIsCompiling] = useState(false);
+  const [isCompiling, setIsCompiling] = useState(true); // Start with true for initial load
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
 
   useEffect(() => {
-    // Set compiling state immediately when route changes
-    setIsCompiling(true);
-
-    // Reset compiling state after a short delay
-    const timer = setTimeout(() => {
-      setIsCompiling(false);
-    }, 1000); // Reduced delay to 1 second
-
-    return () => clearTimeout(timer);
-  }, [pathname, searchParams]);
+    // Only show overlay on initial page load
+    if (isInitialLoad) {
+      const timer = setTimeout(() => {
+        setIsCompiling(false);
+        setIsInitialLoad(false);
+      }, 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [isInitialLoad]);
 
   return (
     <CompilingContext.Provider value={{ isCompiling }}>

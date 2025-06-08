@@ -47,7 +47,7 @@ export function MovieInfo({ movie }: MovieInfoProps) {
             <Badge
               key={genre.id}
               variant="secondary"
-              className="bg-[#4fd1c5]/10 text-[#4fd1c5] hover:bg-[#4fd1c5]/20"
+              className="bg-[#4fd1c5]/10 text-[#4fd1c5] hover:bg-[#4fd1c5]/20 cursor-pointer"
             >
               {genre.name}
             </Badge>
