@@ -287,7 +287,7 @@ export default function SearchPage() {
 
     return (
       <div className="space-y-8">
-        {/* Enhanced Results Header */}
+        {/*  Results Header */}
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 bg-bg-card/50 backdrop-blur-sm rounded-xl p-6 border border-accent/10">
           {/* Results Info */}
           <div className="flex flex-wrap items-center gap-3">
@@ -402,7 +402,7 @@ export default function SearchPage() {
           </div>
         </div>
 
-        {/* Enhanced Results Grid */}
+        {/*  Results Grid */}
         <div
           className={
             viewMode === "grid"
@@ -470,7 +470,7 @@ export default function SearchPage() {
       <Header />
 
       <main className="container mx-auto px-4 py-8 md:py-12 space-y-8 md:space-y-12">
-        {/* Enhanced Search Section */}
+        {/* Search Section */}
         <div className="max-w-4xl mx-auto space-y-6 md:space-y-8">
           {/* Main Search Card */}
           <Card className="border-2 border-accent/20 bg-gradient-to-br from-bg-card/80 via-bg-card to-accent/5 backdrop-blur-xl shadow-2xl">
@@ -514,7 +514,7 @@ export default function SearchPage() {
                   </Button>
                 </div>
 
-                {/* Enhanced Search Type Tabs - Mobile Responsive */}
+                {/* Search Type Tabs */}
                 <Tabs
                   value={type}
                   onValueChange={(value: any) => setType(value)}
@@ -548,7 +548,7 @@ export default function SearchPage() {
             </CardContent>
           </Card>
 
-          {/* Enhanced Recent Searches */}
+          {/* Recent Searches */}
           {user && searchHistory.length > 0 && (
             <Card className="border border-accent/10 bg-bg-card/50 backdrop-blur-sm">
               <CardContent className="p-6">
@@ -603,7 +603,7 @@ export default function SearchPage() {
         <div className="space-y-8">
           {renderResults()}
 
-          {/* Enhanced Pagination */}
+          {/* Pagination */}
           {!isLoading && data?.total_pages && data.total_pages > 1 && (
             <div className="flex justify-center mt-12">
               <div className="flex items-center gap-2 bg-bg-card/50 backdrop-blur-sm rounded-xl p-3 border border-accent/10">
@@ -617,7 +617,7 @@ export default function SearchPage() {
                   <ChevronLeft className="h-4 w-4" />
                 </Button>
 
-                {/* Enhanced pagination logic */}
+                {/* pagination logic */}
                 {Array.from(
                   { length: Math.min(5, data.total_pages) },
                   (_, i) => {

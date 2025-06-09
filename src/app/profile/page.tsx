@@ -8,7 +8,6 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Dialog,
   DialogContent,
@@ -21,6 +20,23 @@ import {
   ChevronLeft,
   Shield,
   Camera,
+  Calendar,
+  Clock,
+  Star,
+  Settings as SettingsIcon,
+  User,
+  Mail,
+  MapPin,
+  Phone,
+  Globe,
+  Activity,
+  Trophy,
+  BookOpen,
+  Heart,
+  Edit,
+  MoreVertical,
+  Download,
+  Share2,
 } from "lucide-react";
 import Link from "next/link";
 import { useProfileStore } from "@/store/profileStore";
@@ -60,7 +76,7 @@ export default function ProfilePage() {
       try {
         await fetchUserData();
         await fetchAvatars();
-        setActiveTab("overview");
+        setActiveTab("settings");
       } catch (error) {
         console.error('Error initializing profile:', error);
         toast({
@@ -107,114 +123,132 @@ export default function ProfilePage() {
 
   return (
     <div className="min-h-screen bg-[var(--bg-main)]">
-      {/* Header */}
-      <div className="container mx-auto px-4 lg:px-6 py-4 lg:py-8">
-        <div className="flex items-center space-x-4 mb-4 lg:mb-8">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8 lg:h-10 lg:w-10 rounded-full hover:bg-accent/10"
-            asChild
-          >
-            <Link href="/home">
-              <ChevronLeft size={20} className="lg:w-6 lg:h-6" />
-            </Link>
-          </Button>
-          <h1 className="text-xl lg:text-2xl font-bold gradient-text">Profile</h1>
+      {/*  Header with Cover Background */}
+      <div className="relative">
+        {/* Cover Background */}
+        <div className="h-48 lg:h-64 bg-gradient-to-br from-[var(--cinehub-accent)]/20 via-[var(--bg-card)] to-[var(--cinehub-accent)]/10 relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-t from-[var(--bg-main)] via-transparent to-transparent" />
+          <div className="absolute top-0 right-0 w-96 h-96 bg-[var(--cinehub-accent)]/5 rounded-full blur-3xl transform translate-x-1/2 -translate-y-1/2" />
+          <div className="absolute bottom-0 left-0 w-64 h-64 bg-[var(--success)]/5 rounded-full blur-3xl transform -translate-x-1/2 translate-y-1/2" />
         </div>
 
-        {/* Profile Content */}
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 lg:gap-6">
-          {/* Left Column - Profile Info */}
-          <div className="lg:col-span-1 space-y-4 lg:space-y-6">
-            {/* Profile Card */}
-            <Card className="bg-card/50 backdrop-blur-sm border-border/50">
-              <CardContent className="p-4 lg:p-6">
-                <div className="flex flex-col items-center space-y-3 lg:space-y-4">
+        {/* Header Navigation */}
+        <div className="absolute top-0 left-0 right-0 p-4 lg:p-6">
+          <div className="container mx-auto flex items-center justify-between">
+            <div className="flex items-center space-x-4">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-10 w-10 rounded-full bg-[var(--bg-card)]/80 backdrop-blur-md border border-[var(--border)]/50 hover:bg-[var(--bg-card)] transition-all duration-200"
+                asChild
+              >
+                <Link href="/home">
+                  <ChevronLeft size={20} />
+                </Link>
+              </Button>
+              <h1 className="text-xl lg:text-2xl font-bold gradient-text">Profile Settings</h1>
+            </div>
+          </div>
+        </div>
+
+        {/* Profile Header Card */}
+        <div className="container mx-auto px-4 lg:px-6 relative -mt-16">
+          <Card className="bg-[var(--bg-card)]/95 backdrop-blur-xl border-[var(--border)]/50 shadow-2xl">
+            <CardContent className="p-6 lg:p-8">
+              <div className="flex flex-col lg:flex-row items-start lg:items-center gap-6">
+                {/* Avatar Section */}
+                <div className="relative flex-shrink-0">
                   <div className="relative">
-                    <Avatar className="h-20 w-20 lg:h-24 lg:w-24 border-4 border-primary/20">
+                    <Avatar className="h-28 w-28 lg:h-32 lg:w-32 border-4 border-[var(--cinehub-accent)]/30 shadow-xl">
                       <AvatarImage
                         src={user?.avatar}
                         alt={user?.name || "User"}
                         className="object-cover"
                       />
-                      <AvatarFallback className="bg-primary/10 text-primary text-xl lg:text-2xl">
+                      <AvatarFallback className="bg-gradient-to-br from-[var(--cinehub-accent)]/20 to-[var(--success)]/20 text-[var(--cinehub-accent)] text-2xl lg:text-3xl font-bold">
                         {getUserInitials(user?.name || "User")}
                       </AvatarFallback>
                     </Avatar>
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="absolute bottom-0 right-0 h-6 w-6 lg:h-8 lg:w-8 rounded-full bg-background/80 backdrop-blur-sm border border-border/50 hover:bg-accent/50"
+                      className="absolute -bottom-1 -right-1 h-10 w-10 rounded-full bg-[var(--cinehub-accent)] hover:bg-[var(--cinehub-accent-hover)] text-[var(--bg-main)] shadow-lg border-2 border-[var(--bg-card)]"
                       onClick={() => setIsAvatarDialogOpen(true)}
                     >
-                      <Camera size={14} className="lg:w-4 lg:h-4" />
+                      <Camera size={16} />
                     </Button>
                   </div>
+                  
+                  {/* Online Status */}
+                  <div className="absolute -top-1 -right-1">
+                    <div className="w-4 h-4 bg-[var(--success)] rounded-full border-2 border-[var(--bg-card)] animate-pulse" />
+                  </div>
+                </div>
 
-                  <div className="text-center">
-                    <h2 className="text-lg lg:text-xl font-semibold">{user?.name}</h2>
-                    <p className="text-xs lg:text-sm text-muted-foreground">
-                      {user?.email}
-                    </p>
-                    <Badge
-                      variant="secondary"
-                      className="mt-2 text-xs px-2 py-0.5 h-5"
-                    >
-                      <Shield size={8} className="mr-1" />
-                      {user?.role}
-                    </Badge>
+                {/* User Info */}
+                <div className="flex-1 space-y-4">
+                  <div>
+                    <div className="flex items-center gap-3 mb-2">
+                      <h2 className="text-2xl lg:text-3xl font-bold text-[var(--text-main)]">{user?.name}</h2>
+                      <Badge className="bg-[var(--cinehub-accent)]/10 text-[var(--cinehub-accent)] border-[var(--cinehub-accent)]/30 px-3 py-1">
+                        <Shield size={12} className="mr-1" />
+                        {user?.role}
+                      </Badge>
+                    </div>
+                    <div className="flex items-center gap-2 text-[var(--text-sub)]">
+                      <Mail size={14} />
+                      <span className="text-sm lg:text-base">{user?.email}</span>
+                    </div>
                   </div>
 
-                  <Separator className="my-2" />
-
-                  <div className="w-full space-y-2">
-                    <div className="flex items-center justify-between text-xs lg:text-sm">
-                      <span className="text-muted-foreground">
-                        Member since
-                      </span>
-                      <span className="font-medium">
-                        {new Date(user?.created_at || "").toLocaleDateString()}
-                      </span>
+                  {/* Stats Grid */}
+                  <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div className="text-center p-3 rounded-lg bg-[var(--bg-main)]/50">
+                      <div className="text-lg lg:text-xl font-bold text-[var(--cinehub-accent)]">
+                        {user?.created_at ? new Date(user.created_at).toLocaleDateString('en-US', { 
+                          year: 'numeric',
+                          month: 'short',
+                          day: 'numeric'
+                        }) : 'N/A'}
+                      </div>
+                      <div className="text-xs text-[var(--text-sub)]">Member Since</div>
                     </div>
-                    <div className="flex items-center justify-between text-xs lg:text-sm">
-                      <span className="text-muted-foreground">
-                        Last login
-                      </span>
-                      <span className="font-medium">
-                        {new Date(user?.last_login_at || "").toLocaleDateString()}
-                      </span>
+                    <div className="text-center p-3 rounded-lg bg-[var(--bg-main)]/50">
+                      <div className="text-lg lg:text-xl font-bold text-[var(--success)]">
+                        {user?.last_login_at ? new Date(user.last_login_at).toLocaleDateString('en-US', {
+                          year: 'numeric',
+                          month: 'short',
+                          day: 'numeric',
+                        }) : 'Never'}
+                      </div>
+                      <div className="text-xs text-[var(--text-sub)]">Last Active</div>
                     </div>
                   </div>
                 </div>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Right Column - Settings */}
-          <div className="lg:col-span-3">
-            <Card className="bg-card/50 backdrop-blur-sm border-border/50">
-              <CardContent className="p-4 lg:p-6">
-                <Settings />
-              </CardContent>
-            </Card>
-          </div>
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </div>
 
-      {/* Avatar Selection Dialog */}
+      {/* Settings Content */}
+      <div className="container mx-auto px-4 lg:px-6 py-8">
+        <Settings />
+      </div>
+
+      {/*  Avatar Selection Dialog */}
       <Dialog open={isAvatarDialogOpen} onOpenChange={setIsAvatarDialogOpen}>
-        <DialogContent className="sm:max-w-[425px]">
+        <DialogContent className="sm:max-w-[500px] bg-[var(--bg-card)]/95 backdrop-blur-xl border-[var(--border)]/50">
           <DialogHeader>
-            <DialogTitle>Choose Avatar</DialogTitle>
+            <DialogTitle className="text-[var(--text-main)] text-xl">Choose Your Avatar</DialogTitle>
           </DialogHeader>
-          <ScrollArea className="h-[300px] pr-4">
-            <div className="grid grid-cols-3 gap-4">
+          <ScrollArea className="h-[400px] pr-4">
+            <div className="grid grid-cols-3 gap-4 p-2">
               {availableAvatars.map((avatar, index) => (
                 <Button
                   key={index}
                   variant="ghost"
-                  className="h-auto p-0"
+                  className="h-auto p-2 hover:bg-[var(--cinehub-accent)]/10 hover:scale-105 transition-all duration-200 rounded-xl border-2 border-transparent hover:border-[var(--cinehub-accent)]/30"
                   onClick={() => handleAvatarSelect(avatar)}
                 >
                   <Image
@@ -222,7 +256,7 @@ export default function ProfilePage() {
                     alt={`Avatar ${index + 1}`}
                     width={100}
                     height={100}
-                    className="rounded-lg"
+                    className="rounded-lg shadow-lg"
                   />
                 </Button>
               ))}

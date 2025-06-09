@@ -105,7 +105,7 @@ export const MovieMedia = lazy(() => import("@/components/movie/MovieMedia"));
 export const SimilarMovies = lazy(() => import("@/components/movie/SimilarMovies"));
 export const MovieReviews = lazy(() => import("@/components/movie/MovieReviews"));
 
-// Enhanced Lazy loading wrapper component with better loading states and error handling
+// Lazy loading wrapper component with better loading states and error handling
 export const withLazyLoading = (
   Component: React.ComponentType,
   loadingMessage?: string,

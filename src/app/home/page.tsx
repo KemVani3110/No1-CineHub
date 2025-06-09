@@ -211,7 +211,7 @@ export default function HomePage() {
           onSidebarChange={(open: boolean) => setIsSidebarOpen(open)}
         />
 
-        {/* Enhanced Mobile Sidebar */}
+        {/*Mobile Sidebar */}
         {isMenuOpen && (
           <div className="fixed inset-0 z-50 md:hidden">
             <div
@@ -246,7 +246,7 @@ export default function HomePage() {
             {/* Hero Section */}
             <LazyHeroSection />
 
-            {/* Enhanced Section Toggle */}
+            {/* Section Toggle */}
             <div className="flex flex-col sm:flex-row gap-6 mb-16 justify-center items-center">
               <div className="flex gap-4">
                 <ToggleButton

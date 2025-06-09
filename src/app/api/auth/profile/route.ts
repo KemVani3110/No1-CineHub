@@ -86,7 +86,7 @@ export async function GET(req: Request) {
     }
 
     const [rows] = await pool.execute(
-      'SELECT id, name, email, avatar, role FROM users WHERE id = ?',
+      'SELECT id, name, email, avatar, role, created_at, last_login_at FROM users WHERE id = ?',
       [session.user.id]
     );
     const users = rows as any[];
