@@ -28,8 +28,8 @@ const TVShowSeasons = ({ tvShow }: TVShowSeasonsProps) => {
     setExpandedSeasons(newExpanded);
   };
 
-  const handlePlayEpisode = (episode: TMDBEpisode, seasonNumber: number) => {
-    window.location.href = `/watch/tv/${tvShow.id}/season/${seasonNumber}/episode/${episode.episode_number}`;
+  const handleEpisodeClick = (seasonNumber: number, episodeNumber: number) => {
+    window.location.href = `/watch-tv/${tvShow.id}/season/${seasonNumber}/episode/${episodeNumber}`;
   };
 
   const { data: seasonDetails, isLoading } = useQuery({
@@ -149,7 +149,7 @@ const TVShowSeasons = ({ tvShow }: TVShowSeasonsProps) => {
                             className="flex gap-3 sm:gap-4 p-3 sm:p-4 bg-[#0d1b2a] rounded-lg hover:bg-[#1b263b] transition-all duration-300 group cursor-pointer"
                             onClick={(e) => {
                               e.stopPropagation();
-                              handlePlayEpisode(episode, season.season_number);
+                              handleEpisodeClick(season.season_number, episode.episode_number);
                             }}
                           >
                             {/* Episode Thumbnail */}

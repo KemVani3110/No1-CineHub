@@ -16,8 +16,8 @@ interface EpisodesListProps {
 export function EpisodesList({ episodes, showId, seasonNumber, currentEpisodeNumber }: EpisodesListProps) {
   const router = useRouter();
 
-  const handlePlayEpisode = (episodeNumber: number) => {
-    router.push(`/watch/tv/${showId}/season/${seasonNumber}/episode/${episodeNumber}`);
+  const handleEpisodeClick = (episodeNumber: number) => {
+    router.push(`/watch-tv/${showId}/season/${seasonNumber}/episode/${episodeNumber}`);
   };
 
   return (
@@ -28,7 +28,7 @@ export function EpisodesList({ episodes, showId, seasonNumber, currentEpisodeNum
           className={`flex gap-2 sm:gap-4 p-2 sm:p-4 bg-[#0d1b2a] rounded-lg hover:bg-[#1b263b] transition-all duration-300 group cursor-pointer ${
             currentEpisodeNumber === episode.episode_number ? "ring-2 ring-[#4fd1c5]" : ""
           }`}
-          onClick={() => handlePlayEpisode(episode.episode_number)}
+          onClick={() => handleEpisodeClick(episode.episode_number)}
         >
           {/* Episode Thumbnail */}
           <div className="relative w-20 sm:w-32 h-14 sm:h-20 flex-shrink-0">

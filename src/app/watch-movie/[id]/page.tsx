@@ -5,16 +5,15 @@ import { useEffect, useState } from "react";
 import { fetchMovieDetails } from "@/services/tmdb";
 import { TMDBMovieDetails } from "@/types/tmdb";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Share2, BookmarkPlus } from "lucide-react";
+import { ArrowLeft, Share2 } from "lucide-react";
 import { VideoPlayer } from "@/components/common/VideoPlayer";
 import { MovieInfo } from "@/components/watch/MovieInfo";
 import { MovieActions } from "@/components/watch/MovieActions";
 import { SimilarMovies } from "@/components/watch/SimilarMovies";
 import { Comments } from "@/components/watch/Comments";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Badge } from "@/components/ui/badge";
 
-export default function WatchPage() {
+export default function WatchMoviePage() {
   const { id } = useParams();
   const router = useRouter();
   const [movie, setMovie] = useState<TMDBMovieDetails | null>(null);
@@ -131,27 +130,13 @@ function WatchPageSkeleton() {
           <Skeleton className="w-full aspect-video" />
           <div className="flex flex-col lg:flex-row gap-8">
             <div className="flex-1 space-y-6">
-              <div className="space-y-4">
-                <Skeleton className="h-8 w-3/4" />
-                <Skeleton className="h-4 w-1/2" />
-                <Skeleton className="h-4 w-2/3" />
-              </div>
+              <Skeleton className="h-12 w-3/4" />
+              <Skeleton className="h-4 w-1/2" />
+              <Skeleton className="h-32 w-full" />
               <div className="flex gap-4">
-                <Skeleton className="h-10 w-32" />
-                <Skeleton className="h-10 w-32" />
+                <Skeleton className="h-10 w-24" />
+                <Skeleton className="h-10 w-24" />
               </div>
-              <div className="space-y-4">
-                <Skeleton className="h-6 w-1/4" />
-                <Skeleton className="h-32 w-full" />
-              </div>
-            </div>
-          </div>
-          <div className="space-y-4">
-            <Skeleton className="h-6 w-1/4" />
-            <div className="flex gap-4 overflow-x-auto pb-4">
-              {Array.from({ length: 10 }).map((_, i) => (
-                <Skeleton key={i} className="h-[300px] w-[200px] flex-shrink-0" />
-              ))}
             </div>
           </div>
         </div>

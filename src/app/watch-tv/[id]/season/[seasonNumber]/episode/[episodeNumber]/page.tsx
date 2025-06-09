@@ -92,17 +92,17 @@ export default function WatchTVEpisode() {
   const prevEpisode = season.episodes[currentEpisodeIndex - 1];
 
   const handleSeasonChange = (newSeasonNumber: string) => {
-    router.push(`/watch/tv/${id}/season/${newSeasonNumber}/episode/1`);
+    router.push(`/watch-tv/${id}/season/${newSeasonNumber}/episode/1`);
   };
 
   const handleEpisodeChange = (direction: "next" | "prev") => {
     if (direction === "next" && nextEpisode) {
       router.push(
-        `/watch/tv/${id}/season/${seasonNumber}/episode/${nextEpisode.episode_number}`
+        `/watch-tv/${id}/season/${seasonNumber}/episode/${nextEpisode.episode_number}`
       );
     } else if (direction === "prev" && prevEpisode) {
       router.push(
-        `/watch/tv/${id}/season/${seasonNumber}/episode/${prevEpisode.episode_number}`
+        `/watch-tv/${id}/season/${seasonNumber}/episode/${prevEpisode.episode_number}`
       );
     }
   };

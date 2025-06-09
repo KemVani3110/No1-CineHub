@@ -322,7 +322,10 @@ function MovieDetailSkeleton() {
               </div>
               <div className="flex gap-1 sm:gap-2 justify-center sm:justify-start flex-wrap">
                 {Array.from({ length: 3 }).map((_, i) => (
-                  <Skeleton key={i} className="h-5 sm:h-6 md:h-8 w-12 sm:w-16 md:w-24" />
+                  <Skeleton
+                    key={i}
+                    className="h-5 sm:h-6 md:h-8 w-12 sm:w-16 md:w-24"
+                  />
                 ))}
               </div>
               <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 md:gap-4">

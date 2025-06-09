@@ -27,7 +27,6 @@ interface ProfileState {
   isAvatarDialogOpen: boolean;
   availableAvatars: string[];
   activeTab: string;
-  watchList: any[];
   formData: FormData;
   loading: boolean;
   setActiveTab: (tab: string) => void;
@@ -39,7 +38,6 @@ interface ProfileState {
   updateAvatar: (avatarPath: string) => Promise<void>;
   fetchUserData: () => Promise<void>;
   fetchAvatars: () => Promise<void>;
-  fetchWatchList: () => Promise<void>;
 }
 
 export const useProfileStore = create<ProfileState>((set, get) => ({
@@ -48,7 +46,6 @@ export const useProfileStore = create<ProfileState>((set, get) => ({
   isAvatarDialogOpen: false,
   availableAvatars: [],
   activeTab: "overview",
-  watchList: [],
   formData: {},
   loading: true,
 
@@ -172,21 +169,6 @@ export const useProfileStore = create<ProfileState>((set, get) => ({
     } catch (error) {
       console.error("Error fetching avatars:", error);
       set({ availableAvatars: [] });
-    }
-  },
-
-  fetchWatchList: async () => {
-    try {
-      const response = await fetch("/api/watchlist");
-      if (!response.ok) {
-        throw new Error("Failed to fetch watchlist");
-      }
-      const data = await response.json();
-      set({ watchList: data });
-    } catch (error) {
-      console.error("Error fetching watchlist:", error);
-      set({ watchList: [] });
-      throw error;
     }
   },
 })); 
