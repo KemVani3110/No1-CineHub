@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useRouter } from "next/navigation";
-import { useToast } from "@/hooks/use-toast";
+import { useToast } from "@/components/ui/use-toast";
 import { WatchlistPage } from "@/components/watch/WatchlistPage";
 import Header from "@/components/common/Header";
 

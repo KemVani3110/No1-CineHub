@@ -1,18 +1,16 @@
-'use client';
+"use client";
 
-import { useParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
-import { fetchTVShowDetails } from '@/services/tmdb';
-import { TMDBTVDetails } from '@/types/tmdb';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import {
-  Share2,
-} from 'lucide-react';
-import { getImageUrl } from '@/services/tmdb';
-import { TMDBGenre } from '@/types/tmdb';
-import { Skeleton } from '@/components/ui/skeleton';
+import { useParams } from "next/navigation";
+import { useEffect, useState } from "react";
+import { fetchTVShowDetails } from "@/services/tmdb";
+import { TMDBTVDetails } from "@/types/tmdb";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Share2 } from "lucide-react";
+import { getImageUrl } from "@/services/tmdb";
+import { TMDBGenre } from "@/types/tmdb";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   TVShowOverview,
   TVShowCast,
@@ -20,11 +18,11 @@ import {
   TVShowSeasons,
   TVShowMedia,
   SimilarTVShows,
-} from '@/components/lazy';
+} from "@/components/lazy";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { WatchlistButton } from "@/components/common/WatchlistButton";
 import { WatchButton } from "@/components/common/WatchButton";
-import Image from 'next/image';
+import Image from "next/image";
 
 export default function TVShowDetail() {
   const { id } = useParams();
@@ -32,14 +30,13 @@ export default function TVShowDetail() {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("overview");
 
-
   useEffect(() => {
     const loadTVShow = async () => {
       try {
         const data = await fetchTVShowDetails(Number(id));
         setTVShow(data);
       } catch (error) {
-        console.error('Error loading TV show:', error);
+        console.error("Error loading TV show:", error);
       } finally {
         setLoading(false);
       }
@@ -59,7 +56,9 @@ export default function TVShowDetail() {
           <h1 className="text-xl sm:text-2xl font-bold text-red-500">
             Error loading TV show
           </h1>
-          <p className="text-slate-400 text-sm sm:text-base">Please try again later</p>
+          <p className="text-slate-400 text-sm sm:text-base">
+            Please try again later
+          </p>
         </div>
       </div>
     );
@@ -80,7 +79,7 @@ export default function TVShowDetail() {
   return (
     <div className="min-h-screen bg-slate-950 text-white">
       {/* Hero Section with Backdrop */}
-      <div className="relative min-h-[60vh] sm:min-h-[70vh] lg:min-h-[80vh] overflow-hidden pt-4 pb-4">
+      <div className="relative min-h-[60vh] sm:min-h-[65vh] md:min-h-[70vh] lg:min-h-[75vh] xl:min-h-[80vh] overflow-hidden pt-8 sm:pt-10 md:pt-12">
         {/* Background Image */}
         <div
           className="absolute inset-0 bg-cover bg-center bg-no-repeat"
@@ -97,11 +96,11 @@ export default function TVShowDetail() {
         </div>
 
         {/* Content Container */}
-        <div className="relative z-10 container mx-auto px-4 sm:px-6 h-full flex items-end sm:items-center">
-          <div className="flex flex-col sm:flex-row gap-4 sm:gap-8 lg:gap-12 w-full max-w-7xl pb-6 sm:pb-0">
+        <div className="relative z-10 container mx-auto px-3 sm:px-4 md:px-6 h-full flex items-end sm:items-center">
+        <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 md:gap-8 lg:gap-10 xl:gap-12 w-full max-w-7xl pb-4 sm:pb-6 md:pb-8">
             {/* TV Show Poster */}
-            <div className="flex-shrink-0 mx-auto sm:mx-0 mt-4 sm:mt-0">
-              <div className="relative w-40 sm:w-56 lg:w-80 h-60 sm:h-84 lg:h-[480px] rounded-xl lg:rounded-2xl overflow-hidden shadow-2xl border border-[#2e3c51] hover:border-[#4fd1c5] transition-all duration-300">
+            <div className="flex-shrink-0 mx-auto sm:mx-0 mt-2 sm:mt-0">
+              <div className="relative w-32 sm:w-44 md:w-52 lg:w-64 xl:w-80 h-48 sm:h-66 md:h-78 lg:h-96 xl:h-[480px] rounded-lg sm:rounded-xl lg:rounded-2xl overflow-hidden shadow-2xl border border-[#2e3c51] hover:border-[#4fd1c5] transition-all duration-300">
                 <Image
                   src={`https://image.tmdb.org/t/p/w500${tvShow.poster_path}`}
                   alt={tvShow.name}
@@ -145,7 +144,13 @@ export default function TVShowDetail() {
                   title={tvShow.name}
                   posterPath={tvShow.poster_path || ""}
                   className="bg-[#4fd1c5] hover:bg-[#38b2ac] text-[#0d1b2a] px-6 sm:px-8 py-2 sm:py-3 rounded-full font-semibold cursor-pointer transition-all duration-300 hover:scale-105 w-full sm:w-auto flex items-center justify-center"
-                  isUpcoming={tvShow.next_episode_to_air && tvShow.next_episode_to_air.air_date ? new Date(tvShow.next_episode_to_air.air_date) > new Date() : false}
+                  isUpcoming={
+                    tvShow.next_episode_to_air &&
+                    tvShow.next_episode_to_air.air_date
+                      ? new Date(tvShow.next_episode_to_air.air_date) >
+                        new Date()
+                      : false
+                  }
                   isDetailView={true}
                 />
                 <div className="flex gap-2 sm:gap-4">
@@ -182,8 +187,10 @@ export default function TVShowDetail() {
           >
             <div className="mb-8">
               <ScrollArea className="w-full">
-                <TabsList className="w-full bg-[#1b263b] border border-[#2e3c51] rounded-lg p-1 
-                                   flex flex-nowrap">
+                <TabsList
+                  className="w-full bg-[#1b263b] border border-[#2e3c51] rounded-lg p-1 
+                                   flex flex-nowrap"
+                >
                   <TabsTrigger
                     value="overview"
                     className="data-[state=active]:bg-[#4fd1c5] data-[state=active]:text-[#0d1b2a] 
@@ -255,7 +262,12 @@ export default function TVShowDetail() {
               </TabsContent>
 
               <TabsContent value="media" className="mt-0">
-                {tvShow.videos && <TVShowMedia videos={tvShow.videos} tvShowTitle={tvShow.name} />}
+                {tvShow.videos && (
+                  <TVShowMedia
+                    videos={tvShow.videos}
+                    tvShowTitle={tvShow.name}
+                  />
+                )}
               </TabsContent>
 
               <TabsContent value="similar" className="mt-0">
@@ -298,13 +310,16 @@ function TVShowDetailSkeleton() {
           </div>
         </div>
       </div>
-      
+
       <div className="container mx-auto px-4 sm:px-6 pt-6 sm:pt-10">
         {/* Fixed skeleton for tabs */}
         <div className="mb-8">
           <div className="flex gap-2 overflow-x-auto sm:grid sm:grid-cols-6 bg-[#1b263b] border border-[#2e3c51] rounded-lg p-1">
             {Array.from({ length: 6 }).map((_, i) => (
-              <Skeleton key={i} className="h-10 min-w-[80px] sm:w-full flex-shrink-0" />
+              <Skeleton
+                key={i}
+                className="h-10 min-w-[80px] sm:w-full flex-shrink-0"
+              />
             ))}
           </div>
         </div>
@@ -316,4 +331,4 @@ function TVShowDetailSkeleton() {
       </div>
     </div>
   );
-} 
+}

@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { useWatchlistStore } from "@/store/watchlistStore";
 import { BookmarkPlus, BookmarkCheck } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
+import { useToast } from "@/components/ui/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";

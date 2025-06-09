@@ -11,7 +11,6 @@ import {
   Home,
   Compass,
   Bell,
-  Settings,
   LogOut,
   Search,
   PanelLeft,
@@ -289,12 +288,6 @@ const Header = ({ onSidebarChange }: HeaderProps) => {
                           </DropdownMenuItem>
                         </>
                       )}
-                      <DropdownMenuItem asChild>
-                        <Link href="/settings" className="cursor-pointer">
-                          <Settings className="mr-3 h-4 w-4" />
-                          Settings
-                        </Link>
-                      </DropdownMenuItem>
                       <DropdownMenuSeparator />
                       <DropdownMenuItem
                         onClick={handleLogout}
@@ -441,15 +434,6 @@ const Header = ({ onSidebarChange }: HeaderProps) => {
                           >
                             <User size={20} className="flex-shrink-0" />
                             <span>Profile</span>
-                          </Link>
-
-                          <Link
-                            href="/settings"
-                            onClick={closeMobileMenu}
-                            className="flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium text-muted-foreground hover:text-primary hover:bg-accent/10"
-                          >
-                            <Settings size={20} className="flex-shrink-0" />
-                            <span>Settings</span>
                           </Link>
 
                           <Button

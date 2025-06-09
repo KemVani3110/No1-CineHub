@@ -81,15 +81,15 @@ const SectionTitle = ({
 }) => (
   <div className="mb-8 group">
     <div className="flex items-center gap-4 mb-3">
-      <div className="relative">
+      <div className="relative flex-shrink-0">
         <div className="flex items-center justify-center w-12 h-12 rounded-2xl bg-gradient-to-br from-[#4FD1C5] to-[#63B3ED] shadow-lg shadow-[#4FD1C5]/20 group-hover:shadow-[#4FD1C5]/30 transition-all duration-300">
           <Icon className="w-6 h-6 text-white" />
         </div>
         <div className="absolute -inset-1 bg-gradient-to-r from-[#4FD1C5] to-[#63B3ED] rounded-2xl blur opacity-20 group-hover:opacity-30 transition-opacity duration-300"></div>
       </div>
-      <div className="flex-1">
+      <div className="flex-1 min-w-0">
         <h2
-          className={`text-3xl md:text-4xl font-bold tracking-tight ${
+          className={`text-2xl sm:text-3xl md:text-4.5xl font-bold tracking-tight leading-tight ${
             gradient
               ? "bg-gradient-to-r from-[#4FD1C5] via-[#63B3ED] to-[#4FD1C5] bg-clip-text text-transparent"
               : "text-white"
@@ -98,15 +98,15 @@ const SectionTitle = ({
           {children}
         </h2>
         {subtitle && (
-          <p className="text-[#9aafc3] text-sm mt-1 font-medium tracking-wide">
+          <p className="text-[#9aafc3] text-xs sm:text-sm mt-1 font-medium tracking-wide">
             {subtitle}
           </p>
         )}
       </div>
     </div>
     <div className="relative">
-      <div className="h-1 w-24 bg-gradient-to-r from-[#4FD1C5] to-[#63B3ED] rounded-full group-hover:w-32 transition-all duration-500" />
-      <div className="absolute top-0 left-0 h-1 w-12 bg-gradient-to-r from-white/50 to-transparent rounded-full animate-pulse" />
+      <div className="h-1 w-20 sm:w-24 bg-gradient-to-r from-[#4FD1C5] to-[#63B3ED] rounded-full group-hover:w-28 sm:group-hover:w-32 transition-all duration-500" />
+      <div className="absolute top-0 left-0 h-1 w-8 sm:w-12 bg-gradient-to-r from-white/50 to-transparent rounded-full animate-pulse" />
     </div>
   </div>
 );
@@ -173,7 +173,7 @@ const ToggleButton = ({
 // Update MovieCard usage to include prefetching
 const MovieCardWithPrefetch = ({ movie }: { movie: any }) => {
   return (
-    <Link 
+    <Link
       href={`/movie/${movie.id}`}
       prefetch={true}
       className="block transform transition-all duration-300 hover:scale-105"

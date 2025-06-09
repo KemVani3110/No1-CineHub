@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useWatchlistStore } from "@/store/watchlistStore";
 import { Film, Tv } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
+import { useToast } from "@/components/ui/use-toast";
 import { MovieCard } from "@/components/common/MovieCard";
 import { TVShowCard } from "@/components/common/TVShowCard";
 import { Pagination } from "@/components/ui/pagination";

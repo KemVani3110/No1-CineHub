@@ -30,7 +30,7 @@ export default function SimilarMovies({ movies }: SimilarMoviesProps) {
           <Button
             variant="outline"
             onClick={() => setShowAll(!showAll)}
-            className="flex items-center gap-2"
+            className="flex items-center gap-2 border-slate-600/50 text-slate-300 hover:border-cinehub-accent/50 hover:text-cinehub-accent hover:bg-cinehub-accent/10 transition-all duration-200 cursor-pointer"
           >
             {showAll ? (
               <>
