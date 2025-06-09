@@ -3,7 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { useState} from "react";
+import { useState } from "react";
 import {
   Menu,
   User,
@@ -63,9 +63,14 @@ const Header = ({ onSidebarChange }: HeaderProps) => {
   const navItems = [
     { name: "Home", path: "/home", icon: Home },
     { name: "Explore", path: "/explore", icon: Compass },
-    { name: "Watchlist", path: "/watchlist", icon: BookmarkPlus, requiresAuth: true },
-    { name: "History", path: "/history", icon: History, requiresAuth: true },
     { name: "Search", path: "/search", icon: Search },
+    {
+      name: "Watchlist",
+      path: "/watchlist",
+      icon: BookmarkPlus,
+      requiresAuth: true,
+    },
+    { name: "History", path: "/history", icon: History, requiresAuth: true },
   ];
 
   const closeMobileMenu = () => {
@@ -77,7 +82,7 @@ const Header = ({ onSidebarChange }: HeaderProps) => {
     closeMobileMenu();
   };
 
-  const handleNavClick = (item: typeof navItems[0]) => {
+  const handleNavClick = (item: (typeof navItems)[0]) => {
     if (item.requiresAuth && !authUser) {
       toast({
         title: "Authentication Required",
@@ -110,7 +115,7 @@ const Header = ({ onSidebarChange }: HeaderProps) => {
     }
 
     // Then check social auth avatars
-    const socialAvatar = 
+    const socialAvatar =
       (authUser as any).picture ||
       (authUser as any).photoURL ||
       (authUser as any).image ||
@@ -212,7 +217,9 @@ const Header = ({ onSidebarChange }: HeaderProps) => {
                             referrerPolicy="no-referrer"
                           />
                           <AvatarFallback className="bg-primary/10 text-primary font-semibold">
-                            {getUserInitials(authUser.name || authUser.email || "User")}
+                            {getUserInitials(
+                              authUser.name || authUser.email || "User"
+                            )}
                           </AvatarFallback>
                         </Avatar>
                       </Button>
@@ -227,7 +234,9 @@ const Header = ({ onSidebarChange }: HeaderProps) => {
                               referrerPolicy="no-referrer"
                             />
                             <AvatarFallback className="bg-primary/10 text-primary text-xs">
-                              {getUserInitials(authUser.name || authUser.email || "User")}
+                              {getUserInitials(
+                                authUser.name || authUser.email || "User"
+                              )}
                             </AvatarFallback>
                           </Avatar>
                           <div className="flex flex-col min-w-0 flex-1">
@@ -247,12 +256,6 @@ const Header = ({ onSidebarChange }: HeaderProps) => {
                         <Link href="/profile" className="cursor-pointer">
                           <User className="mr-3 h-4 w-4" />
                           Profile
-                        </Link>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem asChild>
-                        <Link href="/history" className="cursor-pointer">
-                          <History className="mr-3 h-4 w-4" />
-                          Watch History
                         </Link>
                       </DropdownMenuItem>
                       {authUser?.role === "admin" && (
@@ -347,7 +350,10 @@ const Header = ({ onSidebarChange }: HeaderProps) => {
                     )}
                   </Button>
                 </SheetTrigger>
-                <SheetContent side="right" className="w-[300px] sm:w-[400px] p-0">
+                <SheetContent
+                  side="right"
+                  className="w-[300px] sm:w-[400px] p-0"
+                >
                   <SheetHeader className="sr-only">
                     <SheetTitle>Navigation Menu</SheetTitle>
                   </SheetHeader>
@@ -364,8 +370,12 @@ const Header = ({ onSidebarChange }: HeaderProps) => {
                           />
                         </div>
                         <div>
-                          <h2 className="text-xl font-bold gradient-text">CineHub</h2>
-                          <p className="text-sm text-muted-foreground">Cinema Experience</p>
+                          <h2 className="text-xl font-bold gradient-text">
+                            CineHub
+                          </h2>
+                          <p className="text-sm text-muted-foreground">
+                            Cinema Experience
+                          </p>
                         </div>
                       </div>
                     </div>
@@ -407,7 +417,9 @@ const Header = ({ onSidebarChange }: HeaderProps) => {
                                 referrerPolicy="no-referrer"
                               />
                               <AvatarFallback className="bg-primary/10 text-primary">
-                                {getUserInitials(authUser.name || authUser.email || "User")}
+                                {getUserInitials(
+                                  authUser.name || authUser.email || "User"
+                                )}
                               </AvatarFallback>
                             </Avatar>
                             <div className="flex-1 min-w-0">

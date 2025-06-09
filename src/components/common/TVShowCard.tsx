@@ -2,7 +2,7 @@
 
 import React from "react";
 import Image from "next/image";
-import { Star, Clock, Play, Calendar, Film } from "lucide-react";
+import { Star, Play, Calendar, Film } from "lucide-react";
 import { getImageUrl } from "@/services/tmdb";
 import { useRouter } from "next/navigation";
 import { format } from "date-fns";

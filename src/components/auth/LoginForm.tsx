@@ -45,7 +45,7 @@ export default function LoginForm() {
         throw new Error(result.error);
       }
 
-      // Kiểm tra role từ session
+      // Check Role from session
       const response = await fetch("/api/auth/me");
       const data = await response.json();
 
@@ -58,7 +58,7 @@ export default function LoginForm() {
         description: `Welcome back, ${data.user.name}!`,
       });
 
-      // Chuyển hướng dựa trên role
+      // Redirect based on role
       if (data.user.role === "admin") {
         router.push("/admin/dashboard");
       } else {
@@ -85,7 +85,7 @@ export default function LoginForm() {
         throw new Error(result.error);
       }
 
-      // Kiểm tra role từ session
+      // Check role fromsession
       const response = await fetch("/api/auth/me");
       const data = await response.json();
 
@@ -98,7 +98,7 @@ export default function LoginForm() {
         description: `Welcome back, ${data.user.name}!`,
       });
 
-      // Chuyển hướng dựa trên role
+      // Redirect based on role
       if (data.user.role === "admin") {
         router.push("/admin/dashboard");
       } else {

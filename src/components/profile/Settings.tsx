@@ -4,20 +4,17 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { Badge } from "@/components/ui/badge";
 import { 
   Edit3, 
   Save, 
   X, 
   User, 
   Lock, 
-  Activity,
   Mail,
   Shield,
   Check,
   Eye,
   EyeOff,
-  Settings as SettingsIcon
 } from "lucide-react";
 import { useProfileStore } from "@/store/profileStore";
 import { useState } from "react";

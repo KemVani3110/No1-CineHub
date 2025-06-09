@@ -3,11 +3,10 @@
 import { useEffect } from "react";
 import Image from "next/image";
 import { useToast } from "@/components/ui/use-toast";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
 import {
   Dialog,
   DialogContent,
@@ -20,23 +19,8 @@ import {
   ChevronLeft,
   Shield,
   Camera,
-  Calendar,
-  Clock,
-  Star,
-  Settings as SettingsIcon,
-  User,
   Mail,
-  MapPin,
-  Phone,
-  Globe,
-  Activity,
-  Trophy,
-  BookOpen,
-  Heart,
-  Edit,
-  MoreVertical,
-  Download,
-  Share2,
+
 } from "lucide-react";
 import Link from "next/link";
 import { useProfileStore } from "@/store/profileStore";
@@ -53,7 +37,6 @@ export default function ProfilePage() {
     user,
     isAvatarDialogOpen,
     availableAvatars,
-    activeTab,
     loading: profileLoading,
     setActiveTab,
     setIsAvatarDialogOpen,

@@ -33,6 +33,7 @@ import {
   Film,
   Tv,
   Filter,
+  TrendingUp,
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { TMDBMovie, TMDBTV, TMDBSearchResult } from "@/types/tmdb";
@@ -141,36 +142,33 @@ export default function SearchPage() {
   const renderResults = () => {
     if (!query) {
       return (
-        <Card className="border-2 border-accent/20 bg-gradient-to-br from-bg-card via-bg-card to-accent/5 backdrop-blur-sm shadow-xl">
-          <CardContent className="flex items-center justify-center py-16 px-8">
-            <div className="text-center max-w-md mx-auto">
-              <div className="relative mb-8">
-                <div className="absolute inset-0 bg-accent/20 rounded-full blur-xl animate-pulse"></div>
-                <div className="relative bg-gradient-to-br from-accent/20 to-accent/10 p-6 rounded-full w-24 h-24 mx-auto flex items-center justify-center">
-                  <Sparkles className="h-12 w-12 text-accent animate-pulse" />
-                </div>
-              </div>
-              <h2 className="text-2xl md:text-3xl font-bold text-white mb-4 gradient-text">
-                Discover Amazing Content
-              </h2>
-              <p className="text-text-sub text-lg leading-relaxed mb-6">
-                Search through thousands of movies and TV shows to find your
-                next favorite entertainment
-              </p>
-              <div className="flex items-center justify-center gap-4 text-sm text-text-sub">
-                <div className="flex items-center gap-2">
-                  <Film className="h-4 w-4 text-accent" />
-                  <span>Movies</span>
-                </div>
-                <div className="w-1 h-1 bg-accent/50 rounded-full"></div>
-                <div className="flex items-center gap-2">
-                  <Tv className="h-4 w-4 text-accent" />
-                  <span>TV Shows</span>
-                </div>
+        <div className="flex items-center justify-center py-16 lg:py-24">
+          <div className="text-center max-w-lg mx-auto px-6">
+            <div className="relative mb-8">
+              <div className="absolute inset-0 bg-cinehub-accent/20 rounded-full blur-2xl animate-pulse w-32 h-32 mx-auto"></div>
+              <div className="relative bg-gradient-to-br from-cinehub-accent/20 via-cinehub-accent/10 to-transparent p-8 rounded-full w-32 h-32 mx-auto flex items-center justify-center border border-cinehub-accent/20">
+                <Sparkles className="h-16 w-16 text-cinehub-accent animate-pulse" />
               </div>
             </div>
-          </CardContent>
-        </Card>
+            <h2 className="text-3xl lg:text-4xl font-bold text-white mb-6 gradient-text">
+              Discover Amazing Content
+            </h2>
+            <p className="text-text-sub text-lg lg:text-xl leading-relaxed mb-8 max-w-md mx-auto">
+              Search through thousands of movies and TV shows to find your next
+              favorite entertainment
+            </p>
+            <div className="flex items-center justify-center gap-6 text-sm">
+              <div className="flex items-center gap-2 bg-bg-card/50 px-4 py-2 rounded-full border border-cinehub-accent/20">
+                <Film className="h-4 w-4 text-cinehub-accent" />
+                <span className="text-white font-medium">Movies</span>
+              </div>
+              <div className="flex items-center gap-2 bg-bg-card/50 px-4 py-2 rounded-full border border-cinehub-accent/20">
+                <Tv className="h-4 w-4 text-cinehub-accent" />
+                <span className="text-white font-medium">TV Shows</span>
+              </div>
+            </div>
+          </div>
+        </div>
       );
     }
 
@@ -180,19 +178,19 @@ export default function SearchPage() {
           <div className="flex flex-col items-center justify-center gap-8">
             <div className="relative">
               {/* Outer glow ring */}
-              <div className="absolute inset-0 w-20 h-20 rounded-full bg-accent/20 blur-md animate-ping"></div>
+              <div className="absolute inset-0 w-24 h-24 rounded-full bg-cinehub-accent/30 blur-lg animate-ping"></div>
 
               {/* Spinner ring */}
-              <div className="relative w-20 h-20 rounded-full border-4 border-accent/30 border-t-accent animate-spin shadow-lg"></div>
+              <div className="relative w-24 h-24 rounded-full border-4 border-cinehub-accent/20 border-t-cinehub-accent animate-spin shadow-xl"></div>
 
               {/* Logo in center */}
               <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-                <div className="w-12 h-12 bg-accent/20 rounded-full flex items-center justify-center backdrop-blur-sm">
+                <div className="w-14 h-14 bg-cinehub-accent/10 rounded-full flex items-center justify-center backdrop-blur-sm border border-cinehub-accent/20">
                   <Image
                     src="/logo.png"
                     alt="CineHub Logo"
-                    width={32}
-                    height={32}
+                    width={36}
+                    height={36}
                     className="animate-pulse rounded-full"
                   />
                 </div>
@@ -200,10 +198,10 @@ export default function SearchPage() {
             </div>
 
             <div className="text-center">
-              <h3 className="text-xl font-semibold text-white mb-2">
+              <h3 className="text-xl lg:text-2xl font-semibold text-white mb-3">
                 Searching the cinema universe...
               </h3>
-              <p className="text-text-sub text-base animate-pulse">
+              <p className="text-text-sub text-base lg:text-lg animate-pulse">
                 Finding the best content for you
               </p>
             </div>
@@ -214,203 +212,278 @@ export default function SearchPage() {
 
     if (isError) {
       return (
-        <Card className="border-2 border-danger/30 bg-gradient-to-br from-bg-card to-danger/5">
-          <CardContent className="flex items-center justify-center py-16">
-            <div className="text-center max-w-md">
-              <div className="w-16 h-16 bg-danger/20 rounded-full flex items-center justify-center mx-auto mb-6">
-                <X className="h-8 w-8 text-danger" />
-              </div>
-              <h3 className="text-xl font-semibold text-white mb-3">
-                Oops! Something went wrong
-              </h3>
-              <p className="text-text-sub mb-6">
-                We couldn't complete your search. Please check your connection
-                and try again.
-              </p>
-              <Button
-                variant="outline"
-                className="cursor-pointer hover:bg-accent/10 hover:border-accent transition-all duration-300"
-                onClick={() => window.location.reload()}
-              >
-                <SearchIcon className="h-4 w-4 mr-2" />
-                Try Again
-              </Button>
+        <div className="flex items-center justify-center py-16">
+          <div className="text-center max-w-md px-6">
+            <div className="w-20 h-20 bg-danger/20 rounded-full flex items-center justify-center mx-auto mb-6 border border-danger/30">
+              <X className="h-10 w-10 text-danger" />
             </div>
-          </CardContent>
-        </Card>
+            <h3 className="text-xl lg:text-2xl font-semibold text-white mb-4">
+              Oops! Something went wrong
+            </h3>
+            <p className="text-text-sub mb-8 leading-relaxed">
+              We couldn't complete your search. Please check your connection and
+              try again.
+            </p>
+            <Button
+              variant="outline"
+              className="cursor-pointer hover:bg-cinehub-accent/10 hover:border-cinehub-accent transition-all duration-300"
+              onClick={() => window.location.reload()}
+            >
+              <SearchIcon className="h-4 w-4 mr-2" />
+              Try Again
+            </Button>
+          </div>
+        </div>
       );
     }
 
     if (!data?.results?.length) {
       return (
-        <Card className="border-2 border-muted/30 bg-gradient-to-br from-bg-card to-muted/5">
-          <CardContent className="flex items-center justify-center py-16">
-            <div className="text-center max-w-md">
-              <div className="w-16 h-16 bg-muted/20 rounded-full flex items-center justify-center mx-auto mb-6">
-                <SearchIcon className="h-8 w-8 text-muted-foreground" />
-              </div>
-              <h3 className="text-xl font-semibold text-white mb-3">
-                No Results Found
-              </h3>
-              <p className="text-text-sub mb-6">
-                We couldn't find any{" "}
-                {type === "all"
-                  ? "content"
-                  : type === "movie"
-                  ? "movies"
-                  : "TV shows"}{" "}
-                matching{" "}
-                <span className="text-accent font-medium">"{query}"</span>
-              </p>
-              <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                <Button
-                  variant="outline"
-                  className="cursor-pointer hover:bg-accent/10 hover:border-accent transition-all duration-300"
-                  onClick={clearSearch}
-                >
-                  <X className="h-4 w-4 mr-2" />
-                  Clear Search
-                </Button>
-                <Button
-                  variant="ghost"
-                  className="cursor-pointer hover:bg-accent/10 text-accent"
-                  onClick={() => setType("all")}
-                >
-                  Search All Content
-                </Button>
-              </div>
+        <div className="flex items-center justify-center py-16">
+          <div className="text-center max-w-md px-6">
+            <div className="w-20 h-20 bg-bg-card/50 rounded-full flex items-center justify-center mx-auto mb-6 border border-border">
+              <SearchIcon className="h-10 w-10 text-text-sub" />
             </div>
-          </CardContent>
-        </Card>
-      );
-    }
-
-    return (
-      <div className="space-y-8">
-        {/*  Results Header */}
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 bg-bg-card/50 backdrop-blur-sm rounded-xl p-6 border border-accent/10">
-          {/* Results Info */}
-          <div className="flex flex-wrap items-center gap-3">
-            <Badge
-              variant="secondary"
-              className="text-sm bg-accent/10 text-accent border-accent/20 px-3 py-1"
-            >
-              <SearchIcon className="h-3 w-3 mr-1" />
-              {data?.total_results?.toLocaleString() || 0} results
-            </Badge>
-            <Badge
-              variant="outline"
-              className="text-sm border-muted/30 px-3 py-1"
-            >
-              Page {currentPage} of {data?.total_pages || 1}
-            </Badge>
-            <Badge
-              variant="outline"
-              className="text-sm border-accent/20 text-accent px-3 py-1"
-            >
+            <h3 className="text-xl lg:text-2xl font-semibold text-white mb-4">
+              No Results Found
+            </h3>
+            <p className="text-text-sub mb-8 leading-relaxed">
+              We couldn't find any{" "}
               {type === "all"
-                ? "All Content"
+                ? "content"
                 : type === "movie"
-                ? "Movies"
-                : "TV Shows"}
-            </Badge>
-          </div>
-
-          {/* Controls */}
-          <div className="flex items-center gap-3 flex-wrap">
-            {/* Sort & Filter */}
-            <div className="flex items-center gap-2 bg-bg-main/50 rounded-lg p-1 border border-muted/20">
-              <Filter className="h-4 w-4 text-muted-foreground ml-2" />
-              <Select
-                value={sortBy}
-                onValueChange={(value: any) => setSortBy(value)}
+                ? "movies"
+                : "TV shows"}{" "}
+              matching{" "}
+              <span className="text-cinehub-accent font-medium">"{query}"</span>
+            </p>
+            <div className="flex flex-col sm:flex-row gap-3 justify-center">
+              <Button
+                variant="outline"
+                className="cursor-pointer hover:bg-cinehub-accent/10 hover:border-cinehub-accent transition-all duration-300"
+                onClick={clearSearch}
               >
-                <SelectTrigger className="w-[140px] cursor-pointer border-none bg-transparent hover:bg-accent/5">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent className="bg-bg-card border-accent/20">
-                  <SelectItem
-                    value="popularity"
-                    className="cursor-pointer hover:bg-accent/10"
-                  >
-                    Popularity
-                  </SelectItem>
-                  <SelectItem
-                    value="rating"
-                    className="cursor-pointer hover:bg-accent/10"
-                  >
-                    Rating
-                  </SelectItem>
-                  <SelectItem
-                    value="date"
-                    className="cursor-pointer hover:bg-accent/10"
-                  >
-                    Release Date
-                  </SelectItem>
-                  <SelectItem
-                    value="title"
-                    className="cursor-pointer hover:bg-accent/10"
-                  >
-                    Title
-                  </SelectItem>
-                </SelectContent>
-              </Select>
-
+                <X className="h-4 w-4 mr-2" />
+                Clear Search
+              </Button>
               <Button
                 variant="ghost"
-                size="sm"
-                className="cursor-pointer hover:bg-accent/10 transition-all duration-200"
-                onClick={() =>
-                  setSortOrder(sortOrder === "asc" ? "desc" : "asc")
-                }
+                className="cursor-pointer hover:bg-cinehub-accent/10 text-cinehub-accent"
+                onClick={() => setType("all")}
               >
-                {sortOrder === "asc" ? (
-                  <SortAsc className="h-4 w-4" />
-                ) : (
-                  <SortDesc className="h-4 w-4" />
-                )}
-              </Button>
-            </div>
-
-            {/* View Mode Toggle */}
-            <div className="flex border border-accent/20 rounded-lg overflow-hidden bg-bg-main/30">
-              <Button
-                variant={viewMode === "grid" ? "default" : "ghost"}
-                size="sm"
-                className={`cursor-pointer transition-all duration-200 rounded-none ${
-                  viewMode === "grid"
-                    ? "bg-accent text-accent-foreground shadow-sm"
-                    : "hover:bg-accent/10 text-muted-foreground"
-                }`}
-                onClick={() => setViewMode("grid")}
-              >
-                <Grid3X3 className="h-4 w-4" />
-              </Button>
-              <Button
-                variant={viewMode === "list" ? "default" : "ghost"}
-                size="sm"
-                className={`cursor-pointer transition-all duration-200 rounded-none ${
-                  viewMode === "list"
-                    ? "bg-accent text-accent-foreground shadow-sm"
-                    : "hover:bg-accent/10 text-muted-foreground"
-                }`}
-                onClick={() => setViewMode("list")}
-              >
-                <List className="h-4 w-4" />
+                Search All Content
               </Button>
             </div>
           </div>
         </div>
+      );
+    }
 
-        {/*  Results Grid */}
+    return (
+      <div className="space-y-6">
+        {/* Results Header */}
+        <div className="bg-bg-card/80 backdrop-blur-sm rounded-2xl p-4 lg:p-6 border border-cinehub-accent/10 shadow-lg">
+          {/* Mobile Layout */}
+          <div className="block lg:hidden space-y-4">
+            {/* Results Info */}
+            <div className="flex flex-wrap items-center gap-2">
+              <Badge
+                variant="secondary"
+                className="text-xs bg-cinehub-accent/10 text-cinehub-accent border-cinehub-accent/20 px-3 py-1 font-medium"
+              >
+                <TrendingUp className="h-3 w-3 mr-1" />
+                {data?.total_results?.toLocaleString() || 0} results
+              </Badge>
+              <Badge
+                variant="outline"
+                className="text-xs border-border px-3 py-1"
+              >
+                Page {currentPage}/{data?.total_pages || 1}
+              </Badge>
+            </div>
+
+            {/* Controls Row 1: Sort & Order */}
+            <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2 bg-bg-main/50 rounded-lg p-1 border border-border flex-1">
+                <Filter className="h-4 w-4 text-text-sub ml-2" />
+                <Select
+                  value={sortBy}
+                  onValueChange={(value: any) => setSortBy(value)}
+                >
+                  <SelectTrigger className="flex-1 cursor-pointer border-none bg-transparent hover:bg-cinehub-accent/5">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent className="bg-bg-card border-cinehub-accent/20">
+                    <SelectItem value="popularity" className="cursor-pointer hover:bg-cinehub-accent/10">
+                      Popularity
+                    </SelectItem>
+                    <SelectItem value="rating" className="cursor-pointer hover:bg-cinehub-accent/10">
+                      Rating
+                    </SelectItem>
+                    <SelectItem value="date" className="cursor-pointer hover:bg-cinehub-accent/10">
+                      Date
+                    </SelectItem>
+                    <SelectItem value="title" className="cursor-pointer hover:bg-cinehub-accent/10">
+                      Title
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="cursor-pointer hover:bg-cinehub-accent/10 transition-all duration-200 p-2"
+                  onClick={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}
+                >
+                  {sortOrder === "asc" ? (
+                    <SortAsc className="h-4 w-4" />
+                  ) : (
+                    <SortDesc className="h-4 w-4" />
+                  )}
+                </Button>
+              </div>
+
+              {/* View Mode Toggle */}
+              <div className="flex border border-cinehub-accent/20 rounded-lg overflow-hidden bg-bg-main/30">
+                <Button
+                  variant={viewMode === "grid" ? "default" : "ghost"}
+                  size="sm"
+                  className={`cursor-pointer transition-all duration-200 rounded-none p-2 ${
+                    viewMode === "grid"
+                      ? "bg-cinehub-accent text-bg-main shadow-sm"
+                      : "hover:bg-cinehub-accent/10 text-text-sub"
+                  }`}
+                  onClick={() => setViewMode("grid")}
+                >
+                  <Grid3X3 className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant={viewMode === "list" ? "default" : "ghost"}
+                  size="sm"
+                  className={`cursor-pointer transition-all duration-200 rounded-none p-2 ${
+                    viewMode === "list"
+                      ? "bg-cinehub-accent text-bg-main shadow-sm"
+                      : "hover:bg-cinehub-accent/10 text-text-sub"
+                  }`}
+                  onClick={() => setViewMode("list")}
+                >
+                  <List className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+          </div>
+
+          {/* Desktop Layout */}
+          <div className="hidden lg:flex lg:items-center justify-between">
+            {/* Results Info */}
+            <div className="flex flex-wrap items-center gap-3">
+              <Badge
+                variant="secondary"
+                className="text-sm bg-cinehub-accent/10 text-cinehub-accent border-cinehub-accent/20 px-4 py-2 font-medium"
+              >
+                <TrendingUp className="h-4 w-4 mr-2" />
+                {data?.total_results?.toLocaleString() || 0} results
+              </Badge>
+              <Badge
+                variant="outline"
+                className="text-sm border-border px-4 py-2"
+              >
+                Page {currentPage} of {data?.total_pages || 1}
+              </Badge>
+              <Badge
+                variant="outline"
+                className="text-sm border-cinehub-accent/20 text-cinehub-accent px-4 py-2"
+              >
+                {type === "all"
+                  ? "All Content"
+                  : type === "movie"
+                  ? "Movies"
+                  : "TV Shows"}
+              </Badge>
+            </div>
+
+            {/* Controls */}
+            <div className="flex items-center gap-3">
+              {/* Sort & Filter */}
+              <div className="flex items-center gap-2 bg-bg-main/50 rounded-lg p-1 border border-border">
+                <Filter className="h-4 w-4 text-text-sub ml-2" />
+                <Select
+                  value={sortBy}
+                  onValueChange={(value: any) => setSortBy(value)}
+                >
+                  <SelectTrigger className="w-[140px] cursor-pointer border-none bg-transparent hover:bg-cinehub-accent/5">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent className="bg-bg-card border-cinehub-accent/20">
+                    <SelectItem value="popularity" className="cursor-pointer hover:bg-cinehub-accent/10">
+                      Popularity
+                    </SelectItem>
+                    <SelectItem value="rating" className="cursor-pointer hover:bg-cinehub-accent/10">
+                      Rating
+                    </SelectItem>
+                    <SelectItem value="date" className="cursor-pointer hover:bg-cinehub-accent/10">
+                      Release Date
+                    </SelectItem>
+                    <SelectItem value="title" className="cursor-pointer hover:bg-cinehub-accent/10">
+                      Title
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="cursor-pointer hover:bg-cinehub-accent/10 transition-all duration-200"
+                  onClick={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}
+                >
+                  {sortOrder === "asc" ? (
+                    <SortAsc className="h-4 w-4" />
+                  ) : (
+                    <SortDesc className="h-4 w-4" />
+                  )}
+                </Button>
+              </div>
+
+              {/* View Mode Toggle */}
+              <div className="flex border border-cinehub-accent/20 rounded-lg overflow-hidden bg-bg-main/30">
+                <Button
+                  variant={viewMode === "grid" ? "default" : "ghost"}
+                  size="sm"
+                  className={`cursor-pointer transition-all duration-200 rounded-none ${
+                    viewMode === "grid"
+                      ? "bg-cinehub-accent text-bg-main shadow-sm"
+                      : "hover:bg-cinehub-accent/10 text-text-sub"
+                  }`}
+                  onClick={() => setViewMode("grid")}
+                >
+                  <Grid3X3 className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant={viewMode === "list" ? "default" : "ghost"}
+                  size="sm"
+                  className={`cursor-pointer transition-all duration-200 rounded-none ${
+                    viewMode === "list"
+                      ? "bg-cinehub-accent text-bg-main shadow-sm"
+                      : "hover:bg-cinehub-accent/10 text-text-sub"
+                  }`}
+                  onClick={() => setViewMode("list")}
+                >
+                  <List className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Results Grid */}
         <div
           className={
             viewMode === "grid"
-              ? "grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 md:gap-6"
-              : "space-y-4"
+              ? "grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-3 sm:gap-4 lg:gap-6"
+              : "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6"
           }
         >
-          {sortedResults.map((item: TMDBSearchResult, index) => {
+          {sortedResults.map((item: TMDBSearchResult, index: number) => {
             // Handle movie results
             if (
               type === "movie" ||
@@ -423,7 +496,7 @@ export default function SearchPage() {
                   className="group transform transition-all duration-300 hover:scale-105 hover:z-10 relative"
                   style={{ animationDelay: `${index * 50}ms` }}
                 >
-                  <div className="absolute inset-0 bg-accent/5 rounded-xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-10"></div>
+                  <div className="absolute inset-0 bg-cinehub-accent/5 rounded-xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-10"></div>
                   <MovieCard movie={movie} />
                 </div>
               );
@@ -452,7 +525,7 @@ export default function SearchPage() {
                   className="group transform transition-all duration-300 hover:scale-105 hover:z-10 relative"
                   style={{ animationDelay: `${index * 50}ms` }}
                 >
-                  <div className="absolute inset-0 bg-accent/5 rounded-xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-10"></div>
+                  <div className="absolute inset-0 bg-cinehub-accent/5 rounded-xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-10"></div>
                   <TVShowCard show={tvShow} />
                 </div>
               );
@@ -466,10 +539,10 @@ export default function SearchPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-bg-main via-bg-main to-bg-card/20">
+    <div className="min-h-screen bg-gradient-to-br from-bg-main via-bg-main to-bg-card/20 overflow-x-hidden">
       <Header />
 
-      <main className="container mx-auto px-4 py-8 md:py-12 space-y-8 md:space-y-12">
+      <main className="container mx-auto px-4 py-8 md:py-12 space-y-8 md:space-y-12 ">
         {/* Search Section */}
         <div className="max-w-4xl mx-auto space-y-6 md:space-y-8">
           {/* Main Search Card */}

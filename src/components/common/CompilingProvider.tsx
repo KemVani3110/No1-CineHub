@@ -19,6 +19,13 @@ export function CompilingProvider({ children }: { children: React.ReactNode }) {
   const [isInitialLoad, setIsInitialLoad] = useState(true);
 
   useEffect(() => {
+    // Don't show overlay on not-found page
+    if (pathname === '/not-found') {
+      setIsCompiling(false);
+      setIsInitialLoad(false);
+      return;
+    }
+
     // Only show overlay on initial page load
     if (isInitialLoad) {
       const timer = setTimeout(() => {
@@ -27,7 +34,7 @@ export function CompilingProvider({ children }: { children: React.ReactNode }) {
       }, 1000);
       return () => clearTimeout(timer);
     }
-  }, [isInitialLoad]);
+  }, [isInitialLoad, pathname]);
 
   return (
     <CompilingContext.Provider value={{ isCompiling }}>

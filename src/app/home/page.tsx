@@ -7,7 +7,6 @@ import {
   Film,
   Star,
   PlayCircle,
-  Calendar,
   Sparkles,
   Flame,
   Trophy,
@@ -23,7 +22,6 @@ import {
   UpcomingMovies,
   PopularTVShows,
   TopRatedTVShows,
-  UpcomingTVShows,
   withLazyLoading,
   MovieCard,
 } from "@/components/lazy";
@@ -59,10 +57,6 @@ const LazyPopularTVShows = withLazyLoading(
 const LazyTopRatedTVShows = withLazyLoading(
   TopRatedTVShows,
   "Loading top rated TV shows..."
-);
-const LazyUpcomingTVShows = withLazyLoading(
-  UpcomingTVShows,
-  "Loading upcoming TV shows..."
 );
 
 const queryClient = new QueryClient({
@@ -373,22 +367,6 @@ export default function HomePage() {
                     }
                   >
                     <LazyTopRatedTVShows />
-                  </React.Suspense>
-                </section>
-
-                <section className="relative">
-                  <SectionTitle
-                    icon={Calendar}
-                    subtitle="Coming soon to your screens"
-                  >
-                    Upcoming TV Shows
-                  </SectionTitle>
-                  <React.Suspense
-                    fallback={
-                      <Loading message="Loading upcoming TV shows..." />
-                    }
-                  >
-                    <LazyUpcomingTVShows />
                   </React.Suspense>
                 </section>
               </div>

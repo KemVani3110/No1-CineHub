@@ -10,12 +10,9 @@ import {
   FacebookAuthProvider,
   signInWithPopup,
 } from "firebase/auth";
-import { Facebook, Loader2 } from "lucide-react";
-import { signIn } from "next-auth/react";
 import { useAuth } from "@/hooks/useAuth";
 import { Icons } from "@/components/ui/icons";
-import { FcGoogle } from "react-icons/fc";
-import { FaGithub } from "react-icons/fa";
+
 
 interface SocialLoginButtonsProps {
   onLogin?: () => void;
@@ -110,7 +107,7 @@ export function SocialLoginButtons({ onLogin }: SocialLoginButtonsProps) {
 
   return (
     <div className="space-y-6">
-      {/* Divider với text */}
+      {/* Divider with text */}
       <div className="relative">
         <div className="absolute inset-0 flex items-center">
           <span className="w-full border-t border-border" />

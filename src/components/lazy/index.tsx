@@ -88,7 +88,6 @@ export const NowPlayingMovies = lazy(() => import("@/components/sections/NowPlay
 export const UpcomingMovies = lazy(() => import("@/components/sections/UpcomingMovies"));
 export const PopularTVShows = lazy(() => import("@/components/sections/PopularTVShows"));
 export const TopRatedTVShows = lazy(() => import("@/components/sections/TopRatedTVShows"));
-export const UpcomingTVShows = lazy(() => import("@/components/sections/UpcomingTVShows"));
 
 // TV Show components
 export const TVShowOverview = lazy(() => import("@/components/tv/TVShowOverview"));

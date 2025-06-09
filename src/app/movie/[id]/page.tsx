@@ -7,7 +7,7 @@ import { TMDBMovieDetails } from "@/types/tmdb";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Play, Share2 } from "lucide-react";
+import { Share2 } from "lucide-react";
 import { getImageUrl } from "@/services/tmdb";
 import { TMDBGenre } from "@/types/tmdb";
 import { Skeleton } from "@/components/ui/skeleton";

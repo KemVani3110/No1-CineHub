@@ -3,7 +3,7 @@
 import { TMDBTVDetails } from '@/types/tmdb';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Calendar, Globe, Clock, Star, Users, Tv } from 'lucide-react';
+import { Calendar, Globe, Star, Users, Tv } from 'lucide-react';
 
 interface TVShowOverviewProps {
   tvShow: TMDBTVDetails;

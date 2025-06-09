@@ -4,8 +4,7 @@ import { TMDBTVDetails, TMDBPerson } from '@/types/tmdb';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Users, Camera, Award, Star, ChevronRight } from 'lucide-react';
-import Image from 'next/image';
+import { Users, Award, Star, ChevronRight } from 'lucide-react';
 import { getImageUrl } from '@/services/tmdb';
 import { useState } from 'react';
 

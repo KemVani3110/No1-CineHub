@@ -8,7 +8,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import {
-  Play,
   Share2,
 } from 'lucide-react';
 import { getImageUrl } from '@/services/tmdb';
@@ -23,7 +22,6 @@ import {
   SimilarTVShows,
 } from '@/components/lazy';
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
-import { useRouter } from 'next/navigation';
 import { WatchlistButton } from "@/components/common/WatchlistButton";
 import { WatchButton } from "@/components/common/WatchButton";
 import Image from 'next/image';
@@ -33,7 +31,7 @@ export default function TVShowDetail() {
   const [tvShow, setTVShow] = useState<TMDBTVDetails | null>(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("overview");
-  const router = useRouter();
+
 
   useEffect(() => {
     const loadTVShow = async () => {

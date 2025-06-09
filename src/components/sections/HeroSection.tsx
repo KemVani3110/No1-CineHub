@@ -40,8 +40,8 @@ const HeroSection = () => {
   });
 
   const { data: tvData } = useQuery({
-    queryKey: ["tv", "on_the_air"],
-    queryFn: () => fetchTVShows("on_the_air", 1),
+    queryKey: ["tv", "top_rated"],
+    queryFn: () => fetchTVShows("top_rated", 1),
   });
 
   const { data: movieGenres } = useQuery({

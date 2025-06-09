@@ -30,7 +30,6 @@ export const TMDB_ENDPOINTS = {
   TV: {
     POPULAR: 'popular',
     TOP_RATED: 'top_rated',
-    UPCOMING: 'on_the_air',
   },
 };
 

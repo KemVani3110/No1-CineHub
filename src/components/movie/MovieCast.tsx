@@ -2,7 +2,7 @@ import { TMDBCredits } from "@/types/tmdb";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Users, Camera, Award, Star, ChevronRight, Loader2 } from "lucide-react";
+import { Users, Camera, Award, Star, ChevronRight} from "lucide-react";
 import { getImageUrl } from "@/services/tmdb";
 import { useState } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
