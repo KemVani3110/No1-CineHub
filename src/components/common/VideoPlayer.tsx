@@ -565,9 +565,6 @@ export function VideoPlayer({ videoUrl, posterUrl, title, duration }: VideoPlaye
         )}
       >
         <div className="bg-gradient-to-r from-black/60 via-black/40 to-transparent backdrop-blur-sm rounded-lg p-4 border border-white/10">
-          <h1 className="text-xl md:text-2xl font-bold text-white mb-1 font-['Poppins']">
-            {title}
-          </h1>
           <div className="flex items-center gap-4 text-sm text-white/70">
             <span className="bg-[#4fd1c5]/20 text-[#4fd1c5] px-2 py-1 rounded-full text-xs font-medium">
               {quality}
