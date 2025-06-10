@@ -5,7 +5,6 @@ import { compare } from 'bcrypt';
 import { auth } from 'firebase-admin';
 import { initializeApp, getApps, cert } from 'firebase-admin/app';
 
-
 declare module 'next-auth' {
   interface Session {
     user: {
@@ -43,6 +42,31 @@ if (!getApps().length) {
   });
 }
 
+async function getUserByEmail(email: string) {
+  const connection = await pool.getConnection();
+  try {
+    const [rows] = await connection.query(
+      'SELECT * FROM users WHERE email = ?',
+      [email]
+    );
+    return (rows as any[])[0];
+  } finally {
+    connection.release();
+  }
+}
+
+async function updateUserLastLogin(email: string) {
+  const connection = await pool.getConnection();
+  try {
+    await connection.execute(
+      'UPDATE users SET last_login_at = CURRENT_TIMESTAMP WHERE email = ?',
+      [email]
+    );
+  } finally {
+    connection.release();
+  }
+}
+
 export const authOptions: NextAuthOptions = {
   session: {
     strategy: 'jwt',
@@ -62,85 +86,65 @@ export const authOptions: NextAuthOptions = {
           return null;
         }
 
-        // Check if this is a social login attempt
-        if (credentials.password?.startsWith('eyJ')) {
-          try {
-            // Verify Firebase token
-            const decodedToken = await auth().verifyIdToken(credentials.password);
-            const email = decodedToken.email;
+        try {
+          // Check if this is a social login attempt
+          if (credentials.password?.startsWith('eyJ')) {
+            try {
+              // Verify Firebase token
+              const decodedToken = await auth().verifyIdToken(credentials.password);
+              const email = decodedToken.email;
 
-            if (!email) {
+              if (!email) {
+                return null;
+              }
+
+              const user = await getUserByEmail(email);
+
+              if (!user || !user.is_active) {
+                return null;
+              }
+
+              return {
+                id: user.id.toString(),
+                email: user.email,
+                name: user.name,
+                role: user.role,
+                image: user.avatar,
+              };
+            } catch (error) {
+              console.error('Token verification error:', error);
               return null;
             }
+          }
 
-            // Check if user exists
-            const [rows] = await pool.query(
-              'SELECT * FROM users WHERE email = ?',
-              [email]
-            );
-            const users = rows as any[];
-
-            if (users.length === 0) {
-              return null;
-            }
-
-            const user = users[0];
-
-            if (!user.is_active) {
-              return null;
-            }
-
-            return {
-              id: user.id.toString(),
-              email: user.email,
-              name: user.name,
-              role: user.role,
-              image: user.avatar,
-            };
-          } catch (error) {
-            console.error('Token verification error:', error);
+          // Regular email/password login
+          if (!credentials?.password) {
             return null;
           }
-        }
 
-        // Regular email/password login
-        if (!credentials?.password) {
+          const user = await getUserByEmail(credentials.email);
+
+          if (!user || !user.password_hash || !user.is_active) {
+            return null;
+          }
+
+          const isValid = await compare(credentials.password, user.password_hash);
+
+          if (!isValid) {
+            return null;
+          }
+
+          return {
+            id: user.id.toString(),
+            email: user.email,
+            name: user.name,
+            role: user.role,
+            image: user.avatar,
+          };
+        } catch (error) {
+          console.error('Authentication error:', error);
           return null;
         }
-
-        const [rows] = await pool.query(
-          'SELECT * FROM users WHERE email = ?',
-          [credentials.email]
-        );
-        const users = rows as any[];
-
-        if (users.length === 0) {
-          return null;
-        }
-
-        const user = users[0];
-
-        if (!user.password_hash) {
-          return null;
-        }
-
-        const isValid = await compare(credentials.password, user.password_hash);
-
-        if (!isValid) {
-          return null;
-        }
-
-        if (!user.is_active) {
-          return null;
-        }
-
-        return {
-          id: user.id.toString(),
-          email: user.email,
-          name: user.name,
-          role: user.role,
-          image: user.avatar,
-        };
       }
     }),
   ],
@@ -163,10 +167,11 @@ export const authOptions: NextAuthOptions = {
   events: {
     async signIn({ user }) {
       if (user?.email) {
-        await pool.execute(
-          'UPDATE users SET last_login_at = CURRENT_TIMESTAMP WHERE email = ?',
-          [user.email]
-        );
+        try {
+          await updateUserLastLogin(user.email);
+        } catch (error) {
+          console.error('Error updating last login:', error);
+        }
       }
     },
   },

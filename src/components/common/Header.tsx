@@ -3,7 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useSession } from "next-auth/react";
 import {
   Menu,
   User,
@@ -43,6 +43,7 @@ import { useProfileStore } from "@/store/profileStore";
 import { useToast } from "@/components/ui/use-toast";
 import { useRouter } from "next/navigation";
 import { useHistoryStore } from "@/store/historyStore";
+import { useHeaderStore } from "@/store/headerStore";
 
 interface HeaderProps {
   onSidebarChange?: (isOpen: boolean) => void;
@@ -50,14 +51,19 @@ interface HeaderProps {
 
 const Header = ({ onSidebarChange }: HeaderProps) => {
   const pathname = usePathname();
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const {
+    isMobileMenuOpen,
+    isSidebarOpen,
+    setIsMobileMenuOpen,
+    closeMobileMenu,
+  } = useHeaderStore();
   const { user: authUser, logout } = useAuth();
   const { user: profileUser } = useProfileStore();
   const { toast } = useToast();
   const router = useRouter();
   const { getRecentHistory } = useHistoryStore();
   const recentHistory = getRecentHistory(5);
+  const { data: session } = useSession();
 
   const navItems = [
     { name: "Home", path: "/home", icon: Home },
@@ -72,14 +78,18 @@ const Header = ({ onSidebarChange }: HeaderProps) => {
     { name: "History", path: "/history", icon: History, requiresAuth: true },
   ];
 
-  const closeMobileMenu = () => {
-    setIsMobileMenuOpen(false);
-  };
-
   const handleLogout = async () => {
     await logout();
     closeMobileMenu();
   };
+
+  // Debug log to check authUser
+  console.log("Auth User:", authUser);
+
+  // Check if user logged in through social providers
+  const isSocialLogin =
+    session?.user?.image?.includes("googleusercontent.com") ||
+    session?.user?.image?.includes("facebook.com");
 
   const handleNavClick = (item: (typeof navItems)[0]) => {
     if (item.requiresAuth && !authUser) {
@@ -251,12 +261,14 @@ const Header = ({ onSidebarChange }: HeaderProps) => {
                         </div>
                       </DropdownMenuLabel>
                       <DropdownMenuSeparator />
-                      <DropdownMenuItem asChild>
-                        <Link href="/profile" className="cursor-pointer">
-                          <User className="mr-3 h-4 w-4" />
-                          Profile
-                        </Link>
-                      </DropdownMenuItem>
+                      {!isSocialLogin && (
+                        <DropdownMenuItem asChild>
+                          <Link href="/profile" className="cursor-pointer">
+                            <User className="mr-3 h-4 w-4" />
+                            Profile
+                          </Link>
+                        </DropdownMenuItem>
+                      )}
                       {authUser?.role === "admin" && (
                         <>
                           <DropdownMenuItem asChild>
@@ -427,14 +439,16 @@ const Header = ({ onSidebarChange }: HeaderProps) => {
                             </div>
                           </div>
 
-                          <Link
-                            href="/profile"
-                            onClick={closeMobileMenu}
-                            className="flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium text-muted-foreground hover:text-primary hover:bg-accent/10"
-                          >
-                            <User size={20} className="flex-shrink-0" />
-                            <span>Profile</span>
-                          </Link>
+                          {!isSocialLogin && (
+                            <Link
+                              href="/profile"
+                              onClick={closeMobileMenu}
+                              className="flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium text-muted-foreground hover:text-primary hover:bg-accent/10"
+                            >
+                              <User size={20} className="flex-shrink-0" />
+                              <span>Profile</span>
+                            </Link>
+                          )}
 
                           <Button
                             variant="ghost"

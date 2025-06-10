@@ -23,16 +23,16 @@ async function getUsers() {
 
 export default async function UserManagementPage() {
   const session = await getServerSession(authOptions);
-  
+
   // Check if user is admin
-  if (!session || session.user.role !== 'admin') {
-    redirect('/unauthorized');
+  if (!session || session.user.role !== "admin") {
+    redirect("/unauthorized");
   }
 
   const users = await getUsers();
 
   // Transform data to match client component interface
-  const formattedUsers = users.map((user: any) => ({
+  const formattedUsers = (users as any[]).map((user: any) => ({
     id: user.id,
     name: user.name,
     email: user.email,
@@ -45,8 +45,7 @@ export default async function UserManagementPage() {
 
   return (
     <div className="p-6">
-      <h1 className="text-2xl font-bold mb-6">User Management</h1>
-      <UserManagement initialUsers={formattedUsers} />
+      <UserManagement initialUsers={formattedUsers as any[]} />
     </div>
   );
 }

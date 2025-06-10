@@ -74,7 +74,7 @@ const TVShowSeasons = ({ tvShow }: TVShowSeasonsProps) => {
   return (
     <div className="space-y-8">
       {/* Season Summary Stats */}
-      <div className="relative overflow-hidden bg-gradient-to-br from-[#1b263b] via-[#1b263b] to-[#2e3c51]/30 rounded-2xl p-6 border border-[#2e3c51]/50 backdrop-blur-sm">
+      <div className="relative overflow-hidden bg-gradient-to-br from-[#1b263b] via-[#1b263b] to-[#2e3c51]/30 rounded-2xl p-6 border border-[#2e3c51]/50 backdrop-blur-sm animate-fadeInUp">
         <div className="absolute inset-0 bg-gradient-to-br from-[#4fd1c5]/5 via-transparent to-[#4fd1c5]/10"></div>
         <div className="absolute top-0 right-0 w-32 h-32 bg-[#4fd1c5]/5 rounded-full blur-3xl"></div>
         <div className="relative z-10 flex flex-col sm:flex-row justify-between items-center">
@@ -99,106 +99,106 @@ const TVShowSeasons = ({ tvShow }: TVShowSeasonsProps) => {
       {/* Seasons List */}
       <div className="space-y-8">
         {tvShow.seasons.map((season, index) => (
-          <Card
+          <div
             key={season.id}
-            className="group relative bg-gradient-to-br from-[#1b263b] via-[#1b263b] to-[#2e3c51]/20 border-[#2e3c51] overflow-hidden transition-all duration-700 hover:shadow-2xl hover:shadow-[#4fd1c5]/20 hover:border-[#4fd1c5]/50 hover:transform hover:scale-[1.02] backdrop-blur-sm"
-            style={{
-              animationDelay: `${index * 100}ms`,
-            }}
+            className="animate-fadeInUp"
+            style={{ animationDelay: `${index * 100}ms` }}
           >
-            {/* Animated background elements */}
-            <div className="absolute inset-0 bg-gradient-to-br from-[#4fd1c5]/0 via-[#4fd1c5]/5 to-[#4fd1c5]/0 opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
-            <div className="absolute top-0 right-0 w-40 h-40 bg-[#4fd1c5]/5 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-700 group-hover:animate-pulse"></div>
+            <Card className="group relative bg-gradient-to-br from-[#1b263b] via-[#1b263b] to-[#2e3c51]/20 border-[#2e3c51] overflow-hidden transition-all duration-700 hover:shadow-2xl hover:shadow-[#4fd1c5]/20 hover:border-[#4fd1c5]/50 hover:transform hover:scale-[1.02] backdrop-blur-sm">
+              <CardContent className="p-0 relative z-10">
+                {/* Season Header */}
+                <div
+                  className="flex flex-col lg:flex-row gap-6 p-8 cursor-pointer relative overflow-hidden"
+                  onClick={() => toggleSeasonExpansion(season.season_number)}
+                >
+                  {/* Ripple effect on click */}
+                  <div className="absolute inset-0 bg-gradient-to-r from-[#4fd1c5]/10 via-[#4fd1c5]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
 
-            <CardContent className="p-0 relative z-10">
-              {/* Season Header */}
-              <div
-                className="flex flex-col lg:flex-row gap-6 p-8 cursor-pointer relative overflow-hidden"
-                onClick={() => toggleSeasonExpansion(season.season_number)}
-              >
-                {/* Ripple effect on click */}
-                <div className="absolute inset-0 bg-gradient-to-r from-[#4fd1c5]/10 via-[#4fd1c5]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                  {/* Season Poster */}
+                  <div className="relative w-full lg:w-36 h-52 lg:h-64 flex-shrink-0 mx-auto lg:mx-0 group-hover:scale-105 transition-all duration-700">
+                    <div className="absolute inset-0 bg-gradient-to-br from-[#4fd1c5]/20 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-10"></div>
+                    <img
+                      src={getImageUrl(season.poster_path || null, "w500")}
+                      alt={season.name}
+                      className="w-full h-full object-cover rounded-2xl shadow-2xl group-hover:shadow-[#4fd1c5]/30 transition-all duration-700"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent rounded-2xl"></div>
 
-                {/* Season Poster */}
-                <div className="relative w-full lg:w-36 h-52 lg:h-64 flex-shrink-0 mx-auto lg:mx-0 group-hover:scale-105 transition-all duration-700">
-                  <div className="absolute inset-0 bg-gradient-to-br from-[#4fd1c5]/20 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-10"></div>
-                  <img
-                    src={getImageUrl(season.poster_path || null, "w500")}
-                    alt={season.name}
-                    className="w-full h-full object-cover rounded-2xl shadow-2xl group-hover:shadow-[#4fd1c5]/30 transition-all duration-700"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent rounded-2xl"></div>
-
-                  {/* Floating badge */}
-                  <div className="absolute -top-2 -right-2 bg-gradient-to-r from-[#4fd1c5] to-[#36c7b8] text-[#0d1b2a] text-xs font-bold px-3 py-1 rounded-full shadow-lg">
-                    S{season.season_number}
-                  </div>
-                </div>
-
-                {/* Season Info */}
-                <div className="flex-1 space-y-5 min-w-0 relative z-10">
-                  <div className="flex flex-col sm:flex-row justify-between items-start gap-4">
-                    <div className="space-y-2">
-                      <h3 className="text-2xl lg:text-3xl font-bold bg-gradient-to-r from-[#e0e6ed] to-[#9aafc3] bg-clip-text text-transparent group-hover:from-white group-hover:to-[#4fd1c5] transition-all duration-500">
-                        {season.name}
-                      </h3>
-                      <div className="h-1 w-12 bg-gradient-to-r from-[#4fd1c5] to-[#36c7b8] rounded-full opacity-0 group-hover:opacity-100 group-hover:w-20 transition-all duration-500"></div>
-                    </div>
-
-                    <div className="flex items-center gap-4 flex-shrink-0">
-                      <Badge
-                        variant="secondary"
-                        className="bg-gradient-to-r from-[#2e3c51] to-[#1b263b] text-[#9aafc3] px-5 py-2 text-sm font-semibold rounded-full border border-[#4fd1c5]/20 group-hover:from-[#4fd1c5]/20 group-hover:to-[#36c7b8]/20 group-hover:text-[#4fd1c5] group-hover:border-[#4fd1c5]/50 transition-all duration-500 backdrop-blur-sm"
-                      >
-                        {season.episode_count} episodes
-                      </Badge>
-                      <div className="p-3 rounded-full bg-gradient-to-r from-[#2e3c51] to-[#1b263b] border border-[#4fd1c5]/20 group-hover:from-[#4fd1c5]/20 group-hover:to-[#36c7b8]/20 group-hover:border-[#4fd1c5]/50 transition-all duration-500 backdrop-blur-sm">
-                        {expandedSeasons.has(season.season_number) ? (
-                          <ChevronUp className="w-5 h-5 text-[#4fd1c5] group-hover:scale-110 transition-transform duration-300" />
-                        ) : (
-                          <ChevronDown className="w-5 h-5 text-[#4fd1c5] group-hover:scale-110 transition-transform duration-300" />
-                        )}
-                      </div>
+                    {/* Floating badge */}
+                    <div className="absolute -top-2 -right-2 bg-gradient-to-r from-[#4fd1c5] to-[#36c7b8] text-[#0d1b2a] text-xs font-bold px-3 py-1 rounded-full shadow-lg">
+                      S{season.season_number}
                     </div>
                   </div>
 
-                  {season.overview && (
-                    <p className="text-[#9aafc3] text-base lg:text-lg leading-relaxed line-clamp-3 group-hover:text-[#b8c5d1] transition-colors duration-500">
-                      {season.overview}
-                    </p>
-                  )}
+                  {/* Season Info */}
+                  <div className="flex-1 space-y-5 min-w-0 relative z-10">
+                    <div className="flex flex-col sm:flex-row justify-between items-start gap-4">
+                      <div className="space-y-2">
+                        <h3 className="text-2xl lg:text-3xl font-bold bg-gradient-to-r from-[#e0e6ed] to-[#9aafc3] bg-clip-text text-transparent group-hover:from-white group-hover:to-[#4fd1c5] transition-all duration-500">
+                          {season.name}
+                        </h3>
+                        <div className="h-1 w-12 bg-gradient-to-r from-[#4fd1c5] to-[#36c7b8] rounded-full opacity-0 group-hover:opacity-100 group-hover:w-20 transition-all duration-500"></div>
+                      </div>
 
-                  <div className="flex items-center gap-8 text-sm">
-                    {season.air_date && (
-                      <div className="flex items-center gap-3 group-hover:text-[#4fd1c5] transition-colors duration-500">
-                        <div className="p-2 bg-[#2e3c51]/50 rounded-full group-hover:bg-[#4fd1c5]/20 transition-colors duration-300">
-                          <Calendar className="w-4 h-4" />
+                      <div className="flex items-center gap-4 flex-shrink-0">
+                        <Badge
+                          variant="secondary"
+                          className="bg-gradient-to-r from-[#2e3c51] to-[#1b263b] text-[#9aafc3] px-5 py-2 text-sm font-semibold rounded-full border border-[#4fd1c5]/20 group-hover:from-[#4fd1c5]/20 group-hover:to-[#36c7b8]/20 group-hover:text-[#4fd1c5] group-hover:border-[#4fd1c5]/50 transition-all duration-500 backdrop-blur-sm"
+                        >
+                          {season.episode_count} episodes
+                        </Badge>
+                        <div className="p-3 rounded-full bg-gradient-to-r from-[#2e3c51] to-[#1b263b] border border-[#4fd1c5]/20 group-hover:from-[#4fd1c5]/20 group-hover:to-[#36c7b8]/20 group-hover:border-[#4fd1c5]/50 transition-all duration-500 backdrop-blur-sm">
+                          {expandedSeasons.has(season.season_number) ? (
+                            <ChevronUp className="w-5 h-5 text-[#4fd1c5] group-hover:scale-110 transition-transform duration-300" />
+                          ) : (
+                            <ChevronDown className="w-5 h-5 text-[#4fd1c5] group-hover:scale-110 transition-transform duration-300" />
+                          )}
                         </div>
-                        <span className="font-semibold">
-                          {format(new Date(season.air_date), "yyyy")}
-                        </span>
                       </div>
+                    </div>
+
+                    {season.overview && (
+                      <p className="text-[#9aafc3] text-base lg:text-lg leading-relaxed line-clamp-3 group-hover:text-[#b8c5d1] transition-colors duration-500">
+                        {season.overview}
+                      </p>
                     )}
-                    {season.vote_average > 0 && (
-                      <div className="flex items-center gap-3 group-hover:text-yellow-400 transition-colors duration-500">
-                        <div className="p-2 bg-[#2e3c51]/50 rounded-full group-hover:bg-yellow-500/20 transition-colors duration-300">
-                          <Star
-                            className="w-4 h-4 text-yellow-500 group-hover:text-yellow-400"
-                            fill="currentColor"
-                          />
+
+                    <div className="flex items-center gap-8 text-sm">
+                      {season.air_date && (
+                        <div className="flex items-center gap-3 group-hover:text-[#4fd1c5] transition-colors duration-500">
+                          <div className="p-2 bg-[#2e3c51]/50 rounded-full group-hover:bg-[#4fd1c5]/20 transition-colors duration-300">
+                            <Calendar className="w-4 h-4" />
+                          </div>
+                          <span className="font-semibold">
+                            {format(new Date(season.air_date), "yyyy")}
+                          </span>
                         </div>
-                        <span className="font-semibold">
-                          {season.vote_average.toFixed(1)}
-                        </span>
-                      </div>
-                    )}
+                      )}
+                      {season.vote_average > 0 && (
+                        <div className="flex items-center gap-3 group-hover:text-yellow-400 transition-colors duration-500">
+                          <div className="p-2 bg-[#2e3c51]/50 rounded-full group-hover:bg-yellow-500/20 transition-colors duration-300">
+                            <Star
+                              className="w-4 h-4 text-yellow-500 group-hover:text-yellow-400"
+                              fill="currentColor"
+                            />
+                          </div>
+                          <span className="font-semibold">
+                            {season.vote_average.toFixed(1)}
+                          </span>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              {/* Episodes List */}
-              {expandedSeasons.has(season.season_number) && (
-                <div className="border-t border-[#2e3c51]/50 bg-gradient-to-b from-[#0d1b2a]/30 to-[#0d1b2a]/60 backdrop-blur-sm">
+                {/* Episodes List */}
+                <div
+                  className={`border-t border-[#2e3c51]/50 bg-gradient-to-b from-[#0d1b2a]/30 to-[#0d1b2a]/60 backdrop-blur-sm overflow-hidden transition-all duration-300 ease-in-out ${
+                    expandedSeasons.has(season.season_number)
+                      ? "max-h-[2000px] opacity-100"
+                      : "max-h-0 opacity-0"
+                  }`}
+                >
                   {isLoading || !seasonDetails?.has(season.season_number) ? (
                     <div className="p-8 space-y-6">
                       {Array.from({ length: 3 }).map((_, i) => (
@@ -225,7 +225,8 @@ const TVShowSeasons = ({ tvShow }: TVShowSeasonsProps) => {
                               (episode: TMDBEpisode, episodeIndex: number) => (
                                 <div
                                   key={episode.id}
-                                  className="group/episode relative flex gap-5 p-5 bg-gradient-to-br from-[#1b263b] via-[#1b263b] to-[#2e3c51]/20 rounded-2xl hover:from-[#2e3c51]/50 hover:to-[#1b263b] transition-all duration-500 cursor-pointer border border-[#2e3c51]/30 hover:border-[#4fd1c5]/40 hover:shadow-xl hover:shadow-[#4fd1c5]/10 backdrop-blur-sm hover:scale-105"
+                                  className="group/episode relative flex gap-5 p-5 bg-gradient-to-br from-[#1b263b] via-[#1b263b] to-[#2e3c51]/20 rounded-2xl hover:from-[#2e3c51]/50 hover:to-[#1b263b] transition-all duration-500 cursor-pointer border border-[#2e3c51]/30 hover:border-[#4fd1c5]/40 hover:shadow-xl hover:shadow-[#4fd1c5]/10 backdrop-blur-sm hover:scale-105 animate-fadeIn"
+                                  style={{ animationDelay: `${episodeIndex * 50}ms` }}
                                   onClick={(e) => {
                                     e.stopPropagation();
                                     handleEpisodeClick(
@@ -233,11 +234,7 @@ const TVShowSeasons = ({ tvShow }: TVShowSeasonsProps) => {
                                       episode.episode_number
                                     );
                                   }}
-                                  style={{
-                                    animationDelay: `${episodeIndex * 50}ms`,
-                                  }}
                                 >
-
                                   {/* Episode Thumbnail */}
                                   <div className="relative w-32 lg:w-36 h-20 lg:h-24 flex-shrink-0 rounded-xl overflow-hidden group-hover/episode:scale-105 transition-transform duration-500">
                                     <img
@@ -322,43 +319,13 @@ const TVShowSeasons = ({ tvShow }: TVShowSeasonsProps) => {
                     </ScrollArea>
                   )}
                 </div>
-              )}
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          </div>
         ))}
       </div>
     </div>
   );
 };
-
-function SeasonDetailsSkeleton() {
-  return (
-    <div className="space-y-6">
-      <div className="flex gap-5 p-6 bg-gradient-to-br from-[#1b263b] to-[#2e3c51]/30 rounded-2xl">
-        <Skeleton className="w-36 h-64 rounded-2xl" />
-        <div className="flex-1 space-y-4">
-          <div>
-            <Skeleton className="h-8 w-64 mb-3 rounded-lg" />
-            <Skeleton className="h-4 w-32 rounded-lg" />
-          </div>
-          <div>
-            <Skeleton className="h-5 w-24 mb-3 rounded-lg" />
-            <Skeleton className="h-20 w-full rounded-lg" />
-          </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <Skeleton className="h-4 w-20 mb-2 rounded-lg" />
-              <Skeleton className="h-4 w-28 rounded-lg" />
-            </div>
-            <div>
-              <Skeleton className="h-4 w-24 mb-2 rounded-lg" />
-              <Skeleton className="h-4 w-16 rounded-lg" />
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
 
 export default TVShowSeasons;

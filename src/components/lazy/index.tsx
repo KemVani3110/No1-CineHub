@@ -8,7 +8,10 @@ class LazyLoadErrorBoundary extends React.Component<
   { children: React.ReactNode; fallback?: React.ReactNode },
   { hasError: boolean }
 > {
-  constructor(props: { children: React.ReactNode; fallback?: React.ReactNode }) {
+  constructor(props: {
+    children: React.ReactNode;
+    fallback?: React.ReactNode;
+  }) {
     super(props);
     this.state = { hasError: false };
   }
@@ -23,10 +26,12 @@ class LazyLoadErrorBoundary extends React.Component<
 
   render() {
     if (this.state.hasError) {
-      return this.props.fallback || (
-        <div className="flex items-center justify-center p-4 text-red-500">
-          Failed to load component. Please try refreshing the page.
-        </div>
+      return (
+        this.props.fallback || (
+          <div className="flex items-center justify-center p-4 text-red-500">
+            Failed to load component. Please try refreshing the page.
+          </div>
+        )
       );
     }
 
@@ -50,8 +55,12 @@ export const TVShowCard = lazy(() =>
 
 // Auth components
 export const LoginForm = lazy(() => import("@/components/auth/LoginForm"));
-export const RegisterForm = lazy(() => import("@/components/auth/RegisterForm"));
-export const SocialLoginButtons = lazy(() => import("@/components/auth/SocialLoginButtons"));
+export const RegisterForm = lazy(
+  () => import("@/components/auth/RegisterForm")
+);
+export const SocialLoginButtons = lazy(
+  () => import("@/components/auth/SocialLoginButtons")
+);
 
 // UI components
 export const Dialog = lazy(() =>
@@ -81,28 +90,59 @@ export const ScrollArea = lazy(() =>
 );
 
 // Section components
-export const HeroSection = lazy(() => import("@/components/sections/HeroSection"));
-export const PopularMovies = lazy(() => import("@/components/sections/PopularMovies"));
-export const TopRatedMovies = lazy(() => import("@/components/sections/TopRatedMovies"));
-export const NowPlayingMovies = lazy(() => import("@/components/sections/NowPlayingMovies"));
-export const UpcomingMovies = lazy(() => import("@/components/sections/UpcomingMovies"));
-export const PopularTVShows = lazy(() => import("@/components/sections/PopularTVShows"));
-export const TopRatedTVShows = lazy(() => import("@/components/sections/TopRatedTVShows"));
+export const HeroSection = lazy(
+  () => import("@/components/sections/HeroSection")
+);
+export const PopularMovies = lazy(
+  () => import("@/components/sections/PopularMovies")
+);
+export const TopRatedMovies = lazy(
+  () => import("@/components/sections/TopRatedMovies")
+);
+export const NowPlayingMovies = lazy(
+  () => import("@/components/sections/NowPlayingMovies")
+);
+export const UpcomingMovies = lazy(
+  () => import("@/components/sections/UpcomingMovies")
+);
+export const PopularTVShows = lazy(
+  () => import("@/components/sections/PopularTVShows")
+);
+export const TopRatedTVShows = lazy(
+  () => import("@/components/sections/TopRatedTVShows")
+);
+export const OnTheAirTVShows = lazy(
+  () => import("@/components/sections/OnTheAirTVShows")
+);
 
 // TV Show components
-export const TVShowOverview = lazy(() => import("@/components/tv/TVShowOverview"));
+export const TVShowOverview = lazy(
+  () => import("@/components/tv/TVShowOverview")
+);
 export const TVShowCast = lazy(() => import("@/components/tv/TVShowCast"));
-export const TVShowSeasons = lazy(() => import("@/components/tv/TVShowSeasons"));
+export const TVShowSeasons = lazy(
+  () => import("@/components/tv/TVShowSeasons")
+);
 export const TVShowMedia = lazy(() => import("@/components/tv/TVShowMedia"));
-export const SimilarTVShows = lazy(() => import("@/components/tv/SimilarTVShows"));
-export const TVShowReviews = lazy(() => import("@/components/tv/TVShowReviews"));
+export const SimilarTVShows = lazy(
+  () => import("@/components/tv/SimilarTVShows")
+);
+export const TVShowReviews = lazy(
+  () => import("@/components/tv/TVShowReviews")
+);
 
 // Movie components
-export const MovieOverview = lazy(() => import("@/components/movie/MovieOverview"));
+export const MovieOverview = lazy(
+  () => import("@/components/movie/MovieOverview")
+);
 export const MovieCast = lazy(() => import("@/components/movie/MovieCast"));
 export const MovieMedia = lazy(() => import("@/components/movie/MovieMedia"));
-export const SimilarMovies = lazy(() => import("@/components/movie/SimilarMovies"));
-export const MovieReviews = lazy(() => import("@/components/movie/MovieReviews"));
+export const SimilarMovies = lazy(
+  () => import("@/components/movie/SimilarMovies")
+);
+export const MovieReviews = lazy(
+  () => import("@/components/movie/MovieReviews")
+);
 
 // Lazy loading wrapper component with better loading states and error handling
 export const withLazyLoading = (
@@ -151,11 +191,7 @@ export const withLazyLoading = (
           </div>
         }
       >
-        <Suspense
-          fallback={
-            <CompilingOverlay />
-          }
-        >
+        <Suspense fallback={<CompilingOverlay />}>
           {showContent ? <Component {...props} /> : null}
         </Suspense>
       </LazyLoadErrorBoundary>

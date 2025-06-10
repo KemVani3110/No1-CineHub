@@ -1,7 +1,8 @@
 import axios from 'axios';
-import { TMDBMovie, TMDBResponse } from '@/types/tmdb';
+import { TMDBMovie, TMDBResponse, TMDBTVShow } from '@/types/tmdb';
 
 export type TMDBMovieListType = 'popular' | 'top_rated' | 'now_playing' | 'upcoming';
+export type TMDBTVListType = 'popular' | 'top_rated' | 'on_the_air';
 
 const TMDB_API_KEY = process.env.NEXT_PUBLIC_TMDB_API_KEY;
 const TMDB_BASE_URL = process.env.NEXT_PUBLIC_TMDB_BASE_URL;
@@ -20,6 +21,24 @@ const tmdbApi = axios.create({
   },
 });
 
+// Add request interceptor for logging
+tmdbApi.interceptors.request.use(request => {
+  console.log('Starting Request:', request.url);
+  return request;
+});
+
+// Add response interceptor for logging
+tmdbApi.interceptors.response.use(
+  response => {
+    console.log('Response:', response.config.url, response.status);
+    return response;
+  },
+  error => {
+    console.error('API Error:', error.config?.url, error.response?.status, error.message);
+    return Promise.reject(error);
+  }
+);
+
 export const TMDB_ENDPOINTS = {
   MOVIES: {
     POPULAR: 'popular',
@@ -30,6 +49,7 @@ export const TMDB_ENDPOINTS = {
   TV: {
     POPULAR: 'popular',
     TOP_RATED: 'top_rated',
+    ON_THE_AIR: 'on_the_air',
   },
 };
 
@@ -46,14 +66,20 @@ export const fetchMovies = async (listType: TMDBMovieListType = 'popular', page:
   }
 };
 
-export const fetchTVShows = async (listType: string = 'popular', page: number = 1) => {
+export const fetchTVShows = async (listType: TMDBTVListType = 'popular', page: number = 1): Promise<TMDBResponse<TMDBTVShow>> => {
   try {
-    // Ensure listType is one of the valid TV endpoints
-    const validListType = TMDB_ENDPOINTS.TV[listType.toUpperCase() as keyof typeof TMDB_ENDPOINTS.TV] || 'popular';
-    
-    const { data } = await tmdbApi.get(`/tv/${validListType}`, {
+    console.log('Fetching TV shows with listType:', listType, 'page:', page);
+
+    const { data } = await tmdbApi.get(`/tv/${listType}`, {
       params: { page },
     });
+
+    console.log('TV shows response:', {
+      total: data.total_results,
+      page: data.page,
+      results: data.results?.length
+    });
+
     return data;
   } catch (error) {
     console.error('Error fetching TV shows:', error);

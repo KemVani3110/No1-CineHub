@@ -1,69 +1,82 @@
 "use client";
 
 import React from "react";
-import { useTVShows } from "@/hooks/useTMDB";
-import { TMDBTVShow } from "@/types/tmdb";
-import { Skeleton } from "@/components/ui/skeleton";
+import { useQuery } from "@tanstack/react-query";
 import { TVShowCard } from "@/components/common/TVShowCard";
+import { Skeleton } from "@/components/ui/skeleton";
+import { fetchTVShows } from "@/services/tmdb";
+import { TMDBTVShow } from "@/types/tmdb";
 
 interface TVShowListProps {
-  listType: 'popular' | 'top_rated' | 'on_the_air';
+  listType: "popular" | "top_rated" | "on_the_air";
+  title?: string;
 }
 
-const TVShowList = ({ listType }: TVShowListProps) => {
-  const { data: page1Data, isLoading: isLoadingPage1 } = useTVShows(listType, 1);
-  const { data: page2Data, isLoading: isLoadingPage2 } = useTVShows(listType, 2);
-
-  const isLoading = isLoadingPage1 || isLoadingPage2;
-  const allShows = [...(page1Data?.results || []), ...(page2Data?.results || [])];
-
-  // Filter shows based on list type
-  const filteredShows = allShows.filter((show: TMDBTVShow) => {
-    if (listType === 'on_the_air') {
-      // For upcoming shows, check if the next episode air date is in the future
-      const nextEpisodeDate = show.next_episode_to_air?.air_date;
-      if (!nextEpisodeDate) return false;
-      return new Date(nextEpisodeDate) > new Date();
-    }
-    return true;
+const TVShowList: React.FC<TVShowListProps> = ({ listType, title }) => {
+  const { data: firstPageData, isLoading: isLoadingFirstPage } = useQuery({
+    queryKey: ["tvShows", listType, 1],
+    queryFn: () => fetchTVShows(listType, 1),
   });
 
-  // Get the first 24 shows
-  const displayShows = filteredShows.slice(0, 24);
+  const { data: secondPageData, isLoading: isLoadingSecondPage } = useQuery({
+    queryKey: ["tvShows", listType, 2],
+    queryFn: () => fetchTVShows(listType, 2),
+  });
+
+  const isLoading = isLoadingFirstPage || isLoadingSecondPage;
+
+  // Debug logs
+  console.log("List Type:", listType);
+  console.log("Page 1 Data:", firstPageData);
+  console.log("Page 2 Data:", secondPageData);
 
   if (isLoading) {
     return (
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 md:gap-6">
-        {Array(24).fill(0).map((_, index) => (
-          <div key={index} className="group relative cursor-pointer">
-            <div className="relative overflow-hidden rounded-2xl">
-              <div className="relative aspect-[2/3] w-full">
-                <div className="absolute inset-0 bg-[#1B263B]">
-                  <Skeleton className="w-full h-full" />
-                </div>
-              </div>
-              <div className="mt-3 px-2">
-                <Skeleton className="h-4 w-3/4 mb-2" />
-                <Skeleton className="h-3 w-1/2" />
-              </div>
-            </div>
-          </div>
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+        {Array.from({ length: 12 }).map((_, index) => (
+          <Skeleton key={index} className="aspect-[2/3] rounded-lg" />
         ))}
       </div>
     );
   }
 
-  if (!displayShows.length) {
-    return (
-      <div className="text-center py-8">
-        <p className="text-gray-400">No TV shows found</p>
-      </div>
-    );
+  if (!firstPageData?.results || !secondPageData?.results) {
+    return null;
   }
 
+  // Combine results from both pages and filter out duplicates
+  const allShows = [...firstPageData.results, ...secondPageData.results];
+  const uniqueShows = Array.from(
+    new Map(allShows.map((show) => [show.id, show])).values()
+  );
+
+  // Filter shows based on listType
+  let filteredShows = uniqueShows;
+  if (listType === "on_the_air") {
+    filteredShows = uniqueShows.filter((show: TMDBTVShow) => {
+      // Check if the show has a next episode to air
+      const hasNextEpisode = show.next_episode_to_air !== undefined;
+      // Check if the show is currently airing based on first_air_date
+      const isCurrentlyAiring = show.first_air_date
+        ? new Date(show.first_air_date) <= new Date()
+        : false;
+
+      return hasNextEpisode || isCurrentlyAiring;
+    });
+  }
+
+  // Take only the first 24 shows
+  const shows = filteredShows.slice(0, 24);
+
+  console.log("Filtered shows:", {
+    total: filteredShows.length,
+    displayed: shows.length,
+    listType,
+  });
+
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 md:gap-6">
-      {displayShows.map((show: TMDBTVShow) => (
+    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+      {shows.map((show: TMDBTVShow) => (
         <TVShowCard key={show.id} show={show} />
       ))}
     </div>

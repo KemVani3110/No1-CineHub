@@ -6,10 +6,10 @@ import { Star, Play, Calendar, Film } from "lucide-react";
 import { getImageUrl } from "@/services/tmdb";
 import { useRouter } from "next/navigation";
 import { format } from "date-fns";
-import { TMDBTV } from "@/types/tmdb";
+import { TMDBTVShow } from "@/types/tmdb";
 
 interface TVShowCardProps {
-  show: TMDBTV;
+  show: TMDBTVShow;
 }
 
 const ImageWithFallback = ({ src, alt }: { src: string; alt: string }) => (
@@ -31,6 +31,7 @@ export const TVShowCard: React.FC<TVShowCardProps> = ({ show }) => {
   const releaseDate = show.first_air_date;
   const year = releaseDate ? new Date(releaseDate).getFullYear() : "";
   const rating = show.vote_average;
+  const isCurrentlyAiring = show.next_episode_to_air !== undefined;
 
   const handleClick = () => {
     router.push(`/tv/${show.id}`);
@@ -70,6 +71,9 @@ export const TVShowCard: React.FC<TVShowCardProps> = ({ show }) => {
         <div className="flex items-center gap-2 text-gray-400 text-sm">
           <Film className="w-4 h-4" />
           <span>TV Series</span>
+          {isCurrentlyAiring && (
+            <span className="text-[#4FD1C5]">• Currently Airing</span>
+          )}
         </div>
       </div>
       <div className="absolute inset-0 rounded-3xl bg-gradient-to-r from-[#4FD1C5]/0 to-[#4FD1C5]/0 group-hover:from-[#4FD1C5]/10 group-hover:to-[#38B2AC]/10 transition-all duration-500 -z-10 blur-xl" />
