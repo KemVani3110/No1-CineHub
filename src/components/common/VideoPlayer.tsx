@@ -148,12 +148,19 @@ export function VideoPlayer({ videoUrl, posterUrl, title, duration }: VideoPlaye
       if (isPlaying || isAutoPlaying) {
         videoRef.current.pause();
         setIsAutoPlaying(false);
+        setShowControls(true); // Show controls when paused
       } else {
         // Start auto-playing simulation
         setIsAutoPlaying(true);
         videoRef.current.play().catch(() => {
           // If video can't play, just continue with simulation
         });
+        // Hide controls after a short delay when playing
+        setTimeout(() => {
+          if (isPlaying || isAutoPlaying) {
+            setShowControls(false);
+          }
+        }, 200);
       }
       setPlaying(!isPlaying && !isAutoPlaying);
     }
@@ -238,7 +245,7 @@ export function VideoPlayer({ videoUrl, posterUrl, title, duration }: VideoPlaye
       if (isPlaying || isAutoPlaying) {
         setShowControls(false);
       }
-    }, 5000);
+    }, 3000); // Reduced timeout for better mobile experience
   };
 
   const getProgressPercentage = () => {
@@ -262,7 +269,7 @@ export function VideoPlayer({ videoUrl, posterUrl, title, duration }: VideoPlaye
         playsInline // Important for mobile
       />
 
-      {/* Enhanced Overlay with gradient */}
+      {/*  Overlay with gradient */}
       <div
         className={cn(
           "absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-0 transition-all duration-500 ease-out",
@@ -293,7 +300,7 @@ export function VideoPlayer({ videoUrl, posterUrl, title, duration }: VideoPlaye
         </div>
       )}
 
-      {/* Enhanced Controls - Fixed mobile spacing */}
+      {/*  Controls - Fixed mobile spacing */}
       <div
         className={cn(
           "absolute bottom-0 left-0 right-0 transition-all duration-500 ease-out backdrop-blur-sm z-20",
@@ -302,7 +309,7 @@ export function VideoPlayer({ videoUrl, posterUrl, title, duration }: VideoPlaye
           !showControls && "translate-y-full opacity-0"
         )}
       >
-        {/* Enhanced Progress Bar - Mobile: moved higher to avoid header overlap */}
+        {/*  Progress Bar - Mobile: moved higher to avoid header overlap */}
         <div className={cn(
           "relative space-y-1 md:space-y-2",
           // Mobile: add margin top to create space from header
@@ -329,7 +336,7 @@ export function VideoPlayer({ videoUrl, posterUrl, title, duration }: VideoPlaye
             />
           </div>
           
-          {/* Enhanced Slider (invisible but functional) */}
+          {/*  Slider (invisible but functional) */}
           <div className={cn(
             "absolute left-0 right-0",
             // Mobile: larger touch area
@@ -359,7 +366,7 @@ export function VideoPlayer({ videoUrl, posterUrl, title, duration }: VideoPlaye
           </div>
         </div>
 
-        {/* Enhanced Control Buttons - Mobile Responsive Layout */}
+        {/*  Control Buttons - Mobile Responsive Layout */}
         <div className={cn(
           "flex items-center justify-between",
           // Mobile: different layout approach
@@ -386,7 +393,7 @@ export function VideoPlayer({ videoUrl, posterUrl, title, duration }: VideoPlaye
               <SkipBack className={isMobile ? "h-6 w-6" : "h-5 w-5"} />
             </Button>
 
-            {/* Main play/pause button - enhanced */}
+            {/* Main play/pause button -  */}
             <Button
               variant="ghost"
               size="icon"
@@ -555,7 +562,7 @@ export function VideoPlayer({ videoUrl, posterUrl, title, duration }: VideoPlaye
         </div>
       </div>
 
-      {/* Enhanced Title Overlay - Desktop only */}
+      {/*  Title Overlay - Desktop only */}
       <div
         className={cn(
           "absolute top-0 left-0 right-0 transition-all duration-500 ease-out",

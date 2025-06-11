@@ -1,13 +1,20 @@
-'use client';
+"use client";
 
-import { TMDBTVDetails, TMDBPerson, TMDBCastMember } from '@/types/tmdb';
-import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Users, Camera, Award, Star, ChevronRight, Sparkles } from 'lucide-react';
-import { getImageUrl } from '@/services/tmdb';
-import { useState } from 'react';
-import { Skeleton } from '@/components/ui/skeleton';
+import { TMDBTVDetails, TMDBCastMember } from "@/types/tmdb";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  Users,
+  Award,
+  Star,
+  ChevronRight,
+  Sparkles,
+} from "lucide-react";
+import { getImageUrl } from "@/services/tmdb";
+import { useState } from "react";
+import { Skeleton } from "@/components/ui/skeleton";
+import Image from "next/image";
 
 interface TVShowCastProps {
   tvShow: TMDBTVDetails;
@@ -18,7 +25,10 @@ interface CastMember extends TMDBCastMember {
   episode_count?: number;
 }
 
-export default function TVShowCast({ tvShow, isLoading = false }: TVShowCastProps) {
+export default function TVShowCast({
+  tvShow,
+  isLoading = false,
+}: TVShowCastProps) {
   const [showAllCast, setShowAllCast] = useState(false);
   const cast = (tvShow.credits?.cast || []) as CastMember[];
   const displayCast = showAllCast ? cast : cast.slice(0, 12);
@@ -35,7 +45,9 @@ export default function TVShowCast({ tvShow, isLoading = false }: TVShowCastProp
             <Users className="w-8 h-8 text-slate-400" />
           </div>
           <p className="text-text-sub text-lg">No cast information available</p>
-          <p className="text-text-sub/70 text-sm">Cast details will appear here when available</p>
+          <p className="text-text-sub/70 text-sm">
+            Cast details will appear here when available
+          </p>
         </div>
       </div>
     );
@@ -46,19 +58,21 @@ export default function TVShowCast({ tvShow, isLoading = false }: TVShowCastProp
       <div className="relative overflow-hidden rounded-xl bg-gradient-to-br from-bg-card to-bg-card/80 border border-border hover:border-cinehub-accent/30 transition-all duration-300">
         {/* Profile Image */}
         <div className="relative aspect-[3/4] overflow-hidden">
-          <img
+          <Image
             src={
               person.profile_path
                 ? getImageUrl(person.profile_path, "w500")
                 : "/images/no-profile.jpg"
             }
             alt={person.name}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+            fill
+            sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
+            className="object-cover group-hover:scale-105 transition-transform duration-300"
             loading="lazy"
           />
           {/* Gradient Overlay */}
           <div className="absolute inset-0 bg-gradient-to-t from-bg-main/90 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-          
+
           {/* Hover Effect Icon */}
           <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-x-2 group-hover:translate-x-0">
             <div className="w-8 h-8 rounded-full bg-cinehub-accent/20 backdrop-blur-sm border border-cinehub-accent/30 flex items-center justify-center">
@@ -66,14 +80,14 @@ export default function TVShowCast({ tvShow, isLoading = false }: TVShowCastProp
             </div>
           </div>
         </div>
-        
+
         {/* Info */}
         <div className="p-4 space-y-2">
           <h4 className="font-semibold text-text-main text-sm leading-tight group-hover:text-cinehub-accent transition-colors duration-300">
             {person.name}
           </h4>
           <p className="text-text-sub text-xs leading-tight line-clamp-2">
-            {person.character || 'Unknown Character'}
+            {person.character || "Unknown Character"}
           </p>
           <div className="flex items-center gap-2 pt-1">
             {person.popularity && (
@@ -110,25 +124,34 @@ export default function TVShowCast({ tvShow, isLoading = false }: TVShowCastProp
                   <Users className="w-5 h-5 text-white" />
                 </div>
                 Main Cast
-                <Badge variant="secondary" className="bg-blue-500/20 text-blue-400 border-blue-500/30 hidden sm:inline-flex">
+                <Badge
+                  variant="secondary"
+                  className="bg-blue-500/20 text-blue-400 border-blue-500/30 hidden sm:inline-flex"
+                >
                   {cast.length} members
                 </Badge>
               </h3>
-              <p className="text-text-sub text-sm">Meet the talented actors bringing this story to life</p>
+              <p className="text-text-sub text-sm">
+                Meet the talented actors bringing this story to life
+              </p>
             </div>
-            
+
             {cast.length > 12 && (
               <Button
                 variant="ghost"
                 onClick={() => setShowAllCast(!showAllCast)}
                 className="text-blue-400 hover:text-blue-300 hover:bg-blue-500/10 border border-blue-500/20 hover:border-blue-500/40 transition-all duration-300 cursor-pointer group self-start sm:self-auto"
               >
-                {showAllCast ? 'Show Less' : `Show All (${cast.length})`}
-                <ChevronRight className={`w-4 h-4 ml-2 transition-transform duration-300 ${showAllCast ? 'rotate-90' : 'group-hover:translate-x-1'}`} />
+                {showAllCast ? "Show Less" : `Show All (${cast.length})`}
+                <ChevronRight
+                  className={`w-4 h-4 ml-2 transition-transform duration-300 ${
+                    showAllCast ? "rotate-90" : "group-hover:translate-x-1"
+                  }`}
+                />
               </Button>
             )}
           </div>
-          
+
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 sm:gap-6">
             {displayCast.map((person) => (
               <CastCard key={person.id} person={person} />
@@ -168,4 +191,4 @@ function CastSkeleton() {
       </Card>
     </div>
   );
-} 
+}

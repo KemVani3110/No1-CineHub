@@ -29,7 +29,7 @@ export default function TVShowOverview({ tvShow }: TVShowOverviewProps) {
         </Card>
       </div>
 
-      {/* Stats Grid - Enhanced Design */}
+      {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
         {/* Rating Card */}
         <Card className="group relative overflow-hidden bg-gradient-to-br from-amber-900/30 via-yellow-900/20 to-amber-800/30 border-amber-700/40 hover:border-amber-500/60 transition-all duration-300 hover:scale-105 hover:shadow-xl hover:shadow-amber-500/20">
@@ -94,7 +94,7 @@ export default function TVShowOverview({ tvShow }: TVShowOverviewProps) {
         </Card>
       </div>
 
-      {/* Detailed Information - Enhanced Layout */}
+      {/* Detailed Information */}
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
         {/* TV Show Details */}
         <Card className="bg-gradient-to-br from-slate-900/90 via-slate-800/70 to-slate-900/90 border-slate-700/50 backdrop-blur-xl shadow-xl hover:shadow-2xl transition-all duration-300">

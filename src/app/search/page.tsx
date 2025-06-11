@@ -56,6 +56,14 @@ export default function SearchPage() {
   const { data, isLoading, isError } = useSearch(currentPage);
   const { user } = useAuth();
 
+  // Clear search results when leaving the page
+  useEffect(() => {
+    return () => {
+      setQuery("");
+      setCurrentPage(1);
+    };
+  }, [setQuery]);
+
   // View and sort state
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [sortBy, setSortBy] = useState<
@@ -150,7 +158,7 @@ export default function SearchPage() {
                 <Sparkles className="h-16 w-16 text-cinehub-accent animate-pulse" />
               </div>
             </div>
-            <h2 className="text-3xl lg:text-4xl font-bold text-white mb-6 gradient-text">
+            <h2 className="text-2xl font-bold text-white mb-3 gradient-text">
               Discover Amazing Content
             </h2>
             <p className="text-text-sub text-lg lg:text-xl leading-relaxed mb-8 max-w-md mx-auto">

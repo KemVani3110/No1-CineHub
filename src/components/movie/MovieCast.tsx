@@ -2,20 +2,31 @@ import { TMDBCredits } from "@/types/tmdb";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Users, Camera, Award, Star, ChevronRight, Sparkles } from "lucide-react";
+import {
+  Users,
+  Camera,
+  Award,
+  Star,
+  ChevronRight,
+  Sparkles,
+} from "lucide-react";
 import { getImageUrl } from "@/services/tmdb";
 import { useState } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
+import Image from "next/image";
 
 interface MovieCastProps {
   credits: TMDBCredits | null;
   isLoading?: boolean;
 }
 
-export default function MovieCast({ credits, isLoading = false }: MovieCastProps) {
+export default function MovieCast({
+  credits,
+  isLoading = false,
+}: MovieCastProps) {
   const [showAllCast, setShowAllCast] = useState(false);
   const [showAllCrew, setShowAllCrew] = useState(false);
-  
+
   if (isLoading) {
     return <CastSkeleton />;
   }
@@ -28,37 +39,50 @@ export default function MovieCast({ credits, isLoading = false }: MovieCastProps
             <Users className="w-8 h-8 text-slate-400" />
           </div>
           <p className="text-text-sub text-lg">No cast information available</p>
-          <p className="text-text-sub/70 text-sm">Cast details will appear here when available</p>
+          <p className="text-text-sub/70 text-sm">
+            Cast details will appear here when available
+          </p>
         </div>
       </div>
     );
   }
 
   const displayCast = showAllCast ? credits.cast : credits.cast.slice(0, 12);
-  const keyCrewRoles = ["Director", "Producer", "Executive Producer", "Screenplay", "Writer", "Cinematography", "Music", "Editor"];
+  const keyCrewRoles = [
+    "Director",
+    "Producer",
+    "Executive Producer",
+    "Screenplay",
+    "Writer",
+    "Cinematography",
+    "Music",
+    "Editor",
+  ];
   const keyCrew = credits.crew.filter((person) =>
     keyCrewRoles.includes(person.job)
   );
   const displayCrew = showAllCrew ? keyCrew : keyCrew.slice(0, 8);
 
-  const CastCard = ({ person }: { person: typeof credits.cast[0] }) => (
+  const CastCard = ({ person }: { person: (typeof credits.cast)[0] }) => (
     <div className="group cursor-pointer">
       <div className="relative overflow-hidden rounded-xl bg-gradient-to-br from-bg-card to-bg-card/80 border border-border hover:border-cinehub-accent/30 transition-all duration-300">
         {/* Profile Image */}
         <div className="relative aspect-[3/4] overflow-hidden">
-          <img
+          <Image
             src={
               person.profile_path
                 ? getImageUrl(person.profile_path, "w500")
                 : "/images/no-profile.jpg"
             }
             alt={person.name}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+            fill
+            sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
+            className="object-cover group-hover:scale-105 transition-transform duration-300"
             loading="lazy"
           />
           {/* Gradient Overlay */}
           <div className="absolute inset-0 bg-gradient-to-t from-bg-main/90 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-          
+
           {/* Hover Effect Icon */}
           <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-x-2 group-hover:translate-x-0">
             <div className="w-8 h-8 rounded-full bg-cinehub-accent/20 backdrop-blur-sm border border-cinehub-accent/30 flex items-center justify-center">
@@ -66,7 +90,7 @@ export default function MovieCast({ credits, isLoading = false }: MovieCastProps
             </div>
           </div>
         </div>
-        
+
         {/* Info */}
         <div className="p-4 space-y-2">
           <h4 className="font-semibold text-text-main text-sm leading-tight group-hover:text-cinehub-accent transition-colors duration-300">
@@ -88,7 +112,7 @@ export default function MovieCast({ credits, isLoading = false }: MovieCastProps
     </div>
   );
 
-  const CrewCard = ({ person }: { person: typeof credits.crew[0] }) => (
+  const CrewCard = ({ person }: { person: (typeof credits.crew)[0] }) => (
     <div className="group cursor-pointer">
       <Card className="bg-gradient-to-br from-bg-card to-bg-card/50 border-border hover:border-cinehub-accent/40 transition-all duration-300 group-hover:shadow-lg group-hover:shadow-cinehub-accent/10">
         <CardContent className="p-6">
@@ -108,22 +132,20 @@ export default function MovieCast({ credits, isLoading = false }: MovieCastProps
               {/* Ring effect */}
               <div className="absolute inset-0 rounded-full ring-2 ring-transparent group-hover:ring-cinehub-accent/20 transition-all duration-300" />
             </div>
-            
+
             {/* Info */}
             <div className="flex-1 min-w-0 space-y-2">
               <h4 className="font-semibold text-text-main text-base leading-tight group-hover:text-cinehub-accent transition-colors duration-300">
                 {person.name}
               </h4>
-              <Badge 
-                variant="outline" 
+              <Badge
+                variant="outline"
                 className="border-cinehub-accent/40 text-cinehub-accent text-xs bg-cinehub-accent/10 hover:bg-cinehub-accent/20 transition-colors duration-300"
               >
                 {person.job}
               </Badge>
               {person.department && person.department !== person.job && (
-                <p className="text-text-sub text-xs">
-                  {person.department}
-                </p>
+                <p className="text-text-sub text-xs">{person.department}</p>
               )}
             </div>
 
@@ -149,25 +171,36 @@ export default function MovieCast({ credits, isLoading = false }: MovieCastProps
                   <Users className="w-5 h-5 text-white" />
                 </div>
                 Main Cast
-                <Badge variant="secondary" className="bg-blue-500/20 text-blue-400 border-blue-500/30 hidden sm:inline-flex">
+                <Badge
+                  variant="secondary"
+                  className="bg-blue-500/20 text-blue-400 border-blue-500/30 hidden sm:inline-flex"
+                >
                   {credits.cast.length} members
                 </Badge>
               </h3>
-              <p className="text-text-sub text-sm">Meet the talented actors bringing this story to life</p>
+              <p className="text-text-sub text-sm">
+                Meet the talented actors bringing this story to life
+              </p>
             </div>
-            
+
             {credits.cast.length > 12 && (
               <Button
                 variant="ghost"
                 onClick={() => setShowAllCast(!showAllCast)}
                 className="text-blue-400 hover:text-blue-300 hover:bg-blue-500/10 border border-blue-500/20 hover:border-blue-500/40 transition-all duration-300 cursor-pointer group self-start sm:self-auto"
               >
-                {showAllCast ? 'Show Less' : `Show All (${credits.cast.length})`}
-                <ChevronRight className={`w-4 h-4 ml-2 transition-transform duration-300 ${showAllCast ? 'rotate-90' : 'group-hover:translate-x-1'}`} />
+                {showAllCast
+                  ? "Show Less"
+                  : `Show All (${credits.cast.length})`}
+                <ChevronRight
+                  className={`w-4 h-4 ml-2 transition-transform duration-300 ${
+                    showAllCast ? "rotate-90" : "group-hover:translate-x-1"
+                  }`}
+                />
               </Button>
             )}
           </div>
-          
+
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 sm:gap-6">
             {displayCast.map((person) => (
               <CastCard key={person.id} person={person} />
@@ -186,21 +219,30 @@ export default function MovieCast({ credits, isLoading = false }: MovieCastProps
                   <Camera className="w-5 h-5 text-white" />
                 </div>
                 Key Crew
-                <Badge variant="secondary" className="bg-orange-500/20 text-orange-400 border-orange-500/30 hidden sm:inline-flex">
+                <Badge
+                  variant="secondary"
+                  className="bg-orange-500/20 text-orange-400 border-orange-500/30 hidden sm:inline-flex"
+                >
                   {keyCrew.length} professionals
                 </Badge>
               </h3>
-              <p className="text-text-sub text-sm">The creative minds behind the scenes</p>
+              <p className="text-text-sub text-sm">
+                The creative minds behind the scenes
+              </p>
             </div>
-            
+
             {keyCrew.length > 8 && (
               <Button
                 variant="ghost"
                 onClick={() => setShowAllCrew(!showAllCrew)}
                 className="text-orange-400 hover:text-orange-300 hover:bg-orange-500/10 border border-orange-500/20 hover:border-orange-500/40 transition-all duration-300 cursor-pointer group self-start sm:self-auto"
               >
-                {showAllCrew ? 'Show Less' : `Show All (${keyCrew.length})`}
-                <ChevronRight className={`w-4 h-4 ml-2 transition-transform duration-300 ${showAllCrew ? 'rotate-90' : 'group-hover:translate-x-1'}`} />
+                {showAllCrew ? "Show Less" : `Show All (${keyCrew.length})`}
+                <ChevronRight
+                  className={`w-4 h-4 ml-2 transition-transform duration-300 ${
+                    showAllCrew ? "rotate-90" : "group-hover:translate-x-1"
+                  }`}
+                />
               </Button>
             )}
           </div>
@@ -224,12 +266,18 @@ export default function MovieCast({ credits, isLoading = false }: MovieCastProps
                 </div>
                 Crew by Department
               </h3>
-              <p className="text-text-sub text-sm">Complete crew organized by their expertise</p>
+              <p className="text-text-sub text-sm">
+                Complete crew organized by their expertise
+              </p>
             </div>
-            
+
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
-              {Array.from(new Set(credits.crew.map(person => person.department))).map(department => {
-                const departmentCrew = credits.crew.filter(person => person.department === department);
+              {Array.from(
+                new Set(credits.crew.map((person) => person.department))
+              ).map((department) => {
+                const departmentCrew = credits.crew.filter(
+                  (person) => person.department === department
+                );
                 return (
                   <div key={department} className="group cursor-pointer">
                     <div className="bg-gradient-to-br from-purple-500/10 to-purple-600/5 border border-purple-500/20 rounded-xl p-5 space-y-4 hover:border-purple-500/40 hover:bg-purple-500/10 transition-all duration-300">
@@ -237,16 +285,26 @@ export default function MovieCast({ credits, isLoading = false }: MovieCastProps
                         <h4 className="text-lg font-semibold text-purple-400 group-hover:text-purple-300 transition-colors duration-300">
                           {department}
                         </h4>
-                        <Badge variant="outline" className="text-xs bg-purple-500/10 border-purple-500/30 text-purple-400">
+                        <Badge
+                          variant="outline"
+                          className="text-xs bg-purple-500/10 border-purple-500/30 text-purple-400"
+                        >
                           {departmentCrew.length}
                         </Badge>
                       </div>
-                      
+
                       <div className="space-y-3">
-                        {departmentCrew.slice(0, 5).map(person => (
-                          <div key={person.credit_id} className="flex justify-between items-center text-sm py-2 px-3 rounded-lg bg-bg-main/30 hover:bg-bg-main/50 transition-colors duration-200 cursor-pointer">
-                            <span className="text-text-main font-medium">{person.name}</span>
-                            <span className="text-text-sub text-xs bg-bg-card/50 px-2 py-1 rounded-md">{person.job}</span>
+                        {departmentCrew.slice(0, 5).map((person) => (
+                          <div
+                            key={person.credit_id}
+                            className="flex justify-between items-center text-sm py-2 px-3 rounded-lg bg-bg-main/30 hover:bg-bg-main/50 transition-colors duration-200 cursor-pointer"
+                          >
+                            <span className="text-text-main font-medium">
+                              {person.name}
+                            </span>
+                            <span className="text-text-sub text-xs bg-bg-card/50 px-2 py-1 rounded-md">
+                              {person.job}
+                            </span>
                           </div>
                         ))}
                         {departmentCrew.length > 5 && (

@@ -2,6 +2,7 @@
 
 import React, { lazy, Suspense } from "react";
 import CompilingOverlay from "@/components/common/CompilingOverlay";
+import { Skeleton } from "@/components/ui/skeleton";
 
 // Error boundary for lazy loaded components
 class LazyLoadErrorBoundary extends React.Component<
@@ -144,7 +145,35 @@ export const MovieReviews = lazy(
   () => import("@/components/movie/MovieReviews")
 );
 
-// Lazy loading wrapper component with better loading states and error handling
+// Skeleton components for different content types
+const MovieCardSkeleton = () => (
+  <div className="w-full space-y-3">
+    <Skeleton className="w-full aspect-[2/3] rounded-lg" />
+    <Skeleton className="h-4 w-3/4" />
+    <Skeleton className="h-4 w-1/2" />
+  </div>
+);
+
+const TVShowCardSkeleton = () => (
+  <div className="w-full space-y-3">
+    <Skeleton className="w-full aspect-[2/3] rounded-lg" />
+    <Skeleton className="h-4 w-3/4" />
+    <Skeleton className="h-4 w-1/2" />
+  </div>
+);
+
+const SectionSkeleton = () => (
+  <div className="space-y-4">
+    <Skeleton className="h-8 w-48" />
+    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+      {[...Array(5)].map((_, i) => (
+        <MovieCardSkeleton key={i} />
+      ))}
+    </div>
+  </div>
+);
+
+// lazy loading wrapper with skeleton support
 export const withLazyLoading = (
   Component: React.ComponentType,
   loadingMessage?: string,
@@ -152,6 +181,7 @@ export const withLazyLoading = (
     minLoadingTime?: number;
     showBackdrop?: boolean;
     retryCount?: number;
+    skeleton?: React.ComponentType;
   }
 ) => {
   return function LazyLoadedComponent(props: any) {
@@ -162,7 +192,6 @@ export const withLazyLoading = (
     React.useEffect(() => {
       const timer = setTimeout(() => {
         setIsLoading(false);
-        // Add a small delay before showing content for smooth transition
         setTimeout(() => setShowContent(true), 100);
       }, options?.minLoadingTime || 300);
 
@@ -174,6 +203,10 @@ export const withLazyLoading = (
       setIsLoading(true);
       setShowContent(false);
     };
+
+    if (isLoading && options?.skeleton) {
+      return <options.skeleton />;
+    }
 
     return (
       <LazyLoadErrorBoundary
@@ -191,10 +224,21 @@ export const withLazyLoading = (
           </div>
         }
       >
-        <Suspense fallback={<CompilingOverlay />}>
+        <Suspense 
+          fallback={
+            options?.skeleton ? (
+              <options.skeleton />
+            ) : (
+              <CompilingOverlay message={loadingMessage} />
+            )
+          }
+        >
           {showContent ? <Component {...props} /> : null}
         </Suspense>
       </LazyLoadErrorBoundary>
     );
   };
 };
+
+// Export skeleton components
+export { MovieCardSkeleton, TVShowCardSkeleton, SectionSkeleton };

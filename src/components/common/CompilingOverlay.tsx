@@ -2,7 +2,11 @@
 
 import Image from 'next/image';
 
-const CompilingOverlay = () => {
+interface CompilingOverlayProps {
+  message?: string;
+}
+
+const CompilingOverlay = ({ message = "Please wait while we update your application..." }: CompilingOverlayProps) => {
   return (
     <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center animate-fade-in">
       <div className="flex flex-col items-center justify-center gap-6">
@@ -23,7 +27,7 @@ const CompilingOverlay = () => {
             Loading Changes
           </h3>
           <p className="text-muted-foreground">
-            Please wait while we update your application...
+            {message}
           </p>
         </div>
 

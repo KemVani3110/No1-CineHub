@@ -273,7 +273,7 @@ export function ExploreFilters({ genres }: ExploreFiltersProps) {
                 />
                 <div className="relative">
                   <Input
-                    type="number"
+                    type="year"
                     value={yearInput}
                     onChange={handleYearInputChange}
                     min={1900}
@@ -322,7 +322,7 @@ export function ExploreFilters({ genres }: ExploreFiltersProps) {
                 />
                 <div className="relative">
                   <Input
-                    type="number"
+                    type="minute"
                     value={runtimeInput}
                     onChange={handleRuntimeInputChange}
                     min={0}
