@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { auth } from 'firebase-admin';
 import { initializeApp, getApps, cert } from 'firebase-admin/app';
-import pool from '@/lib/db';
+import { getFirestore } from 'firebase-admin/firestore';
 
 // Initialize Firebase Admin if not already initialized
 if (!getApps().length) {
@@ -19,6 +19,8 @@ if (!getApps().length) {
     });
   }
 }
+
+const db = getFirestore();
 
 export async function POST(request: Request) {
   try {
@@ -52,116 +54,33 @@ export async function POST(request: Request) {
       );
     }
 
-    // Check if user exists by provider_id
-    const [rows] = await pool.execute(
-      'SELECT * FROM users WHERE provider_id = ? AND provider = ?',
-      [user.providerId, provider]
-    );
-    const existingUser = (rows as any[])[0];
+    // Lưu user vào Firestore (nếu chưa có)
+    const userRef = db.collection('users').doc(decodedToken.uid);
+    const userDoc = await userRef.get();
 
-    if (existingUser) {
-      // Update user info if needed
-      if (!existingUser.is_active) {
-        return NextResponse.json(
-          { message: 'Account is disabled' },
-          { status: 403 }
-        );
-      }
-
-      // Update last login and user info
-      await pool.execute(
-        `UPDATE users 
-         SET last_login_at = CURRENT_TIMESTAMP,
-             name = ?,
-             avatar = ?,
-             email = ?
-         WHERE id = ?`,
-        [
-          user.name || decodedToken.name,
-          user.avatar || decodedToken.picture,
-          decodedToken.email,
-          existingUser.id
-        ]
-      );
-
-      return NextResponse.json({
-        user: {
-          id: existingUser.id,
-          name: user.name || decodedToken.name,
-          email: decodedToken.email,
-          avatar: user.avatar || decodedToken.picture,
-          role: existingUser.role,
-        },
-      });
-    }
-
-    // Check if email already exists
-    const [emailRows] = await pool.execute(
-      'SELECT * FROM users WHERE email = ?',
-      [decodedToken.email]
-    );
-    const existingEmailUser = (emailRows as any[])[0];
-
-    if (existingEmailUser) {
-      // Update existing user with social login info
-      await pool.execute(
-        `UPDATE users 
-         SET provider = ?,
-             provider_id = ?,
-             last_login_at = CURRENT_TIMESTAMP,
-             name = ?,
-             avatar = ?
-         WHERE id = ?`,
-        [
-          provider,
-          user.providerId,
-          user.name || decodedToken.name,
-          user.avatar || decodedToken.picture,
-          existingEmailUser.id
-        ]
-      );
-
-      return NextResponse.json({
-        user: {
-          id: existingEmailUser.id,
-          name: user.name || decodedToken.name,
-          email: decodedToken.email,
-          avatar: user.avatar || decodedToken.picture,
-          role: existingEmailUser.role,
-        },
-      });
-    }
-
-    // Create new user if doesn't exist
-    const [result] = await pool.execute(
-      `INSERT INTO users (
-        email, name, avatar, role, is_active, 
-        email_verified, provider, provider_id, last_login_at
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)`,
-      [
-        decodedToken.email,
-        user.name || decodedToken.name,
-        user.avatar || decodedToken.picture,
-        'user', // Always set role as 'user' for social login
-        true,
-        true,
+    if (!userDoc.exists) {
+      await userRef.set({
+        email: decodedToken.email,
+        name: user.name || decodedToken.name || '',
+        avatar: user.avatar || decodedToken.picture || '',
         provider,
-        user.providerId,
-      ]
-    );
+        providerId: user.providerId,
+        createdAt: new Date(),
+        role: 'user',
+        isActive: true,
+      });
+    }
 
-    const [newUser] = await pool.execute(
-      'SELECT * FROM users WHERE email = ?',
-      [decodedToken.email]
-    );
+    // Lấy lại user từ Firestore
+    const savedUser = (await userRef.get()).data();
 
     return NextResponse.json({
       user: {
-        id: (newUser as any[])[0].id,
-        name: (newUser as any[])[0].name,
-        email: (newUser as any[])[0].email,
-        avatar: (newUser as any[])[0].avatar,
-        role: (newUser as any[])[0].role,
+        id: decodedToken.uid,
+        name: savedUser?.name,
+        email: savedUser?.email,
+        avatar: savedUser?.avatar,
+        role: savedUser?.role,
       },
     });
   } catch (error) {
