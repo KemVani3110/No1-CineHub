@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { TMDBMovie, TMDBResponse, TMDBTVShow } from '@/types/tmdb';
+import { TMDBMovie, TMDBResponse, TMDBTVShow, TMDBDiscoverMovieParams, TMDBDiscoverTVParams, TMDBGenre } from '@/types/tmdb';
 
 export type TMDBMovieListType = 'popular' | 'top_rated' | 'now_playing' | 'upcoming';
 export type TMDBTVListType = 'popular' | 'top_rated' | 'on_the_air';
@@ -10,31 +10,45 @@ const TMDB_IMAGE_BASE_URL = process.env.NEXT_PUBLIC_TMDB_IMAGE_BASE_URL;
 
 // Create axios instance
 const tmdbApi = axios.create({
-  baseURL: TMDB_BASE_URL,
+  baseURL: TMDB_BASE_URL || 'https://api.themoviedb.org/3',
   params: {
     api_key: TMDB_API_KEY,
     language: 'en-US',
   },
   headers: {
-    'Accept': 'application/json',
     'Content-Type': 'application/json',
+    'Accept': 'application/json',
   },
 });
 
 // Add request interceptor for logging
-tmdbApi.interceptors.request.use(request => {
-  console.log('Starting Request:', request.url);
-  return request;
-});
+tmdbApi.interceptors.request.use(
+  (config) => {
+    console.log('TMDB API Request:', {
+      url: config.url,
+      method: config.method,
+      params: config.params,
+    });
+    return config;
+  },
+  (error) => {
+    console.error('TMDB API Request Error:', error);
+    return Promise.reject(error);
+  }
+);
 
 // Add response interceptor for logging
 tmdbApi.interceptors.response.use(
-  response => {
-    console.log('Response:', response.config.url, response.status);
+  (response) => {
+    console.log('TMDB API Response:', {
+      url: response.config.url,
+      status: response.status,
+      data: response.data,
+    });
     return response;
   },
-  error => {
-    console.error('API Error:', error.config?.url, error.response?.status, error.message);
+  (error) => {
+    console.error('TMDB API Response Error:', error);
     return Promise.reject(error);
   }
 );
@@ -56,41 +70,58 @@ export const TMDB_ENDPOINTS = {
 // API functions
 export const fetchMovies = async (listType: TMDBMovieListType = 'popular', page: number = 1): Promise<TMDBResponse<TMDBMovie>> => {
   try {
-    const { data } = await tmdbApi.get(`/movie/${listType}`, {
+    const response = await tmdbApi.get(`/movie/${listType}`, {
       params: { page },
     });
-    return data;
-  } catch (error) {
-    console.error('Error fetching movies:', error);
-    return { results: [], page: 1, total_pages: 1, total_results: 0 };
+    return response.data;
+  } catch (error: any) {
+    console.error('Error fetching movies:', {
+      message: error.message,
+      response: error.response?.data,
+      status: error.response?.status,
+      config: {
+        url: error.config?.url,
+        params: error.config?.params,
+      }
+    });
+    return {
+      page: 1,
+      results: [],
+      total_pages: 0,
+      total_results: 0,
+    };
   }
 };
 
 export const fetchTVShows = async (listType: TMDBTVListType = 'popular', page: number = 1): Promise<TMDBResponse<TMDBTVShow>> => {
   try {
-    console.log('Fetching TV shows with listType:', listType, 'page:', page);
-
-    const { data } = await tmdbApi.get(`/tv/${listType}`, {
+    const response = await tmdbApi.get(`/tv/${listType}`, {
       params: { page },
     });
-
-    console.log('TV shows response:', {
-      total: data.total_results,
-      page: data.page,
-      results: data.results?.length
+    return response.data;
+  } catch (error: any) {
+    console.error('Error fetching TV shows:', {
+      message: error.message,
+      response: error.response?.data,
+      status: error.response?.status,
+      config: {
+        url: error.config?.url,
+        params: error.config?.params,
+      }
     });
-
-    return data;
-  } catch (error) {
-    console.error('Error fetching TV shows:', error);
-    return { results: [], page: 1, total_pages: 1, total_results: 0 };
+    return {
+      page: 1,
+      results: [],
+      total_pages: 0,
+      total_results: 0,
+    };
   }
 };
 
-export const fetchGenres = async (type: 'movie' | 'tv') => {
+export const fetchGenres = async (type: 'movie' | 'tv'): Promise<TMDBGenre[]> => {
   try {
-    const { data } = await tmdbApi.get(`/genre/${type}/list`);
-    return data.genres;
+    const response = await tmdbApi.get(`/genre/${type}/list`);
+    return response.data.genres;
   } catch (error) {
     console.error(`Error fetching ${type} genres:`, error);
     return [];
@@ -191,5 +222,55 @@ export const searchTVShows = async (query: string, page: number = 1) => {
   } catch (error) {
     console.error('Error searching TV shows:', error);
     return { results: [], page: 1, total_pages: 1, total_results: 0 };
+  }
+};
+
+export const discoverMovies = async (params: Record<string, any> = {}): Promise<TMDBResponse<TMDBMovie>> => {
+  try {
+    const response = await tmdbApi.get('/discover/movie', { params });
+    const adjustedItems = response.data.results
+      .filter((item: TMDBMovie) => item.poster_path)
+      .map((item: TMDBMovie) => ({
+        ...item,
+        media_type: 'movie' as const,
+      }));
+
+    return {
+      ...response.data,
+      results: adjustedItems,
+    };
+  } catch (error) {
+    console.error('Error discovering movies:', error);
+    return {
+      page: 1,
+      results: [],
+      total_pages: 0,
+      total_results: 0,
+    };
+  }
+};
+
+export const discoverTVShows = async (params: Record<string, any> = {}): Promise<TMDBResponse<TMDBTVShow>> => {
+  try {
+    const response = await tmdbApi.get('/discover/tv', { params });
+    const adjustedItems = response.data.results
+      .filter((item: TMDBTVShow) => item.poster_path)
+      .map((item: TMDBTVShow) => ({
+        ...item,
+        media_type: 'tv' as const,
+      }));
+
+    return {
+      ...response.data,
+      results: adjustedItems,
+    };
+  } catch (error) {
+    console.error('Error discovering TV shows:', error);
+    return {
+      page: 1,
+      results: [],
+      total_pages: 0,
+      total_results: 0,
+    };
   }
 }; 
