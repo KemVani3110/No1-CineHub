@@ -36,7 +36,7 @@ import {
   TrendingUp,
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
-import { TMDBMovie, TMDBTV, TMDBSearchResult } from "@/types/tmdb";
+import { TMDBMovie, TMDBTV, TMDBSearchResult, TMDBTVShow } from "@/types/tmdb";
 import Header from "@/components/common/Header";
 import Image from "next/image";
 
@@ -512,20 +512,16 @@ export default function SearchPage() {
 
             // Handle TV show results
             if (type === "tv" || (item.media_type === "tv" && type === "all")) {
-              const tvShow: TMDBTV = {
+              const tvShow: TMDBTVShow = {
                 id: item.id,
                 name: item.name || "",
-                original_name: item.original_name || "",
+                poster_path: item.poster_path || null,
+                backdrop_path: item.backdrop_path || null,
                 overview: item.overview || "",
                 first_air_date: item.first_air_date || "",
-                poster_path: item.poster_path,
-                backdrop_path: item.backdrop_path,
-                genre_ids: item.genre_ids || [],
-                original_language: item.original_language || "",
-                popularity: item.popularity,
-                vote_count: item.vote_count || 0,
                 vote_average: item.vote_average || 0,
-                origin_country: [],
+                vote_count: item.vote_count || 0,
+                genre_ids: item.genre_ids || [],
               };
               return (
                 <div

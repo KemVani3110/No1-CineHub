@@ -16,11 +16,12 @@ const pool = mysql.createPool({
 
 export async function GET(
   request: NextRequest,
-  context: { params: { type: string; id: string } }
+  context: { params: Promise<{ type: string; id: string }> }
 ) {
-  console.log("Stream API called with params:", context.params);
-  
   try {
+    const params = await context.params;
+    console.log("Stream API called with params:", params);
+    
     // Get session first
     const session = await getServerSession(authOptions);
     console.log("Session:", session);
@@ -35,7 +36,7 @@ export async function GET(
     }
 
     // Get params from context
-    const { type, id } = context.params;
+    const { type, id } = params;
     console.log("Processing request for:", { type, id });
 
     // Validate media type

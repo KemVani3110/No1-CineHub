@@ -10,7 +10,7 @@ export async function POST(request: Request) {
   try {
     const session = await getServerSession(authOptions);
 
-    if (!session?.user) {
+    if (!session?.user?.role) {
       return NextResponse.json(
         { message: "Unauthorized" },
         { status: 401 }
@@ -74,12 +74,12 @@ export async function POST(request: Request) {
         file.type,
         session.user.id,
       ]
-    );
+    ) as [any, any];
 
     const [avatar] = await db.query(
       `SELECT * FROM user_avatars WHERE id = ?`,
       [result.insertId]
-    );
+    ) as [any[], any];
 
     return NextResponse.json({
       message: "Avatar uploaded successfully",

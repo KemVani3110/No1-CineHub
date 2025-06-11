@@ -18,7 +18,7 @@ export async function POST(req: Request) {
     const [existingUsers] = await db.query(
       'SELECT id FROM users WHERE email = ?',
       [email]
-    );
+    ) as [any[], any];
 
     if (existingUsers.length > 0) {
       return NextResponse.json(
@@ -41,7 +41,7 @@ export async function POST(req: Request) {
         provider
       ) VALUES (?, ?, ?, 'user', true, 'local')`,
       [name, email, passwordHash]
-    );
+    ) as [any, any];
 
     const userId = result.insertId;
 

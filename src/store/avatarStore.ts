@@ -1,5 +1,4 @@
 import { create } from 'zustand';
-import { useToast } from '@/components/ui/use-toast';
 
 interface UserAvatar {
   id: number;

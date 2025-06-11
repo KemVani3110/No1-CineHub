@@ -235,17 +235,13 @@ export function WatchlistPage() {
                   show={{
                     id: item.id,
                     name: item.title,
-                    original_name: item.title,
+                    poster_path: item.posterPath,
+                    backdrop_path: null,
                     overview: "",
                     first_air_date: item.addedAt,
-                    poster_path: item.posterPath,
-                    backdrop_path: undefined,
-                    genre_ids: [],
-                    original_language: "en",
-                    popularity: 0,
-                    vote_count: 0,
                     vote_average: getRating(item.id, 'tv'),
-                    origin_country: []
+                    vote_count: 0,
+                    genre_ids: []
                   }}
                 />
               </div>

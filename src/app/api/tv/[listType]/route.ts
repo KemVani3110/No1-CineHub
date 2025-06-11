@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 
 const TMDB_API_KEY = process.env.NEXT_PUBLIC_TMDB_API_KEY;
 const TMDB_BASE_URL = process.env.NEXT_PUBLIC_TMDB_BASE_URL;
@@ -8,10 +8,11 @@ if (!TMDB_API_KEY || !TMDB_BASE_URL) {
 }
 
 export async function GET(
-  request: Request,
-  { params }: { params: { listType: string } }
+  request: NextRequest,
+  context: { params: Promise<{ listType: string }> }
 ) {
   try {
+    const params = await context.params;
     const { searchParams } = new URL(request.url);
     const page = searchParams.get('page') || '1';
 

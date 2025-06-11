@@ -9,7 +9,7 @@ interface AuthState {
   login: (email: string, password: string) => Promise<void>;
   register: (userData: Partial<User> & { password: string }) => Promise<void>;
   logout: () => Promise<void>;
-  socialLogin: (provider: 'google' | 'facebook', token: string) => Promise<void>;
+  socialLogin: (provider: 'google' | 'facebook', token: string, userData: { email: string; name: string; avatar?: string; providerId: string; }) => Promise<void>;
   getCurrentUser: () => Promise<void>;
   clearError: () => void;
 }
@@ -61,10 +61,10 @@ export const useAuthStore = create<AuthState>((set) => ({
     }
   },
 
-  socialLogin: async (provider, token) => {
+  socialLogin: async (provider, token, userData) => {
     set({ isLoading: true, error: null });
     try {
-      const response = await authService.socialLogin(provider, token);
+      const response = await authService.socialLogin({ provider, token, user: userData });
       set({ user: response.user, isLoading: false });
     } catch (error) {
       set({ 

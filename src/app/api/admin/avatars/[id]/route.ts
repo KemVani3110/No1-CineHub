@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { unlink } from "fs/promises";
@@ -6,13 +6,14 @@ import { join } from "path";
 import { db } from "@/lib/db";
 
 export async function DELETE(
-  request: Request,
-  { params }: { params: { id: string } }
+  req: NextRequest,
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions);
+    const params = await context.params;
 
-    if (!session?.user) {
+    if (!session?.user?.role) {
       return NextResponse.json(
         { message: "Unauthorized" },
         { status: 401 }
@@ -39,7 +40,7 @@ export async function DELETE(
     const [avatars] = await db.query(
       `SELECT * FROM user_avatars WHERE id = ?`,
       [avatarId]
-    );
+    ) as [any[], any];
 
     if (!avatars.length) {
       return NextResponse.json(

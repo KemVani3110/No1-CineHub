@@ -26,7 +26,7 @@ export async function GET() {
       ORDER BY created_at DESC
     `);
 
-    ("API - Users fetched:", rows);
+    console.log("API - Users fetched:", rows);
     return NextResponse.json({ users: rows });
   } catch (error) {
     console.error('Error fetching users:', error);

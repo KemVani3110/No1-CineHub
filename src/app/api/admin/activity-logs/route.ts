@@ -1,25 +1,21 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import pool from '@/lib/db';
 
-export async function GET(request: Request) {
+export async function GET(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
-    if (!session || session.user.role !== 'admin') {
+    if (!session?.user?.role || session.user.role !== 'admin') {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const { searchParams } = new URL(request.url);
     const page = parseInt(searchParams.get('page') || '1');
     const limit = parseInt(searchParams.get('limit') || '10');
-    const search = searchParams.get('search') || '';
-    const startDate = searchParams.get('startDate') || '';
-    const endDate = searchParams.get('endDate') || '';
-    const action = searchParams.get('action') || '';
-
     const offset = (page - 1) * limit;
 
+    // Build query
     let query = `
       SELECT 
         l.*,
@@ -34,33 +30,23 @@ export async function GET(request: Request) {
     `;
     const queryParams: any[] = [];
 
-    if (search) {
-      query += `
-        AND (
-          a.name LIKE ? OR
-          a.email LIKE ? OR
-          u.name LIKE ? OR
-          u.email LIKE ? OR
-          l.description LIKE ?
-        )
-      `;
-      const searchParam = `%${search}%`;
-      queryParams.push(searchParam, searchParam, searchParam, searchParam, searchParam);
+    // Add filters
+    const action = searchParams.get('action');
+    if (action) {
+      query += ' AND l.action = ?';
+      queryParams.push(action);
     }
 
+    const startDate = searchParams.get('startDate');
     if (startDate) {
       query += ' AND l.created_at >= ?';
       queryParams.push(startDate);
     }
 
+    const endDate = searchParams.get('endDate');
     if (endDate) {
       query += ' AND l.created_at <= ?';
       queryParams.push(endDate);
-    }
-
-    if (action) {
-      query += ' AND l.action = ?';
-      queryParams.push(action);
     }
 
     // Get total count

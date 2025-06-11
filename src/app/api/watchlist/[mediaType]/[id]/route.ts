@@ -1,11 +1,11 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { db } from '@/lib/db';
 
 export async function DELETE(
-  req: Request,
-  { params }: { params: { mediaType: string; id: string } }
+  request: NextRequest,
+  context: { params: Promise<{ mediaType: string; id: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -13,6 +13,7 @@ export async function DELETE(
       return new NextResponse('Unauthorized', { status: 401 });
     }
 
+    const params = await context.params;
     const { mediaType, id } = params;
 
     await db.query(
