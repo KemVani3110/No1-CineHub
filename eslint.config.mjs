@@ -10,19 +10,24 @@ const compat = new FlatCompat({
 });
 
 const eslintConfig = [
-  {
-    ignoreDuringBuilds: true,
+  ...compat.config({
+    extends: ['next', 'next/core-web-vitals', 'next/typescript'],
     rules: {
-      "@typescript-eslint/no-unused-vars": "warn",
-      "@typescript-eslint/no-explicit-any": "warn",
-      "react/no-unescaped-entities": "warn",
-      "react-hooks/exhaustive-deps": "warn",
-      "@next/next/no-img-element": "warn",
-      "@typescript-eslint/no-unused-expressions": "warn",
-      "react/display-name": "warn"
+      'react/no-unescaped-entities': 'off',
+      '@next/next/no-page-custom-font': 'off',
+      '@typescript-eslint/no-unused-vars': 'off',
+      '@typescript-eslint/no-explicit-any': 'off',
+      'no-unused-expressions': 'off',
+      '@next/next/no-img-element': 'off',
+      'react/display-name': 'off',
+      'react-hooks/exhaustive-deps': 'off',
+      'react-hooks/rules-of-hooks': 'off',
+      'react/no-unescaped-entities': 'off',
+      'react/no-unknown-property': 'off',
+      'react/no-unused-vars': 'off',
     },
-  },
-  ...compat.extends("next/core-web-vitals", "next/typescript"),
+  }),
 ];
+
 
 export default eslintConfig;

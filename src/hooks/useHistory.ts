@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useHistoryStore, HistoryItem } from "@/store/historyStore";
+import { useHistoryStore} from "@/store/historyStore";
 import { useAuth } from "./useAuth";
 import { useToast } from "@/components/ui/use-toast";
 import { useRouter } from "next/navigation";

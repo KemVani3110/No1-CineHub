@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+
 // src/types/tmdb.ts
 
 // Base TMDB API response structure

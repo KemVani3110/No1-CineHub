@@ -19,7 +19,7 @@ export async function GET(request: NextRequest) {
     }
 
     const data = await response.json();
-    (`Successfully fetched TV shows data for ${listType}`);
+    console.log(`Successfully fetched TV shows data for ${listType}`);
     
     return NextResponse.json(data);
   } catch (error) {

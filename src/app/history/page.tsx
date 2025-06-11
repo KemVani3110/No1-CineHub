@@ -285,7 +285,9 @@ export default function HistoryPage() {
                     onClick={(e) => {
                       e.preventDefault();
                       e.stopPropagation();
-                      item.id && handleRemoveFromHistory(item.id);
+                      if (item.id) {
+                        handleRemoveFromHistory(item.id);
+                      }
                     }}
                   >
                     <X size={16} />

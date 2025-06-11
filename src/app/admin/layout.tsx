@@ -10,17 +10,17 @@ export default async function AdminLayout({
 }) {
   const session = await getServerSession(authOptions);
 
-  if (!session?.user) {
-    ("Admin Layout - No session, redirecting to login");
+  if (!session?.user?.role) {
+    console.log("Admin Layout - No session, redirecting to login");
     redirect("/login");
   }
 
   if (session.user.role !== "admin") {
-    ("Admin Layout - User is not admin, redirecting to home");
+    console.log("Admin Layout - User is not admin, redirecting to home");
     redirect("/home");
   }
 
-  ("Admin Layout - Access granted");
+  console.log("Admin Layout - Access granted");
 
   return (
     <div className="flex h-screen bg-background">

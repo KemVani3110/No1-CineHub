@@ -7,17 +7,17 @@ export async function GET() {
   try {
     const session = await getServerSession(authOptions);
 
-    if (!session?.user) {
-      ("API - No session");
+    if (!session?.user?.role) {
+      console.log("API - No session");
       return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
     }
 
     if (session.user.role !== 'admin') {
-      ("API - Not admin");
+      console.log("API - Not admin");
       return NextResponse.json({ error: 'Not authorized' }, { status: 403 });
     }
 
-    ("API - Fetching users");
+    console.log("API - Fetching users");
     const [rows] = await pool.execute(`
       SELECT 
         id, name, email, role, is_active as isActive, 
