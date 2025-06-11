@@ -1,8 +1,7 @@
-
 // src/types/auth.ts
 
 export interface User {
-    id: number;
+    id: string;
     email: string;
     name: string;
     avatar?: string;
@@ -12,8 +11,14 @@ export interface User {
     createdAt: Date;
     updatedAt: Date;
     lastLoginAt?: Date;
-    provider?: AuthProvider;
+    provider: AuthProvider;
     providerId?: string;
+    stats?: {
+        watchlistCount: number;
+        reviewCount: number;
+        ratingCount: number;
+    };
+    recentActivity?: any[];
 }
 
 export enum UserRole {

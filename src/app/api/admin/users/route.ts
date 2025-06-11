@@ -1,7 +1,20 @@
 import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
-import pool from '@/lib/db';
+import { getFirestore } from 'firebase-admin/firestore';
+
+const db = getFirestore();
+
+interface UserData {
+  name: string;
+  email: string;
+  role: string;
+  isActive: boolean;
+  avatar?: string;
+  createdAt?: Date;
+  lastLoginAt?: Date;
+  updatedAt?: Date;
+}
 
 export async function GET() {
   try {
@@ -18,16 +31,21 @@ export async function GET() {
     }
 
     console.log("API - Fetching users");
-    const [rows] = await pool.execute(`
-      SELECT 
-        id, name, email, role, is_active as isActive, 
-        avatar, created_at as createdAt, last_login_at as lastLoginAt
-      FROM users
-      ORDER BY created_at DESC
-    `);
+    const usersSnapshot = await db.collection('users').orderBy('createdAt', 'desc').get();
+    
+    const users = usersSnapshot.docs.map(doc => ({
+      id: doc.id,
+      name: doc.data().name,
+      email: doc.data().email,
+      role: doc.data().role,
+      isActive: doc.data().isActive,
+      avatar: doc.data().avatar,
+      createdAt: doc.data().createdAt?.toDate(),
+      lastLoginAt: doc.data().lastLoginAt?.toDate(),
+    }));
 
-    console.log("API - Users fetched:", rows);
-    return NextResponse.json({ users: rows });
+    console.log("API - Users fetched:", users);
+    return NextResponse.json({ users });
   } catch (error) {
     console.error('Error fetching users:', error);
     return NextResponse.json(
@@ -51,35 +69,32 @@ export async function PATCH(request: Request) {
 
     const { userId, role, isActive } = await request.json();
 
-    await pool.execute(
-      'UPDATE users SET role = ?, is_active = ? WHERE id = ?',
-      [role, isActive, userId]
-    );
+    // Update user in Firestore
+    const userRef = db.collection('users').doc(userId);
+    await userRef.update({
+      role,
+      isActive,
+      updatedAt: new Date()
+    });
 
-    const [rows] = await pool.execute(
-      `SELECT 
-        id, name, email, role, is_active as isActive, 
-        avatar, created_at as createdAt, last_login_at as lastLoginAt
-      FROM users WHERE id = ?`,
-      [userId]
-    );
-    const updatedUser = (rows as any[])[0];
+    // Get updated user data
+    const updatedUserDoc = await userRef.get();
+    const updatedUser = {
+      id: updatedUserDoc.id,
+      ...(updatedUserDoc.data() as UserData)
+    };
 
     // Log the activity
-    await pool.execute(
-      `INSERT INTO admin_activity_logs 
-        (admin_id, action, target_user_id, description, metadata, ip_address, user_agent)
-      VALUES (?, ?, ?, ?, ?, ?, ?)`,
-      [
-        session.user.id,
-        'UPDATE_USER',
-        userId,
-        `Updated user ${updatedUser.name} (${updatedUser.email})`,
-        JSON.stringify({ role, isActive }),
-        request.headers.get('x-forwarded-for') || 'unknown',
-        request.headers.get('user-agent') || 'unknown',
-      ]
-    );
+    await db.collection('admin_activity_logs').add({
+      adminId: session.user.id,
+      action: 'UPDATE_USER',
+      targetUserId: userId,
+      description: `Updated user ${updatedUser.name} (${updatedUser.email})`,
+      metadata: { role, isActive },
+      ipAddress: request.headers.get('x-forwarded-for') || 'unknown',
+      userAgent: request.headers.get('user-agent') || 'unknown',
+      createdAt: new Date()
+    });
 
     return NextResponse.json({ user: updatedUser });
   } catch (error) {

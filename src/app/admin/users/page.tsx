@@ -1,24 +1,37 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import { db } from "@/lib/db";
+import { getFirestore } from "firebase-admin/firestore";
 import { redirect } from "next/navigation";
 import { UserManagement } from "@/components/admin/UserManagement";
+import { User } from "@/types/auth";
 
 async function getUsers() {
-  const [rows] = await db.query(`
-    SELECT 
-      id,
-      name,
-      email,
-      role,
-      is_active,
-      avatar,
-      created_at,
-      last_login_at 
-    FROM users 
-    ORDER BY created_at DESC
-  `);
-  return rows;
+  const db = getFirestore();
+  const usersSnapshot = await db.collection('users').orderBy('createdAt', 'desc').get();
+  
+  return usersSnapshot.docs.map(doc => {
+    const data = doc.data();
+    return {
+      id: doc.id,
+      name: data.name,
+      email: data.email,
+      role: data.role,
+      isActive: data.isActive,
+      avatar: data.avatar,
+      createdAt: data.createdAt?.toDate(),
+      lastLoginAt: data.lastLoginAt?.toDate(),
+      emailVerified: data.emailVerified || false,
+      updatedAt: data.updatedAt?.toDate() || new Date(),
+      provider: data.provider || 'local',
+      providerId: data.providerId,
+      stats: data.stats || {
+        watchlistCount: 0,
+        reviewCount: 0,
+        ratingCount: 0
+      },
+      recentActivity: data.recentActivity || []
+    } as User;
+  });
 }
 
 export default async function UserManagementPage() {
@@ -31,21 +44,9 @@ export default async function UserManagementPage() {
 
   const users = await getUsers();
 
-  // Transform data to match client component interface
-  const formattedUsers = (users as any[]).map((user: any) => ({
-    id: user.id,
-    name: user.name,
-    email: user.email,
-    role: user.role,
-    isActive: user.is_active,
-    avatar: user.avatar,
-    createdAt: user.created_at,
-    lastLoginAt: user.last_login_at,
-  }));
-
   return (
     <div className="p-6">
-      <UserManagement initialUsers={formattedUsers as any[]} />
+      <UserManagement initialUsers={users} />
     </div>
   );
 }

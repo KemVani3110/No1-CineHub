@@ -1,52 +1,28 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { signIn, signOut, useSession } from 'next-auth/react';
 import { authService } from '@/services/auth/authService';
 import { useToast } from '@/components/ui/use-toast';
 
 interface User {
-  id: number;
+  id: number | string;
   email: string;
   name: string;
   role: string;
   avatar?: string;
+  provider?: string;
+  providerId?: string;
 }
 
 export function useAuth() {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
-  const { data: session, status } = useSession();
   const { toast } = useToast();
-
-  useEffect(() => {
-    if (status === 'authenticated' && session?.user) {
-      setUser({
-        id: parseInt(session.user.id),
-        email: session.user.email || '',
-        name: session.user.name || '',
-        role: session.user.role || 'user',
-        avatar: session.user.image || undefined,
-      });
-    } else if (status === 'unauthenticated') {
-      setUser(null);
-    }
-    setLoading(status === 'loading');
-  }, [session, status]);
 
   const login = async (email: string, password: string) => {
     try {
       setLoading(true);
       const response = await authService.login({ email, password });
-      const result = await signIn('credentials', {
-        email,
-        redirect: false,
-      });
-
-      if (result?.error) {
-        throw new Error(result.error);
-      }
-
       setUser(response.user);
       return response;
     } catch (error) {
@@ -109,7 +85,6 @@ export function useAuth() {
     try {
       setLoading(true);
       await authService.logout();
-      await signOut({ redirect: false });
       setUser(null);
       router.push('/login');
     } catch (error) {

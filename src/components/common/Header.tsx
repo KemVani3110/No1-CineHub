@@ -63,7 +63,6 @@ const Header = ({ onSidebarChange }: HeaderProps) => {
   const router = useRouter();
   const { getRecentHistory } = useHistoryStore();
   const recentHistory = getRecentHistory(5);
-  const { data: session } = useSession();
 
   const navItems = [
     { name: "Home", path: "/home", icon: Home },
@@ -87,9 +86,7 @@ const Header = ({ onSidebarChange }: HeaderProps) => {
   console.log("Auth User:", authUser);
 
   // Check if user logged in through social providers
-  const isSocialLogin =
-    session?.user?.image?.includes("googleusercontent.com") ||
-    session?.user?.image?.includes("facebook.com");
+  const isSocialLogin = authUser?.provider === "google" || authUser?.provider === "facebook";
 
   const handleNavClick = (item: (typeof navItems)[0]) => {
     if (item.requiresAuth && !authUser) {

@@ -89,7 +89,7 @@ export function UserManagement({
     return matchesSearch && matchesRole && matchesStatus;
   });
 
-  const handleRoleChange = async (userId: number, newRole: string) => {
+  const handleRoleChange = async (userId: string, newRole: string) => {
     try {
       setLoading((prev) => ({ ...prev, [`role-${userId}`]: true }));
 
@@ -133,7 +133,7 @@ export function UserManagement({
     }
   };
 
-  const handleStatusChange = async (userId: number, isActive: boolean) => {
+  const handleStatusChange = async (userId: string, isActive: boolean) => {
     try {
       setLoading((prev) => ({ ...prev, [`status-${userId}`]: true }));
 
@@ -246,80 +246,45 @@ export function UserManagement({
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card className="bg-[var(--bg-card)] border-[var(--border)] hover:shadow-lg transition-shadow cursor-pointer">
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-[var(--text-sub)]">
-                  Total Users
-                </p>
-                <p className="text-2xl font-bold text-[var(--text-main)]">
-                  {getStatsCount("total")}
-                </p>
-              </div>
-              <div className="h-8 w-8 bg-[var(--cinehub-accent)]/10 rounded-full flex items-center justify-center">
-                <Users className="h-4 w-4 text-[var(--cinehub-accent)]" />
-              </div>
-            </div>
+        <Card className="bg-[var(--bg-card)] border-[var(--border)]">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Total Users</CardTitle>
+            <Users className="h-4 w-4 text-[var(--text-sub)]" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{getStatsCount("total")}</div>
           </CardContent>
         </Card>
-
-        <Card className="bg-[var(--bg-card)] border-[var(--border)] hover:shadow-lg transition-shadow cursor-pointer">
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-[var(--text-sub)]">
-                  Active Users
-                </p>
-                <p className="text-2xl font-bold text-[var(--success)]">
-                  {getStatsCount("active")}
-                </p>
-              </div>
-              <div className="h-8 w-8 bg-[var(--success)]/10 rounded-full flex items-center justify-center">
-                <UserCheck className="h-4 w-4 text-[var(--success)]" />
-              </div>
-            </div>
+        <Card className="bg-[var(--bg-card)] border-[var(--border)]">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Active Users</CardTitle>
+            <UserCheck className="h-4 w-4 text-[var(--text-sub)]" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{getStatsCount("active")}</div>
           </CardContent>
         </Card>
-
-        <Card className="bg-[var(--bg-card)] border-[var(--border)] hover:shadow-lg transition-shadow cursor-pointer">
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-[var(--text-sub)]">
-                  Administrators
-                </p>
-                <p className="text-2xl font-bold text-red-400">
-                  {getStatsCount("admin")}
-                </p>
-              </div>
-              <div className="h-8 w-8 bg-red-400/10 rounded-full flex items-center justify-center">
-                <Shield className="h-4 w-4 text-red-400" />
-              </div>
-            </div>
+        <Card className="bg-[var(--bg-card)] border-[var(--border)]">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Admins</CardTitle>
+            <Shield className="h-4 w-4 text-[var(--text-sub)]" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{getStatsCount("admin")}</div>
           </CardContent>
         </Card>
-
-        <Card className="bg-[var(--bg-card)] border-[var(--border)] hover:shadow-lg transition-shadow cursor-pointer">
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-[var(--text-sub)]">
-                  Moderators
-                </p>
-                <p className="text-2xl font-bold text-blue-400">
-                  {getStatsCount("moderator")}
-                </p>
-              </div>
-              <div className="h-8 w-8 bg-blue-400/10 rounded-full flex items-center justify-center">
-                <UserCheck className="h-4 w-4 text-blue-400" />
-              </div>
-            </div>
+        <Card className="bg-[var(--bg-card)] border-[var(--border)]">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Moderators</CardTitle>
+            <UserCheck className="h-4 w-4 text-[var(--text-sub)]" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{getStatsCount("moderator")}</div>
           </CardContent>
         </Card>
       </div>
 
-      {/* Search and Filter Section */}
+      {/* Search and Filters */}
       <Card className="bg-[var(--bg-card)] border-[var(--border)]">
         <CardContent className="p-6">
           <div className="flex flex-col lg:flex-row gap-4 items-center justify-between">
@@ -364,7 +329,10 @@ export function UserManagement({
                 </Select>
               </div>
 
-              <Select value={statusFilter} onValueChange={setStatusFilter}>
+              <Select
+                value={statusFilter}
+                onValueChange={setStatusFilter}
+              >
                 <SelectTrigger className="w-[140px] bg-[var(--bg-main)] border-[var(--border)] cursor-pointer hover:border-[var(--cinehub-accent)] transition-colors">
                   <SelectValue placeholder="Status" />
                 </SelectTrigger>
@@ -385,30 +353,18 @@ export function UserManagement({
         </CardContent>
       </Card>
 
-      {/* User Table */}
-      <Card className="bg-[var(--bg-card)] border-[var(--border)] overflow-hidden">
-        <div className="overflow-x-auto">
+      {/* Users Table */}
+      <Card className="bg-[var(--bg-card)] border-[var(--border)]">
+        <CardContent className="p-0">
           <Table>
             <TableHeader>
-              <TableRow className="bg-[var(--cinehub-accent)]/5 border-[var(--border)] hover:bg-[var(--cinehub-accent)]/5">
-                <TableHead className="text-[var(--text-main)] font-semibold">
-                  User
-                </TableHead>
-                <TableHead className="text-[var(--text-main)] font-semibold hidden sm:table-cell">
-                  Email
-                </TableHead>
-                <TableHead className="text-[var(--text-main)] font-semibold">
-                  Role
-                </TableHead>
-                <TableHead className="text-[var(--text-main)] font-semibold hidden md:table-cell">
-                  Change Role
-                </TableHead>
-                <TableHead className="text-[var(--text-main)] font-semibold">
-                  Status
-                </TableHead>
-                <TableHead className="text-[var(--text-main)] font-semibold w-[50px]">
-                  Actions
-                </TableHead>
+              <TableRow className="border-[var(--border)]">
+                <TableHead className="w-[300px]">User</TableHead>
+                <TableHead className="hidden sm:table-cell">Email</TableHead>
+                <TableHead>Role</TableHead>
+                <TableHead className="hidden md:table-cell">Change Role</TableHead>
+                <TableHead className="hidden md:table-cell">Status</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -480,50 +436,48 @@ export function UserManagement({
                       </SelectContent>
                     </Select>
                   </TableCell>
-                  <TableCell>
-                    <Badge
-                      variant={user.isActive ? "default" : "secondary"}
-                      className={cn(
-                        "cursor-pointer hover:opacity-80 transition-opacity",
-                        user.isActive
-                          ? "bg-[var(--success)]/10 text-[var(--success)] border-[var(--success)]/20 hover:bg-[var(--success)]/20"
-                          : "bg-[var(--text-sub)]/10 text-[var(--text-sub)] border-[var(--text-sub)]/20 hover:bg-[var(--text-sub)]/20"
-                      )}
+                  <TableCell className="hidden md:table-cell">
+                    <Button
+                      variant={user.isActive ? "default" : "destructive"}
+                      size="sm"
                       onClick={() => handleStatusChange(user.id, !user.isActive)}
+                      disabled={loading[`status-${user.id}`]}
+                      className="w-[100px]"
                     >
                       {loading[`status-${user.id}`] ? (
-                        <div className="flex items-center">
-                          <Loader2 className="mr-1 h-3 w-3 animate-spin" />
-                          <span>...</span>
-                        </div>
+                        <Loader2 className="h-4 w-4 animate-spin" />
                       ) : user.isActive ? (
-                        "Active"
+                        <>
+                          <UserCheck className="h-4 w-4 mr-2" />
+                          Active
+                        </>
                       ) : (
-                        "Inactive"
+                        <>
+                          <UserX className="h-4 w-4 mr-2" />
+                          Inactive
+                        </>
                       )}
-                    </Badge>
+                    </Button>
                   </TableCell>
-                  <TableCell>
+                  <TableCell className="text-right">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <Button
                           variant="ghost"
-                          className="h-8 w-8 p-0 cursor-pointer hover:bg-[var(--cinehub-accent)]/10 hover:text-[var(--cinehub-accent)] transition-colors"
+                          size="icon"
+                          className="h-8 w-8 p-0 hover:bg-[var(--cinehub-accent)]/10"
                         >
                           <MoreHorizontal className="h-4 w-4" />
                         </Button>
                       </DropdownMenuTrigger>
-                      <DropdownMenuContent
-                        align="end"
-                        className="bg-[var(--bg-card)] border-[var(--border)]"
-                      >
-                        <DropdownMenuItem className="cursor-pointer hover:bg-[var(--cinehub-accent)]/10 text-[var(--text-main)]">
-                          <Eye className="mr-2 h-4 w-4" />
+                      <DropdownMenuContent align="end" className="bg-[var(--bg-card)] border-[var(--border)]">
+                        <DropdownMenuItem className="cursor-pointer hover:bg-[var(--cinehub-accent)]/10">
+                          <Eye className="h-4 w-4 mr-2" />
                           View Details
                         </DropdownMenuItem>
-                        <DropdownMenuItem className="cursor-pointer hover:bg-[var(--cinehub-accent)]/10 text-[var(--text-main)] md:hidden">
-                          <Settings className="mr-2 h-4 w-4" />
-                          Change Role
+                        <DropdownMenuItem className="cursor-pointer hover:bg-[var(--cinehub-accent)]/10">
+                          <Settings className="h-4 w-4 mr-2" />
+                          Edit Profile
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
@@ -532,36 +486,8 @@ export function UserManagement({
               ))}
             </TableBody>
           </Table>
-        </div>
+        </CardContent>
       </Card>
-
-      {/* Empty State */}
-      {filteredUsers.length === 0 && (
-        <Card className="bg-[var(--bg-card)] border-[var(--border)]">
-          <CardContent className="text-center py-12">
-            <div className="w-16 h-16 bg-[var(--cinehub-accent)]/10 rounded-full flex items-center justify-center mx-auto mb-4">
-              <UserX className="h-8 w-8 text-[var(--text-sub)]" />
-            </div>
-            <h3 className="text-lg font-semibold text-[var(--text-main)] mb-2">
-              No users found
-            </h3>
-            <p className="text-[var(--text-sub)] mb-4">
-              Try adjusting your search or filter criteria.
-            </p>
-            <Button
-              variant="outline"
-              onClick={() => {
-                setSearchTerm("");
-                setRoleFilter("all");
-                setStatusFilter("all");
-              }}
-              className="cursor-pointer hover:bg-[var(--cinehub-accent)]/10 hover:text-[var(--cinehub-accent)] transition-colors"
-            >
-              Clear Filters
-            </Button>
-          </CardContent>
-        </Card>
-      )}
     </div>
   );
 }
