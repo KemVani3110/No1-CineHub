@@ -25,6 +25,7 @@ const eslintConfig = [
       'react/no-unescaped-entities': 'off',
       'react/no-unknown-property': 'off',
       'react/no-unused-vars': 'off',
+      '@typescript-eslint/no-empty-object-type': 'off',
     },
   }),
 ];
