@@ -5,13 +5,19 @@ import pool from '@/lib/db';
 
 // Initialize Firebase Admin if not already initialized
 if (!getApps().length) {
-  initializeApp({
-    credential: cert({
-      projectId: process.env.FIREBASE_ADMIN_PROJECT_ID,
-      clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-      privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
-    }),
-  });
+  const privateKey = process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n');
+  
+  if (!process.env.FIREBASE_ADMIN_PROJECT_ID || !process.env.FIREBASE_CLIENT_EMAIL || !privateKey) {
+    console.error('Missing Firebase Admin configuration');
+  } else {
+    initializeApp({
+      credential: cert({
+        projectId: process.env.FIREBASE_ADMIN_PROJECT_ID,
+        clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+        privateKey: privateKey,
+      }),
+    });
+  }
 }
 
 export async function POST(request: Request) {
@@ -19,6 +25,7 @@ export async function POST(request: Request) {
     const { provider, token, user } = await request.json();
 
     if (!token || !provider || !user) {
+      console.error('Missing required fields:', { provider, token: !!token, user: !!user });
       return NextResponse.json(
         { message: 'Missing required fields' },
         { status: 400 }
@@ -26,9 +33,19 @@ export async function POST(request: Request) {
     }
 
     // Verify the Firebase token
-    const decodedToken = await auth().verifyIdToken(token);
+    let decodedToken;
+    try {
+      decodedToken = await auth().verifyIdToken(token);
+    } catch (error) {
+      console.error('Token verification error:', error);
+      return NextResponse.json(
+        { message: 'Invalid token' },
+        { status: 401 }
+      );
+    }
 
     if (!decodedToken.email) {
+      console.error('No email in decoded token');
       return NextResponse.json(
         { message: 'Email is required' },
         { status: 400 }

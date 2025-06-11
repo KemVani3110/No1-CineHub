@@ -261,14 +261,12 @@ const Header = ({ onSidebarChange }: HeaderProps) => {
                         </div>
                       </DropdownMenuLabel>
                       <DropdownMenuSeparator />
-                      {!isSocialLogin && (
-                        <DropdownMenuItem asChild>
-                          <Link href="/profile" className="cursor-pointer">
-                            <User className="mr-3 h-4 w-4" />
-                            Profile
-                          </Link>
-                        </DropdownMenuItem>
-                      )}
+                      <DropdownMenuItem asChild>
+                        <Link href="/profile" className="cursor-pointer">
+                          <User className="mr-3 h-4 w-4" />
+                          Profile
+                        </Link>
+                      </DropdownMenuItem>
                       {authUser?.role === "admin" && (
                         <>
                           <DropdownMenuItem asChild>
@@ -439,16 +437,14 @@ const Header = ({ onSidebarChange }: HeaderProps) => {
                             </div>
                           </div>
 
-                          {!isSocialLogin && (
-                            <Link
-                              href="/profile"
-                              onClick={closeMobileMenu}
-                              className="flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium text-muted-foreground hover:text-primary hover:bg-accent/10"
-                            >
-                              <User size={20} className="flex-shrink-0" />
-                              <span>Profile</span>
-                            </Link>
-                          )}
+                          <Link
+                            href="/profile"
+                            onClick={closeMobileMenu}
+                            className="flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium text-muted-foreground hover:text-primary hover:bg-accent/10"
+                          >
+                            <User size={20} className="flex-shrink-0" />
+                            <span>Profile</span>
+                          </Link>
 
                           <Button
                             variant="ghost"
