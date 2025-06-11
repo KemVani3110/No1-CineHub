@@ -2,15 +2,18 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { authService } from '@/services/auth/authService';
 import { useToast } from '@/components/ui/use-toast';
+import { User, UserRole, AuthProvider } from '@/types/auth';
 
-interface User {
-  id: number | string;
-  email: string;
-  name: string;
-  role: string;
-  avatar?: string;
-  provider?: string;
-  providerId?: string;
+interface AuthState {
+  user: User | null;
+  isLoading: boolean;
+  error: string | null;
+  login: (email: string, password: string) => Promise<void>;
+  register: (userData: Partial<User> & { password: string }) => Promise<void>;
+  logout: () => Promise<void>;
+  socialLogin: (provider: AuthProvider, token: string, userData: { email: string; name: string; avatar?: string; providerId: string; }) => Promise<void>;
+  getCurrentUser: () => Promise<void>;
+  clearError: () => void;
 }
 
 export function useAuth() {

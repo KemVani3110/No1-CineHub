@@ -1,4 +1,4 @@
-import { User } from '@/types/user';
+import { User, AuthProvider } from '@/types/auth';
 
 interface LoginCredentials {
   email: string;
@@ -11,7 +11,7 @@ interface AuthResponse {
 }
 
 interface SocialLoginData {
-  provider: 'google' | 'facebook';
+  provider: AuthProvider;
   token: string;
   user: {
     email: string;

@@ -1,18 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import mysql from "mysql2/promise";
+import { getFirestore } from "firebase-admin/firestore";
 
-// Create MySQL connection pool
-const pool = mysql.createPool({
-  host: process.env.DB_HOST,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME,
-  waitForConnections: true,
-  connectionLimit: 10,
-  queueLimit: 0,
-});
+const db = getFirestore();
 
 export async function GET(
   request: NextRequest,
@@ -69,24 +60,30 @@ export async function GET(
 
     const mediaData = await tmdbResponse.json();
 
-    // Add to watch history
-    await pool.execute(
-      `INSERT INTO watch_history 
-        (user_id, media_type, movie_id, tv_id, title, poster_path, watched_at)
-       VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
-       ON DUPLICATE KEY UPDATE 
-         watched_at = CURRENT_TIMESTAMP,
-         title = VALUES(title),
-         poster_path = VALUES(poster_path)`,
-      [
-        session.user.id,
-        type,
-        type === 'movie' ? id : null,
-        type === 'tv' ? id : null,
-        mediaData.title || mediaData.name,
-        mediaData.poster_path
-      ]
-    );
+    // Log the stream request in Firestore
+    await db.collection('stream_logs').add({
+      userId: session.user.id,
+      mediaType: type,
+      mediaId: id,
+      mediaTitle: mediaData.title || mediaData.name,
+      timestamp: new Date(),
+      ipAddress: request.headers.get('x-forwarded-for') || 'unknown',
+      userAgent: request.headers.get('user-agent') || 'unknown'
+    });
+
+    // Update user's watch history in Firestore
+    const userRef = db.collection('users').doc(session.user.id);
+    await userRef.update({
+      watchHistory: {
+        [type]: {
+          [id]: {
+            lastWatched: new Date(),
+            title: mediaData.title || mediaData.name,
+            posterPath: mediaData.poster_path
+          }
+        }
+      }
+    });
 
     // Return video sources (placeholder)
     return NextResponse.json({

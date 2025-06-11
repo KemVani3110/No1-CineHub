@@ -2,18 +2,28 @@ import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { getFirestore } from 'firebase-admin/firestore';
+import { UserRole, AuthProvider } from '@/types/auth';
 
 const db = getFirestore();
 
 interface UserData {
   name: string;
   email: string;
-  role: string;
+  role: UserRole;
   isActive: boolean;
   avatar?: string;
   createdAt?: Date;
   lastLoginAt?: Date;
   updatedAt?: Date;
+  provider: AuthProvider;
+  providerId?: string;
+  emailVerified: boolean;
+  stats?: {
+    watchlistCount: number;
+    reviewCount: number;
+    ratingCount: number;
+  };
+  recentActivity?: any[];
 }
 
 export async function GET() {

@@ -1,6 +1,9 @@
 // src/types/auth.ts
 
-export interface User {
+export type UserRole = 'admin' | 'user' | 'moderator';
+export type AuthProvider = 'local' | 'google' | 'facebook';
+
+export interface BaseUser {
     id: string;
     email: string;
     name: string;
@@ -21,16 +24,10 @@ export interface User {
     recentActivity?: any[];
 }
 
-export enum UserRole {
-    USER = 'user',
-    MODERATOR = 'moderator',
-    ADMIN = 'admin'
-}
+export interface User extends BaseUser {}
 
-export enum AuthProvider {
-    EMAIL = 'email',
-    GOOGLE = 'google',
-    FACEBOOK = 'facebook'
+export interface FirestoreUser extends BaseUser {
+    passwordHash?: string;
 }
 
 export interface AuthSession {

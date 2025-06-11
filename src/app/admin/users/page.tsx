@@ -3,7 +3,7 @@ import { authOptions } from "@/lib/auth";
 import { getFirestore } from "firebase-admin/firestore";
 import { redirect } from "next/navigation";
 import { UserManagement } from "@/components/admin/UserManagement";
-import { User } from "@/types/auth";
+import { User, UserRole, AuthProvider } from "@/types/auth";
 
 async function getUsers() {
   const db = getFirestore();
@@ -15,14 +15,14 @@ async function getUsers() {
       id: doc.id,
       name: data.name,
       email: data.email,
-      role: data.role,
+      role: data.role as UserRole,
       isActive: data.isActive,
       avatar: data.avatar,
       createdAt: data.createdAt?.toDate(),
       lastLoginAt: data.lastLoginAt?.toDate(),
       emailVerified: data.emailVerified || false,
       updatedAt: data.updatedAt?.toDate() || new Date(),
-      provider: data.provider || 'local',
+      provider: (data.provider || 'local') as AuthProvider,
       providerId: data.providerId,
       stats: data.stats || {
         watchlistCount: 0,

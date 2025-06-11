@@ -1,9 +1,10 @@
 import { NextAuthOptions } from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
-import pool from '@/lib/db';
 import { compare } from 'bcrypt';
 import { auth } from 'firebase-admin';
 import { initializeApp, getApps, cert } from 'firebase-admin/app';
+import { getFirestore } from 'firebase-admin/firestore';
+import { User, FirestoreUser, UserRole, AuthProvider } from '@/types/auth';
 
 declare module 'next-auth' {
   interface Session {
@@ -12,7 +13,7 @@ declare module 'next-auth' {
       name?: string | null;
       email?: string | null;
       image?: string | null;
-      role?: string;
+      role?: UserRole;
     };
   }
   interface User {
@@ -20,14 +21,14 @@ declare module 'next-auth' {
     name?: string | null;
     email?: string | null;
     image?: string | null;
-    role?: string;
+    role?: UserRole;
   }
 }
 
 declare module 'next-auth/jwt' {
   interface JWT {
     id: string;
-    role?: string;
+    role?: UserRole;
   }
 }
 
@@ -48,28 +49,32 @@ if (!getApps().length) {
   }
 }
 
-async function getUserByEmail(email: string) {
-  const connection = await pool.getConnection();
-  try {
-    const [rows] = await connection.query(
-      'SELECT * FROM users WHERE email = ?',
-      [email]
-    );
-    return (rows as any[])[0];
-  } finally {
-    connection.release();
+const db = getFirestore();
+
+async function getUserByEmail(email: string): Promise<FirestoreUser | null> {
+  const usersRef = db.collection('users');
+  const snapshot = await usersRef.where('email', '==', email).get();
+  
+  if (snapshot.empty) {
+    return null;
   }
+
+  const doc = snapshot.docs[0];
+  return {
+    id: doc.id,
+    ...doc.data()
+  } as FirestoreUser;
 }
 
 async function updateUserLastLogin(email: string) {
-  const connection = await pool.getConnection();
-  try {
-    await connection.execute(
-      'UPDATE users SET last_login_at = CURRENT_TIMESTAMP WHERE email = ?',
-      [email]
-    );
-  } finally {
-    connection.release();
+  const usersRef = db.collection('users');
+  const snapshot = await usersRef.where('email', '==', email).get();
+  
+  if (!snapshot.empty) {
+    const doc = snapshot.docs[0];
+    await doc.ref.update({
+      lastLoginAt: new Date()
+    });
   }
 }
 
@@ -106,12 +111,12 @@ export const authOptions: NextAuthOptions = {
 
               const user = await getUserByEmail(email);
 
-              if (!user || !user.is_active) {
+              if (!user || !user.isActive) {
                 return null;
               }
 
               return {
-                id: user.id.toString(),
+                id: user.id,
                 email: user.email,
                 name: user.name,
                 role: user.role,
@@ -130,18 +135,18 @@ export const authOptions: NextAuthOptions = {
 
           const user = await getUserByEmail(credentials.email);
 
-          if (!user || !user.password_hash || !user.is_active) {
+          if (!user || !user.passwordHash || !user.isActive) {
             return null;
           }
 
-          const isValid = await compare(credentials.password, user.password_hash);
+          const isValid = await compare(credentials.password, user.passwordHash);
 
           if (!isValid) {
             return null;
           }
 
           return {
-            id: user.id.toString(),
+            id: user.id,
             email: user.email,
             name: user.name,
             role: user.role,
@@ -164,8 +169,8 @@ export const authOptions: NextAuthOptions = {
     },
     async session({ session, token }) {
       if (token) {
-        session.user.id = token.id as string;
-        session.user.role = token.role as string;
+        session.user.id = token.id;
+        session.user.role = token.role;
       }
       return session;
     },

@@ -1,175 +1,49 @@
 // src/types/user.ts
 
-import { UserRole, AuthProvider } from './auth';
+import { UserRole, AuthProvider, User as BaseUser } from './auth';
 
-export interface UserProfile {
-    id: number;
-    email: string;
-    name: string;
-    avatar?: string;
-    role: UserRole;
-    isActive: boolean;
-    emailVerified: boolean;
-    createdAt: Date;
-    updatedAt: Date;
-    lastLoginAt?: Date;
-    provider: AuthProvider;
-    providerId?: string;
+export interface UserProfile extends BaseUser {
     preferences?: UserPreferences;
-    stats?: UserStats;
 }
 
 export interface UserPreferences {
+    theme: 'light' | 'dark' | 'system';
     language: string;
     notifications: {
         email: boolean;
         push: boolean;
-        recommendations: boolean;
-        newReleases: boolean;
+        marketing: boolean;
     };
     privacy: {
-        showWatchlist: boolean;
-        showRatings: boolean;
+        showEmail: boolean;
         showActivity: boolean;
+        showWatchlist: boolean;
     };
-    genrePreferences?: number[]; // TMDB genre IDs
 }
 
 export interface UserStats {
-    totalMoviesWatched: number;
-    totalTVShowsWatched: number;
-    totalRatings: number;
-    totalComments: number;
-    averageRating: number;
-    favoriteGenres: GenreStats[];
-    watchTime: number; // in minutes
-    joinedDate: Date;
-}
-
-export interface GenreStats {
-    genreId: number;
-    genreName: string;
-    count: number;
-    percentage: number;
-}
-
-export interface UpdateUserProfileRequest {
-    name?: string;
-    email?: string;
-    avatar?: string;
-    preferences?: Partial<UserPreferences>;
+    watchlistCount: number;
+    reviewCount: number;
+    ratingCount: number;
+    lastActive?: Date;
+    totalWatchTime?: number;
+    favoriteGenres?: string[];
+    favoriteActors?: string[];
+    favoriteDirectors?: string[];
 }
 
 export interface UserActivity {
-    id: number;
-    userId: number;
-    type: ActivityType;
-    entityType: 'movie' | 'tv';
-    entityId: number;
-    entityTitle: string;
-    entityPoster?: string;
-    metadata?: Record<string, any>;
+    id: string;
+    type: 'watchlist' | 'review' | 'rating' | 'login' | 'profile_update';
+    description: string;
+    metadata?: any;
     createdAt: Date;
-}
-
-export enum ActivityType {
-    WATCHED = 'watched',
-    RATED = 'rated',
-    ADDED_TO_WATCHLIST = 'added_to_watchlist',
-    REMOVED_FROM_WATCHLIST = 'removed_from_watchlist',
-    COMMENTED = 'commented',
-    LIKED = 'liked'
 }
 
 // Admin-specific types
-export interface AdminUserView {
-    id: number;
-    email: string;
-    name: string;
-    avatar?: string;
-    role: UserRole;
-    isActive: boolean;
-    emailVerified: boolean;
-    createdAt: Date;
-    updatedAt: Date;
-    lastLoginAt?: Date;
-    provider: AuthProvider;
+export interface AdminUserView extends BaseUser {
     stats: UserStats;
     recentActivity: UserActivity[];
-}
-
-export interface AdminUserUpdateRequest {
-    name?: string;
-    email?: string;
-    role?: UserRole;
-    isActive?: boolean;
-    password?: string; // Admin can reset user password
-}
-
-export interface AdminStats {
-    totalUsers: number;
-    totalActiveUsers: number;
-    newUsersToday: number;
-    newUsersThisWeek: number;
-    newUsersThisMonth: number;
-    usersByRole: {
-        [key in UserRole]: number;
-    };
-    usersByProvider: {
-        [key in AuthProvider]: number;
-    };
-    topGenres: GenreStats[];
-    totalMoviesRated: number;
-    totalTVShowsRated: number;
-    totalComments: number;
-    averageRating: number;
-}
-
-export interface AdminActivityLog {
-    id: number;
-    adminId: number;
-    adminName: string;
-    action: AdminAction;
-    targetUserId?: number;
-    targetUserName?: string;
-    details: string;
-    metadata?: Record<string, any>;
-    createdAt: Date;
-}
-
-export enum AdminAction {
-    USER_CREATED = 'user_created',
-    USER_UPDATED = 'user_updated',
-    USER_DELETED = 'user_deleted',
-    USER_ACTIVATED = 'user_activated',
-    USER_DEACTIVATED = 'user_deactivated',
-    ROLE_CHANGED = 'role_changed',
-    PASSWORD_RESET = 'password_reset',
-    AVATAR_UPLOADED = 'avatar_uploaded'
-}
-
-// Avatar management
-export interface UserAvatar {
-    id: number;
-    filename: string;
-    originalName: string;
-    url: string;
-    size: number;
-    mimeType: string;
-    uploadedBy: number;
-    uploadedAt: Date;
-    isActive: boolean;
-}
-
-export interface UploadAvatarRequest {
-    file: File;
-}
-
-export interface UploadAvatarResponse {
-    success: boolean;
-    avatar: UserAvatar;
-    url: string;
-    message?: string;
 }
 
 // User search and filtering
@@ -187,70 +61,71 @@ export interface UserSearchParams {
     limit?: number;
 }
 
-export interface UserListResponse {
-    users: AdminUserView[];
-    pagination: {
-        page: number;
-        limit: number;
-        totalCount: number;
-        totalPages: number;
-        hasNext: boolean;
-        hasPrev: boolean;
-    };
+// User management actions
+export interface UserAction {
+    type: 'activate' | 'deactivate' | 'delete' | 'change_role' | 'reset_password';
+    userId: string;
+    metadata?: any;
 }
 
-// Social features
-export interface UserFollowing {
-    id: number;
-    followerId: number;
-    followingId: number;
+// User session
+export interface UserSession {
+    id: string;
+    userId: string;
+    deviceInfo: {
+        browser: string;
+        os: string;
+        device: string;
+        ip: string;
+    };
+    lastActive: Date;
     createdAt: Date;
-    follower: Pick<UserProfile, 'id' | 'name' | 'avatar'>;
-    following: Pick<UserProfile, 'id' | 'name' | 'avatar'>;
+    expiresAt: Date;
 }
 
-export interface UserPublicProfile {
-    id: number;
-    name: string;
-    avatar?: string;
-    joinedDate: Date;
-    stats: {
-        totalMoviesRated: number;
-        totalTVShowsRated: number;
-        averageRating: number;
-        favoriteGenres: GenreStats[];
+// User notification preferences
+export interface UserNotificationSettings {
+    email: {
+        enabled: boolean;
+        frequency: 'immediate' | 'daily' | 'weekly';
+        types: {
+            watchlist: boolean;
+            reviews: boolean;
+            system: boolean;
+            marketing: boolean;
+        };
     };
-    recentActivity?: UserActivity[];
-    isFollowing?: boolean;
-    followersCount: number;
-    followingCount: number;
+    push: {
+        enabled: boolean;
+        types: {
+            watchlist: boolean;
+            reviews: boolean;
+            system: boolean;
+        };
+    };
 }
 
-// Account deletion
-export interface DeleteAccountRequest {
-    password: string;
-    reason?: string;
-    feedback?: string;
+// User security settings
+export interface UserSecuritySettings {
+    twoFactorEnabled: boolean;
+    twoFactorMethod?: 'authenticator' | 'sms' | 'email';
+    loginNotifications: boolean;
+    sessionTimeout: number;
+    lastPasswordChange: Date;
+    trustedDevices: {
+        id: string;
+        name: string;
+        lastUsed: Date;
+    }[];
 }
 
-export interface DeleteAccountResponse {
-    success: boolean;
-    message: string;
-    scheduledDeletionDate?: Date;
-}
-
-export interface User {
-    id: number;
-    email: string;
-    name: string;
-    avatar?: string;
-    role: 'user' | 'admin' | 'moderator';
-    is_active: boolean;
-    email_verified: boolean;
-    email_verified_at?: string;
-    provider: 'local' | 'google' | 'facebook' | 'github';
-    provider_id?: string;
-    created_at: string;
-    updated_at: string;
-    last_login_at?: string;
+// User export data
+export interface UserExportData {
+    profile: UserProfile;
+    preferences: UserPreferences;
+    stats: UserStats;
+    activity: UserActivity[];
+    sessions: UserSession[];
+    notifications: UserNotificationSettings;
+    security: UserSecuritySettings;
 }
