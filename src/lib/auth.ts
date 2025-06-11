@@ -2,7 +2,8 @@ import { NextAuthOptions } from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import pool from '@/lib/db';
 import { compare } from 'bcrypt';
-import { adminAuth } from '@/lib/firebase-admin';
+import { auth } from 'firebase-admin';
+import { initializeApp, getApps, cert } from 'firebase-admin/app';
 
 declare module 'next-auth' {
   interface Session {
@@ -28,6 +29,17 @@ declare module 'next-auth/jwt' {
     id: string;
     role?: string;
   }
+}
+
+// Initialize Firebase Admin if not already initialized
+if (!getApps().length) {
+  initializeApp({
+    credential: cert({
+      projectId: process.env.FIREBASE_ADMIN_PROJECT_ID,
+      clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+      privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
+    }),
+  });
 }
 
 async function getUserByEmail(email: string) {
@@ -79,7 +91,7 @@ export const authOptions: NextAuthOptions = {
           if (credentials.password?.startsWith('eyJ')) {
             try {
               // Verify Firebase token
-              const decodedToken = await adminAuth.verifyIdToken(credentials.password);
+              const decodedToken = await auth().verifyIdToken(credentials.password);
               const email = decodedToken.email;
 
               if (!email) {
@@ -130,10 +142,10 @@ export const authOptions: NextAuthOptions = {
             image: user.avatar,
           };
         } catch (error) {
-          console.error('Auth error:', error);
+          console.error('Authentication error:', error);
           return null;
         }
-      },
+      }
     }),
   ],
   callbacks: {

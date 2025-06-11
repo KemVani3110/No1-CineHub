@@ -1,6 +1,18 @@
 import { NextResponse } from 'next/server';
-import { adminAuth } from '@/lib/firebase-admin';
+import { auth } from 'firebase-admin';
+import { initializeApp, getApps, cert } from 'firebase-admin/app';
 import pool from '@/lib/db';
+
+// Initialize Firebase Admin if not already initialized
+if (!getApps().length) {
+  initializeApp({
+    credential: cert({
+      projectId: process.env.FIREBASE_ADMIN_PROJECT_ID,
+      clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+      privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
+    }),
+  });
+}
 
 export async function POST(request: Request) {
   try {
@@ -14,7 +26,7 @@ export async function POST(request: Request) {
     }
 
     // Verify the Firebase token
-    const decodedToken = await adminAuth.verifyIdToken(token);
+    const decodedToken = await auth().verifyIdToken(token);
 
     if (!decodedToken.email) {
       return NextResponse.json(
@@ -31,46 +43,114 @@ export async function POST(request: Request) {
     const existingUser = (rows as any[])[0];
 
     if (existingUser) {
-      // Update last login time
+      // Update user info if needed
+      if (!existingUser.is_active) {
+        return NextResponse.json(
+          { message: 'Account is disabled' },
+          { status: 403 }
+        );
+      }
+
+      // Update last login and user info
       await pool.execute(
-        'UPDATE users SET last_login_at = CURRENT_TIMESTAMP WHERE id = ?',
-        [existingUser.id]
+        `UPDATE users 
+         SET last_login_at = CURRENT_TIMESTAMP,
+             name = ?,
+             avatar = ?,
+             email = ?
+         WHERE id = ?`,
+        [
+          user.name || decodedToken.name,
+          user.avatar || decodedToken.picture,
+          decodedToken.email,
+          existingUser.id
+        ]
       );
 
       return NextResponse.json({
         user: {
           id: existingUser.id,
-          email: existingUser.email,
-          name: existingUser.name,
+          name: user.name || decodedToken.name,
+          email: decodedToken.email,
+          avatar: user.avatar || decodedToken.picture,
           role: existingUser.role,
-          image: existingUser.avatar,
         },
       });
     }
 
-    // Create new user
+    // Check if email already exists
+    const [emailRows] = await pool.execute(
+      'SELECT * FROM users WHERE email = ?',
+      [decodedToken.email]
+    );
+    const existingEmailUser = (emailRows as any[])[0];
+
+    if (existingEmailUser) {
+      // Update existing user with social login info
+      await pool.execute(
+        `UPDATE users 
+         SET provider = ?,
+             provider_id = ?,
+             last_login_at = CURRENT_TIMESTAMP,
+             name = ?,
+             avatar = ?
+         WHERE id = ?`,
+        [
+          provider,
+          user.providerId,
+          user.name || decodedToken.name,
+          user.avatar || decodedToken.picture,
+          existingEmailUser.id
+        ]
+      );
+
+      return NextResponse.json({
+        user: {
+          id: existingEmailUser.id,
+          name: user.name || decodedToken.name,
+          email: decodedToken.email,
+          avatar: user.avatar || decodedToken.picture,
+          role: existingEmailUser.role,
+        },
+      });
+    }
+
+    // Create new user if doesn't exist
     const [result] = await pool.execute(
       `INSERT INTO users (
-        email, name, avatar, provider, provider_id, role, is_active, email_verified
-      ) VALUES (?, ?, ?, ?, ?, 'user', 1, 1)`,
-      [user.email, user.name, user.avatar, provider, user.providerId]
+        email, name, avatar, role, is_active, 
+        email_verified, provider, provider_id, last_login_at
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)`,
+      [
+        decodedToken.email,
+        user.name || decodedToken.name,
+        user.avatar || decodedToken.picture,
+        'user', // Always set role as 'user' for social login
+        true,
+        true,
+        provider,
+        user.providerId,
+      ]
     );
 
-    const newUserId = (result as any).insertId;
+    const [newUser] = await pool.execute(
+      'SELECT * FROM users WHERE email = ?',
+      [decodedToken.email]
+    );
 
     return NextResponse.json({
       user: {
-        id: newUserId,
-        email: user.email,
-        name: user.name,
-        role: 'user',
-        image: user.avatar,
+        id: (newUser as any[])[0].id,
+        name: (newUser as any[])[0].name,
+        email: (newUser as any[])[0].email,
+        avatar: (newUser as any[])[0].avatar,
+        role: (newUser as any[])[0].role,
       },
     });
   } catch (error) {
     console.error('Social login error:', error);
     return NextResponse.json(
-      { message: 'Authentication failed' },
+      { message: error instanceof Error ? error.message : 'Authentication failed' },
       { status: 401 }
     );
   }
