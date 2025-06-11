@@ -1,6 +1,24 @@
 import { NextResponse } from 'next/server';
 import { hash } from 'bcrypt';
-import { db } from '@/lib/db';
+import { initializeApp, getApps, cert } from 'firebase-admin/app';
+import { getFirestore } from 'firebase-admin/firestore';
+
+// Initialize Firebase Admin if not already initialized
+if (!getApps().length) {
+  const privateKey = process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n');
+  if (!process.env.FIREBASE_ADMIN_PROJECT_ID || !process.env.FIREBASE_CLIENT_EMAIL || !privateKey) {
+    console.error('Missing Firebase Admin configuration');
+  } else {
+    initializeApp({
+      credential: cert({
+        projectId: process.env.FIREBASE_ADMIN_PROJECT_ID,
+        clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+        privateKey: privateKey,
+      }),
+    });
+  }
+}
+const db = getFirestore();
 
 export async function POST(req: Request) {
   try {
@@ -15,12 +33,8 @@ export async function POST(req: Request) {
     }
 
     // Check if email already exists
-    const [existingUsers] = await db.query(
-      'SELECT id FROM users WHERE email = ?',
-      [email]
-    ) as [any[], any];
-
-    if (existingUsers.length > 0) {
+    const userQuery = await db.collection('users').where('email', '==', email).get();
+    if (!userQuery.empty) {
       return NextResponse.json(
         { message: 'Email already registered' },
         { status: 400 }
@@ -30,42 +44,22 @@ export async function POST(req: Request) {
     // Hash password
     const passwordHash = await hash(password, 12);
 
-    // Create user
-    const [result] = await db.query(
-      `INSERT INTO users (
-        name,
-        email,
-        password_hash,
-        role,
-        is_active,
-        provider
-      ) VALUES (?, ?, ?, 'user', true, 'local')`,
-      [name, email, passwordHash]
-    ) as [any, any];
-
-    const userId = result.insertId;
-
-    // Create default user preferences
-    await db.query(
-      `INSERT INTO user_preferences (
-        user_id,
-        language,
-        notifications_email,
-        notifications_push,
-        notifications_recommendations,
-        notifications_new_releases,
-        privacy_show_watchlist,
-        privacy_show_ratings,
-        privacy_show_activity
-      ) VALUES (?, 'en', true, true, true, true, true, true, true)`,
-      [userId]
-    );
+    // Create user in Firestore
+    const userRef = await db.collection('users').add({
+      name,
+      email,
+      passwordHash,
+      role: 'user',
+      isActive: true,
+      provider: 'local',
+      createdAt: new Date(),
+    });
 
     return NextResponse.json(
       {
         message: 'Registration successful',
         user: {
-          id: userId,
+          id: userRef.id,
           name,
           email,
         },

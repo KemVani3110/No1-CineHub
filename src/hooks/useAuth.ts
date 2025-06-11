@@ -74,17 +74,6 @@ export function useAuth() {
           providerId: userData.providerId,
         },
       });
-
-      const result = await signIn('credentials', {
-        email: userData.email,
-        password: token,
-        redirect: false,
-      });
-
-      if (result?.error) {
-        throw new Error(result.error);
-      }
-
       setUser(response.user);
       return response;
     } catch (error) {

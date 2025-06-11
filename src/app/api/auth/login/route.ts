@@ -1,7 +1,25 @@
 import { NextResponse } from 'next/server';
 import { sign } from 'jsonwebtoken';
 import { compare } from 'bcrypt';
-import { db } from '@/lib/db';
+import { initializeApp, getApps, cert } from 'firebase-admin/app';
+import { getFirestore } from 'firebase-admin/firestore';
+
+// Initialize Firebase Admin if not already initialized
+if (!getApps().length) {
+  const privateKey = process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n');
+  if (!process.env.FIREBASE_ADMIN_PROJECT_ID || !process.env.FIREBASE_CLIENT_EMAIL || !privateKey) {
+    console.error('Missing Firebase Admin configuration');
+  } else {
+    initializeApp({
+      credential: cert({
+        projectId: process.env.FIREBASE_ADMIN_PROJECT_ID,
+        clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+        privateKey: privateKey,
+      }),
+    });
+  }
+}
+const db = getFirestore();
 
 export async function POST(req: Request) {
   try {
@@ -15,23 +33,19 @@ export async function POST(req: Request) {
       );
     }
 
-    // Get user from database
-    const [users] = await db.query(
-      'SELECT * FROM users WHERE email = ?',
-      [email]
-    ) as [any[], any];
-
-    const user = users[0];
-
-    if (!user) {
+    // Get user from Firestore
+    const userQuery = await db.collection('users').where('email', '==', email).get();
+    if (userQuery.empty) {
       return NextResponse.json(
         { message: 'Invalid email or password' },
         { status: 401 }
       );
     }
+    const userDoc = userQuery.docs[0];
+    const user = userDoc.data();
 
     // Check if user is active
-    if (!user.is_active) {
+    if (user.isActive === false) {
       return NextResponse.json(
         { message: 'Account is deactivated' },
         { status: 403 }
@@ -39,31 +53,18 @@ export async function POST(req: Request) {
     }
 
     // Verify password
-    const isValidPassword = await compare(password, user.password_hash);
-
+    const isValidPassword = await compare(password, user.passwordHash);
     if (!isValidPassword) {
-      // Update login attempts
-      await db.query(
-        'UPDATE users SET login_attempts = login_attempts + 1 WHERE id = ?',
-        [user.id]
-      );
-
       return NextResponse.json(
         { message: 'Invalid email or password' },
         { status: 401 }
       );
     }
 
-    // Reset login attempts on successful login
-    await db.query(
-      'UPDATE users SET login_attempts = 0, last_login_at = CURRENT_TIMESTAMP WHERE id = ?',
-      [user.id]
-    );
-
     // Generate JWT token
     const token = sign(
       {
-        id: user.id,
+        id: userDoc.id,
         email: user.email,
         role: user.role,
       },
@@ -71,18 +72,12 @@ export async function POST(req: Request) {
       { expiresIn: '7d' }
     );
 
-    // Create session
-    await db.query(
-      'INSERT INTO sessions (user_id, token_id, refresh_token, expires_at) VALUES (?, ?, ?, DATE_ADD(NOW(), INTERVAL 7 DAY))',
-      [user.id, token, token]
-    );
-
     // Set cookie
     const response = NextResponse.json(
       {
         message: 'Login successful',
         user: {
-          id: user.id,
+          id: userDoc.id,
           email: user.email,
           name: user.name,
           role: user.role,
