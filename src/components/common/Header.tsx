@@ -38,12 +38,14 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuthStore } from "@/store/authStore";
 import { useProfileStore } from "@/store/profileStore";
 import { useToast } from "@/components/ui/use-toast";
 import { useRouter } from "next/navigation";
 import { useHistoryStore } from "@/store/historyStore";
 import { useHeaderStore } from "@/store/headerStore";
+import { useEffect } from "react";
+import { signOut as nextAuthSignOut } from 'next-auth/react';
 
 interface HeaderProps {
   onSidebarChange?: (isOpen: boolean) => void;
@@ -57,12 +59,45 @@ const Header = ({ onSidebarChange }: HeaderProps) => {
     setIsMobileMenuOpen,
     closeMobileMenu,
   } = useHeaderStore();
-  const { user: authUser, logout } = useAuth();
-  const { user: profileUser } = useProfileStore();
+  const { data: session, status } = useSession();
+  const { user: authUser, logout, getCurrentUser } = useAuthStore();
+  const { user: profileUser, fetchUserData } = useProfileStore();
   const { toast } = useToast();
   const router = useRouter();
   const { getRecentHistory } = useHistoryStore();
   const recentHistory = getRecentHistory(5);
+
+  // Fetch user data when session changes
+  useEffect(() => {
+    let isMounted = true;
+    const fetchData = async () => {
+      if (status === 'authenticated' && session?.user?.id) {
+        try {
+          // Only fetch if we don't have the data yet
+          if (!authUser) {
+            await getCurrentUser();
+          }
+          if (!profileUser) {
+            await fetchUserData();
+          }
+        } catch (error) {
+          console.error('Error fetching user data:', error);
+          if (isMounted) {
+            toast({
+              title: "Error",
+              description: "Failed to load user data. Please try refreshing the page.",
+              variant: "destructive",
+            });
+          }
+        }
+      }
+    };
+
+    fetchData();
+    return () => {
+      isMounted = false;
+    };
+  }, [status, session?.user?.id, authUser, profileUser, getCurrentUser, fetchUserData, toast]);
 
   const navItems = [
     { name: "Home", path: "/home", icon: Home },
@@ -78,12 +113,23 @@ const Header = ({ onSidebarChange }: HeaderProps) => {
   ];
 
   const handleLogout = async () => {
-    await logout();
-    closeMobileMenu();
+    try {
+      await logout();
+      closeMobileMenu();
+      router.push('/login');
+    } catch (error) {
+      console.error('Logout error:', error);
+      toast({
+        title: "Logout Failed",
+        description: "There was an error logging out. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   // Debug log to check authUser
   console.log("Auth User:", authUser);
+  console.log("Session:", session);
 
   // Check if user logged in through social providers
   const isSocialLogin = authUser?.provider === "google" || authUser?.provider === "facebook";
@@ -113,21 +159,47 @@ const Header = ({ onSidebarChange }: HeaderProps) => {
 
   // Get user avatar with fallback
   const getUserAvatar = () => {
-    if (!authUser) return null;
-
     // First check if user has a custom avatar from our system
     if (profileUser?.avatar) {
       return profileUser.avatar;
     }
 
-    // Then check social auth avatars
-    const socialAvatar =
-      (authUser as any).picture ||
-      (authUser as any).photoURL ||
-      (authUser as any).image ||
-      (authUser as any).profilePicture;
+    // Then check auth user avatar
+    if (authUser?.avatar) {
+      return authUser.avatar;
+    }
 
-    return socialAvatar || null;
+    // Then check session image (for social logins)
+    if (session?.user?.image) {
+      return session.user.image;
+    }
+
+    return undefined;
+  };
+
+  // Get user name with fallback
+  const getUserName = () => {
+    return profileUser?.name || 
+           authUser?.name || 
+           session?.user?.name || 
+           profileUser?.email || 
+           authUser?.email || 
+           session?.user?.email || 
+           "User";
+  };
+
+  // Get user email with fallback
+  const getUserEmail = () => {
+    return profileUser?.email || 
+           authUser?.email || 
+           session?.user?.email;
+  };
+
+  // Get user role with fallback
+  const getUserRole = () => {
+    return profileUser?.role || 
+           authUser?.role || 
+           session?.user?.role;
   };
 
   return (
@@ -218,14 +290,12 @@ const Header = ({ onSidebarChange }: HeaderProps) => {
                         <Avatar className="h-10 w-10 border-2 border-primary/20">
                           <AvatarImage
                             src={getUserAvatar()}
-                            alt={authUser.name || authUser.email || "User"}
+                            alt={getUserName()}
                             className="object-cover"
                             referrerPolicy="no-referrer"
                           />
                           <AvatarFallback className="bg-primary/10 text-primary font-semibold">
-                            {getUserInitials(
-                              authUser.name || authUser.email || "User"
-                            )}
+                            {getUserInitials(getUserName())}
                           </AvatarFallback>
                         </Avatar>
                       </Button>
@@ -236,22 +306,20 @@ const Header = ({ onSidebarChange }: HeaderProps) => {
                           <Avatar className="h-8 w-8">
                             <AvatarImage
                               src={getUserAvatar()}
-                              alt={authUser.name || authUser.email || "User"}
+                              alt={getUserName()}
                               referrerPolicy="no-referrer"
                             />
                             <AvatarFallback className="bg-primary/10 text-primary text-xs">
-                              {getUserInitials(
-                                authUser.name || authUser.email || "User"
-                              )}
+                              {getUserInitials(getUserName())}
                             </AvatarFallback>
                           </Avatar>
                           <div className="flex flex-col min-w-0 flex-1">
                             <span className="font-medium truncate">
-                              {authUser.name || authUser.email}
+                              {getUserName()}
                             </span>
-                            {authUser.email && authUser.name && (
+                            {getUserEmail() && (
                               <span className="text-xs text-muted-foreground truncate">
-                                {authUser.email}
+                                {getUserEmail()}
                               </span>
                             )}
                           </div>
@@ -264,7 +332,7 @@ const Header = ({ onSidebarChange }: HeaderProps) => {
                           Profile
                         </Link>
                       </DropdownMenuItem>
-                      {authUser?.role === "admin" && (
+                      {getUserRole() === "admin" && (
                         <>
                           <DropdownMenuItem asChild>
                             <Link
@@ -413,22 +481,20 @@ const Header = ({ onSidebarChange }: HeaderProps) => {
                             <Avatar className="h-10 w-10">
                               <AvatarImage
                                 src={getUserAvatar()}
-                                alt={authUser.name || authUser.email || "User"}
+                                alt={getUserName()}
                                 referrerPolicy="no-referrer"
                               />
                               <AvatarFallback className="bg-primary/10 text-primary">
-                                {getUserInitials(
-                                  authUser.name || authUser.email || "User"
-                                )}
+                                {getUserInitials(getUserName())}
                               </AvatarFallback>
                             </Avatar>
                             <div className="flex-1 min-w-0">
                               <p className="font-medium truncate">
-                                {authUser.name || authUser.email}
+                                {getUserName()}
                               </p>
-                              {authUser.email && authUser.name && (
+                              {getUserEmail() && (
                                 <p className="text-xs text-muted-foreground truncate">
-                                  {authUser.email}
+                                  {getUserEmail()}
                                 </p>
                               )}
                             </div>

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
-import pool from '@/lib/db';
+import { profileService } from '@/services/profile/profileService';
 
 export async function GET(request: NextRequest) {
   try {
@@ -13,14 +13,8 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Fetch avatars from the database
-    const [rows] = await pool.execute(
-      'SELECT id, path, name FROM avatars WHERE is_active = true'
-    );
-
-    return NextResponse.json({
-      avatars: rows,
-    });
+    const avatars = await profileService.getAvailableAvatars();
+    return NextResponse.json({ avatars });
   } catch (error) {
     console.error('Get avatars error:', error);
     return NextResponse.json(

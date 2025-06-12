@@ -1,13 +1,13 @@
 import { create } from 'zustand';
+import { User } from '@/types/auth';
+import { profileService } from '@/services/profile/profileService';
+import { useAuthStore } from './authStore';
+import debounce from 'lodash/debounce';
 
-interface User {
-  id: number;
+interface Avatar {
+  id: string;
+  path: string;
   name: string;
-  email: string;
-  avatar: string;
-  role: string;
-  created_at: string;
-  last_login_at: string;
 }
 
 interface FormData {
@@ -23,7 +23,7 @@ interface ProfileState {
   user: User | null;
   isEditing: boolean;
   isAvatarDialogOpen: boolean;
-  availableAvatars: string[];
+  availableAvatars: Avatar[];
   activeTab: string;
   formData: FormData;
   loading: boolean;
@@ -34,7 +34,7 @@ interface ProfileState {
   updateProfile: () => Promise<void>;
   changePassword: () => Promise<void>;
   updateAvatar: (avatarPath: string) => Promise<void>;
-  fetchUserData: () => Promise<void>;
+  fetchUserData: (() => Promise<void> | undefined);
   fetchAvatars: () => Promise<void>;
 }
 
@@ -45,7 +45,7 @@ export const useProfileStore = create<ProfileState>((set, get) => ({
   availableAvatars: [],
   activeTab: "overview",
   formData: {},
-  loading: true,
+  loading: false,
 
   setActiveTab: (tab) => set({ activeTab: tab }),
   setIsEditing: (isEditing) => set({ isEditing }),
@@ -54,28 +54,21 @@ export const useProfileStore = create<ProfileState>((set, get) => ({
 
   updateProfile: async () => {
     const { formData } = get();
+    const authUser = useAuthStore.getState().user;
+    
+    if (!authUser?.id) {
+      throw new Error('User not authenticated');
+    }
+
     try {
-      const response = await fetch("/api/profile", {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
-      });
-
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || "Failed to update profile");
-      }
-
-      const data = await response.json();
+      const updatedUser = await profileService.updateProfile(authUser.id, formData);
       set({ 
-        user: data.user, 
+        user: updatedUser, 
         isEditing: false,
         formData: {
-          name: data.user.name,
-          email: data.user.email,
-          avatar: data.user.avatar
+          name: updatedUser.name,
+          email: updatedUser.email,
+          avatar: updatedUser.avatar
         }
       });
     } catch (error) {
@@ -85,20 +78,15 @@ export const useProfileStore = create<ProfileState>((set, get) => ({
 
   changePassword: async () => {
     const { formData } = get();
+    const authUser = useAuthStore.getState().user;
+    
+    if (!authUser?.id) {
+      throw new Error('User not authenticated');
+    }
+
     try {
-      const response = await fetch("/api/profile/password", {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
-      });
-
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || "Failed to change password");
-      }
-
+      // Note: Password change should be handled by Firebase Auth
+      // This is just a placeholder for now
       set({ 
         isEditing: false,
         formData: {
@@ -113,57 +101,59 @@ export const useProfileStore = create<ProfileState>((set, get) => ({
   },
 
   updateAvatar: async (avatarPath: string) => {
+    const authUser = useAuthStore.getState().user;
+    
+    if (!authUser?.id) {
+      throw new Error('User not authenticated');
+    }
+
     try {
-      const response = await fetch("/api/profile/avatar", {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ avatar: avatarPath }),
-      });
-
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || "Failed to update avatar");
-      }
-
-      const data = await response.json();
-      set({ user: data.user });
+      const updatedUser = await profileService.updateAvatar(authUser.id, avatarPath);
+      set({ user: updatedUser });
     } catch (error) {
       throw error;
     }
   },
 
-  fetchUserData: async () => {
-    try {
-      const response = await fetch("/api/profile");
-      if (!response.ok) {
-        throw new Error("Failed to fetch user data");
-      }
-      const data = await response.json();
-      set({ 
-        user: data.user, 
-        formData: {
-          name: data.user.name,
-          email: data.user.email,
-          avatar: data.user.avatar
-        },
-        loading: false 
-      });
-    } catch (error) {
+  fetchUserData: debounce(async () => {
+    const authUser = useAuthStore.getState().user;
+    
+    if (!authUser?.id) {
+      set({ loading: false, user: null });
+      return;
+    }
+
+    if (get().user?.id === authUser.id) {
       set({ loading: false });
-      throw error;
+      return;
     }
-  },
+
+    set({ loading: true });
+    try {
+      const userData = await profileService.getProfile(authUser.id);
+      if (userData) {
+        set({ 
+          user: userData, 
+          formData: {
+            name: userData.name,
+            email: userData.email,
+            avatar: userData.avatar
+          },
+          loading: false 
+        });
+      } else {
+        set({ loading: false, user: null });
+      }
+    } catch (error) {
+      console.error('Error fetching profile:', error);
+      set({ loading: false, user: null });
+    }
+  }, 300),
 
   fetchAvatars: async () => {
     try {
-      const response = await fetch("/api/profile/avatars");
-      if (!response.ok) {
-        throw new Error("Failed to fetch avatars");
-      }
-      const data = await response.json();
-      set({ availableAvatars: data.avatars.map((avatar: any) => avatar.file_path) });
+      const avatars = await profileService.getAvailableAvatars();
+      set({ availableAvatars: avatars });
     } catch (error) {
       console.error("Error fetching avatars:", error);
       set({ availableAvatars: [] });

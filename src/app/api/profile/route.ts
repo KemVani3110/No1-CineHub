@@ -1,99 +1,145 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import { db } from "@/lib/db";
-import { RowDataPacket } from "mysql2";
+import { getFirestore } from "firebase-admin/firestore";
+import { auth } from "firebase-admin";
+import { User, AuthProvider } from "@/types/auth";
 
-interface User extends RowDataPacket {
-  id: number;
-  name: string;
-  email: string;
-  avatar: string;
-  role: string;
-  created_at: Date;
-  last_login_at: Date | null;
+const db = getFirestore();
+
+async function createUserDocument(userId: string, userData: any): Promise<User> {
+  const userRef = db.collection('users').doc(userId);
+  const defaultUserData = {
+    name: userData.name || '',
+    email: userData.email || '',
+    avatar: userData.avatar || '/uploads/avatars/default.png',
+    role: 'user',
+    isActive: true,
+    emailVerified: userData.emailVerified || false,
+    provider: userData.provider || 'local',
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    lastLoginAt: new Date(),
+    stats: {
+      watchlistCount: 0,
+      reviewCount: 0,
+      ratingCount: 0
+    },
+    recentActivity: []
+  };
+
+  await userRef.set(defaultUserData);
+  return {
+    id: userId,
+    ...defaultUserData
+  } as User;
 }
 
 export async function GET() {
   try {
     const session = await getServerSession(authOptions);
-    if (!session?.user) {
-      return NextResponse.json(
-        { message: "Unauthorized" },
-        { status: 401 }
-      );
+    if (!session?.user?.id) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const [users] = await db.query<User[]>(
-      "SELECT id, name, email, avatar, role, created_at, last_login_at FROM users WHERE id = ?",
-      [session.user.id]
-    );
+    // Get user document
+    const userRef = db.collection('users').doc(session.user.id);
+    const userDoc = await userRef.get();
 
-    const user = users[0];
-    if (!user) {
-      return NextResponse.json(
-        { message: "User not found" },
-        { status: 404 }
-      );
+    if (!userDoc.exists) {
+      // Get user from Firebase Auth
+      const firebaseUser = await auth().getUser(session.user.id);
+      
+      // Create new user document
+      const user = await createUserDocument(session.user.id, {
+        name: firebaseUser.displayName || '',
+        email: firebaseUser.email || '',
+        avatar: firebaseUser.photoURL || '/uploads/avatars/default.png',
+        provider: firebaseUser.providerData[0]?.providerId || 'local',
+        emailVerified: firebaseUser.emailVerified
+      });
+
+      return NextResponse.json({ user });
     }
+
+    const userData = userDoc.data();
+    const user: User = {
+      id: userDoc.id,
+      name: userData?.name || '',
+      email: userData?.email || '',
+      avatar: userData?.avatar,
+      role: userData?.role || 'user',
+      isActive: userData?.isActive ?? true,
+      emailVerified: userData?.emailVerified ?? false,
+      provider: userData?.provider || 'local',
+      createdAt: userData?.createdAt?.toDate(),
+      lastLoginAt: userData?.lastLoginAt?.toDate(),
+      updatedAt: userData?.updatedAt?.toDate(),
+      stats: userData?.stats || {
+        watchlistCount: 0,
+        reviewCount: 0,
+        ratingCount: 0
+      },
+      recentActivity: userData?.recentActivity || []
+    };
 
     return NextResponse.json({ user });
   } catch (error) {
-    console.error("Error fetching user data:", error);
+    console.error('Error in GET /api/profile:', error);
     return NextResponse.json(
-      { message: "Internal server error" },
+      { error: 'Internal server error' },
       { status: 500 }
     );
   }
 }
 
-export async function PUT(req: Request) {
+export async function PUT(request: Request) {
   try {
     const session = await getServerSession(authOptions);
-    if (!session?.user) {
-      return NextResponse.json(
-        { message: "Unauthorized" },
-        { status: 401 }
-      );
+    if (!session?.user?.id) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { name, email } = await req.json();
-    if (!name || !email) {
-      return NextResponse.json(
-        { message: "Name and email are required" },
-        { status: 400 }
-      );
-    }
+    const data = await request.json();
+    const userRef = db.collection('users').doc(session.user.id);
+    
+    const updateData: any = {
+      updatedAt: new Date()
+    };
 
-    // Update user data in the database
-    const [result] = await db.query(
-      "UPDATE users SET name = ?, email = ? WHERE id = ?",
-      [name, email, session.user.id]
-    );
+    if (data.name) updateData.name = data.name;
+    if (data.email) updateData.email = data.email;
+    if (data.avatar) updateData.avatar = data.avatar;
 
-    if (!result) {
-      return NextResponse.json(
-        { message: "Failed to update profile" },
-        { status: 500 }
-      );
-    }
+    await userRef.update(updateData);
+    
+    const updatedDoc = await userRef.get();
+    const userData = updatedDoc.data();
+    const user: User = {
+      id: updatedDoc.id,
+      name: userData?.name || '',
+      email: userData?.email || '',
+      avatar: userData?.avatar,
+      role: userData?.role || 'user',
+      isActive: userData?.isActive ?? true,
+      emailVerified: userData?.emailVerified ?? false,
+      provider: userData?.provider || 'local',
+      createdAt: userData?.createdAt?.toDate(),
+      lastLoginAt: userData?.lastLoginAt?.toDate(),
+      updatedAt: userData?.updatedAt?.toDate(),
+      stats: userData?.stats || {
+        watchlistCount: 0,
+        reviewCount: 0,
+        ratingCount: 0
+      },
+      recentActivity: userData?.recentActivity || []
+    };
 
-    // Get updated user data
-    const [users] = await db.query<User[]>(
-      "SELECT id, name, email, avatar, role, created_at, last_login_at FROM users WHERE id = ?",
-      [session.user.id]
-    );
-
-    const user = users[0];
-
-    return NextResponse.json({
-      message: "Profile updated successfully",
-      user,
-    });
+    return NextResponse.json({ user });
   } catch (error) {
-    console.error("Error updating profile:", error);
+    console.error('Error in PUT /api/profile:', error);
     return NextResponse.json(
-      { message: "Internal server error" },
+      { error: 'Internal server error' },
       { status: 500 }
     );
   }

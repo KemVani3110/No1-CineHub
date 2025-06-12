@@ -3,7 +3,6 @@
 import dynamic from "next/dynamic";
 import { Suspense } from "react";
 import Loading from "@/components/common/Loading";
-import { CompilingProvider } from "@/components/common/CompilingProvider";
 import { LoadingProvider } from "@/providers/LoadingProvider";
 
 // Dynamically import heavy providers
@@ -34,16 +33,14 @@ export default function ClientLayout({
     <Suspense
       fallback={<Loading message="Loading CineHub..." showBackdrop={true} />}
     >
-      <CompilingProvider>
-        <Providers>
-          <QueryProvider>
-            <LoadingProvider>
-              {children}
-              <Toaster />
-            </LoadingProvider>
-          </QueryProvider>
-        </Providers>
-      </CompilingProvider>
+      <Providers>
+        <QueryProvider>
+          <LoadingProvider>
+            {children}
+            <Toaster />
+          </LoadingProvider>
+        </QueryProvider>
+      </Providers>
     </Suspense>
   );
 }

@@ -20,19 +20,19 @@ import {
   Shield,
   Camera,
   Mail,
-
 } from "lucide-react";
 import Link from "next/link";
 import { useProfileStore } from "@/store/profileStore";
 import Loading from "@/components/common/Loading";
-import { useAuth } from "@/hooks/useAuth";
+import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Settings from "@/components/profile/Settings";
+import { format } from "date-fns";
 
 export default function ProfilePage() {
   const router = useRouter();
   const { toast } = useToast();
-  const { user: authUser, loading: authLoading } = useAuth();
+  const { data: session, status } = useSession();
   const {
     user,
     isAvatarDialogOpen,
@@ -46,19 +46,23 @@ export default function ProfilePage() {
   } = useProfileStore();
 
   useEffect(() => {
-    if (authLoading) {
+    if (status === 'loading') {
       return;
     }
 
-    if (!authUser) {
+    if (status === 'unauthenticated') {
       router.push("/login");
       return;
     }
 
     const initializeProfile = async () => {
+      if (!session?.user?.id) return;
+      
       try {
-        await fetchUserData();
-        await fetchAvatars();
+        await Promise.all([
+          fetchUserData(),
+          fetchAvatars()
+        ]);
         setActiveTab("settings");
       } catch (error) {
         console.error('Error initializing profile:', error);
@@ -71,7 +75,7 @@ export default function ProfilePage() {
     };
 
     initializeProfile();
-  }, [authUser, authLoading, router, fetchUserData, fetchAvatars, setActiveTab, toast]);
+  }, [session?.user?.id, status, router, fetchUserData, fetchAvatars, setActiveTab, toast]);
 
   const handleAvatarSelect = async (avatarPath: string) => {
     try {
@@ -100,8 +104,19 @@ export default function ProfilePage() {
       .slice(0, 2);
   };
 
-  if (authLoading || profileLoading) {
+  const formatDate = (date: any) => {
+    if (!date) return 'N/A';
+    // Handle both Firestore Timestamp and Date objects
+    const dateObj = date instanceof Date ? date : date?.toDate?.() || new Date(date);
+    return format(dateObj, 'MMM d, yyyy');
+  };
+
+  if (status === 'loading' || profileLoading) {
     return <Loading message="Loading profile..." />;
+  }
+
+  if (!user) {
+    return null;
   }
 
   return (
@@ -175,7 +190,7 @@ export default function ProfilePage() {
                       <h2 className="text-2xl lg:text-3xl font-bold text-[var(--text-main)]">{user?.name}</h2>
                       <Badge className="bg-[var(--cinehub-accent)]/10 text-[var(--cinehub-accent)] border-[var(--cinehub-accent)]/30 px-3 py-1">
                         <Shield size={12} className="mr-1" />
-                        {user?.role}
+                        {user?.role || 'user'}
                       </Badge>
                     </div>
                     <div className="flex items-center gap-2 text-[var(--text-sub)]">
@@ -188,21 +203,13 @@ export default function ProfilePage() {
                   <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                     <div className="text-center p-3 rounded-lg bg-[var(--bg-main)]/50">
                       <div className="text-lg lg:text-xl font-bold text-[var(--cinehub-accent)]">
-                        {user?.created_at ? new Date(user.created_at).toLocaleDateString('en-US', { 
-                          year: 'numeric',
-                          month: 'short',
-                          day: 'numeric'
-                        }) : 'N/A'}
+                        {formatDate(user?.createdAt)}
                       </div>
                       <div className="text-xs text-[var(--text-sub)]">Member Since</div>
                     </div>
                     <div className="text-center p-3 rounded-lg bg-[var(--bg-main)]/50">
                       <div className="text-lg lg:text-xl font-bold text-[var(--success)]">
-                        {user?.last_login_at ? new Date(user.last_login_at).toLocaleDateString('en-US', {
-                          year: 'numeric',
-                          month: 'short',
-                          day: 'numeric',
-                        }) : 'Never'}
+                        {formatDate(user?.lastLoginAt)}
                       </div>
                       <div className="text-xs text-[var(--text-sub)]">Last Active</div>
                     </div>
@@ -232,10 +239,10 @@ export default function ProfilePage() {
                   key={index}
                   variant="ghost"
                   className="h-auto p-2 hover:bg-[var(--cinehub-accent)]/10 hover:scale-105 transition-all duration-200 rounded-xl border-2 border-transparent hover:border-[var(--cinehub-accent)]/30"
-                  onClick={() => handleAvatarSelect(avatar)}
+                  onClick={() => handleAvatarSelect(avatar.path)}
                 >
                   <Image
-                    src={avatar}
+                    src={avatar.path}
                     alt={`Avatar ${index + 1}`}
                     width={100}
                     height={100}

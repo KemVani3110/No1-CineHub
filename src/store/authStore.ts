@@ -1,6 +1,9 @@
 import { create } from 'zustand';
 import { User } from '@/types/auth';
 import { authService } from '@/services/auth/authService';
+import { auth } from '@/lib/firebase';
+import { signOut } from 'firebase/auth';
+import { signOut as nextAuthSignOut } from 'next-auth/react';
 
 interface AuthState {
   user: User | null;
@@ -50,7 +53,11 @@ export const useAuthStore = create<AuthState>((set) => ({
   logout: async () => {
     set({ isLoading: true, error: null });
     try {
-      await authService.logout();
+      // Sign out from Firebase
+      await signOut(auth);
+      // Sign out from NextAuth
+      await nextAuthSignOut({ redirect: false });
+      // Clear the store
       set({ user: null, isLoading: false });
     } catch (error) {
       set({ 
@@ -79,9 +86,15 @@ export const useAuthStore = create<AuthState>((set) => ({
     set({ isLoading: true, error: null });
     try {
       const user = await authService.getCurrentUser();
+      if (!user) {
+        set({ user: null, isLoading: false });
+        return;
+      }
       set({ user, isLoading: false });
     } catch (error) {
+      console.error('Error getting current user:', error);
       set({ 
+        user: null,
         error: error instanceof Error ? error.message : 'Failed to get current user',
         isLoading: false 
       });
