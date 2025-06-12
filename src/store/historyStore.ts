@@ -20,6 +20,7 @@ interface HistoryState {
   clearHistory: () => void;
   getRecentHistory: (limit?: number) => HistoryItem[];
   setHistory: (items: HistoryItem[]) => void;
+  reset: () => void;
 }
 
 export const useHistoryStore = create<HistoryState>()(
@@ -56,6 +57,8 @@ export const useHistoryStore = create<HistoryState>()(
       setHistory: (items) => {
         set({ items });
       },
+
+      reset: () => set({ items: [] }),
     }),
     {
       name: 'history-storage',

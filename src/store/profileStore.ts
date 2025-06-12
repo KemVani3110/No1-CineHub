@@ -36,6 +36,7 @@ interface ProfileState {
   updateAvatar: (avatarPath: string) => Promise<void>;
   fetchUserData: (() => Promise<void> | undefined);
   fetchAvatars: () => Promise<void>;
+  reset: () => void;
 }
 
 export const useProfileStore = create<ProfileState>((set, get) => ({
@@ -159,4 +160,14 @@ export const useProfileStore = create<ProfileState>((set, get) => ({
       set({ availableAvatars: [] });
     }
   },
+
+  reset: () => set({
+    user: null,
+    isEditing: false,
+    isAvatarDialogOpen: false,
+    availableAvatars: [],
+    activeTab: "overview",
+    formData: {},
+    loading: false
+  }),
 })); 

@@ -114,8 +114,21 @@ const Header = ({ onSidebarChange }: HeaderProps) => {
 
   const handleLogout = async () => {
     try {
+      // First sign out from NextAuth
+      await nextAuthSignOut({ redirect: false });
+      
+      // Then logout from our auth store
       await logout();
+      
+      // Reset all stores
+      useProfileStore.getState().reset();
+      useHistoryStore.getState().reset();
+      useHeaderStore.getState().reset();
+      
+      // Close mobile menu if open
       closeMobileMenu();
+      
+      // Redirect to login page
       router.push('/login');
     } catch (error) {
       console.error('Logout error:', error);
