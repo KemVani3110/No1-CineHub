@@ -18,6 +18,7 @@ import {
   Activity,
   BookmarkPlus,
   History,
+  CircleUser,
 } from "lucide-react";
 import {
   Sheet,
@@ -44,8 +45,10 @@ import { useToast } from "@/components/ui/use-toast";
 import { useRouter } from "next/navigation";
 import { useHistoryStore } from "@/store/historyStore";
 import { useHeaderStore } from "@/store/headerStore";
-import { useEffect } from "react";
+import { useEffect, useRef, useCallback, useMemo } from "react";
 import { signOut as nextAuthSignOut } from 'next-auth/react';
+import { useAuth } from "@/hooks/useAuth";
+import { useAdmin } from "@/hooks/useAdmin";
 
 interface HeaderProps {
   onSidebarChange?: (isOpen: boolean) => void;
@@ -62,22 +65,32 @@ const Header = ({ onSidebarChange }: HeaderProps) => {
   const { data: session, status } = useSession();
   const { user: authUser, logout, getCurrentUser } = useAuthStore();
   const { user: profileUser, fetchUserData } = useProfileStore();
+  const { admin, isLoading: isAdminLoading } = useAdmin();
   const { toast } = useToast();
   const router = useRouter();
   const { getRecentHistory } = useHistoryStore();
   const recentHistory = getRecentHistory(5);
 
-  // Fetch user data when session changes
+  // Use refs to track if data has been fetched
+  const authDataFetched = useRef(false);
+  const profileDataFetched = useRef(false);
+
+  // Fetch user data when session changes, but only once
   useEffect(() => {
     let isMounted = true;
+
     const fetchData = async () => {
       if (status === 'authenticated' && session?.user?.id) {
         try {
-          // Only fetch if we don't have the data yet
-          if (!authUser) {
+          // Only fetch auth data if not already fetched
+          if (!authUser && !authDataFetched.current) {
+            authDataFetched.current = true;
             await getCurrentUser();
           }
-          if (!profileUser) {
+
+          // Only fetch profile data if not already fetched
+          if (!profileUser && !profileDataFetched.current) {
+            profileDataFetched.current = true;
             await fetchUserData();
           }
         } catch (error) {
@@ -94,25 +107,20 @@ const Header = ({ onSidebarChange }: HeaderProps) => {
     };
 
     fetchData();
+
+    // Reset fetch flags when session changes
+    if (status !== 'authenticated') {
+      authDataFetched.current = false;
+      profileDataFetched.current = false;
+    }
+
     return () => {
       isMounted = false;
     };
-  }, [status, session?.user?.id, authUser, profileUser, getCurrentUser, fetchUserData, toast]);
+  }, [status, session?.user?.id]); // Remove unnecessary dependencies
 
-  const navItems = [
-    { name: "Home", path: "/home", icon: Home },
-    { name: "Explore", path: "/explore", icon: Compass },
-    { name: "Search", path: "/search", icon: Search },
-    {
-      name: "Watchlist",
-      path: "/watchlist",
-      icon: BookmarkPlus,
-      requiresAuth: true,
-    },
-    { name: "History", path: "/history", icon: History, requiresAuth: true },
-  ];
-
-  const handleLogout = async () => {
+  // Memoize handlers
+  const handleLogout = useCallback(async () => {
     try {
       // First sign out from NextAuth
       await nextAuthSignOut({ redirect: false });
@@ -124,6 +132,10 @@ const Header = ({ onSidebarChange }: HeaderProps) => {
       useProfileStore.getState().reset();
       useHistoryStore.getState().reset();
       useHeaderStore.getState().reset();
+      
+      // Reset fetch flags
+      authDataFetched.current = false;
+      profileDataFetched.current = false;
       
       // Close mobile menu if open
       closeMobileMenu();
@@ -138,16 +150,9 @@ const Header = ({ onSidebarChange }: HeaderProps) => {
         variant: "destructive",
       });
     }
-  };
+  }, [logout, closeMobileMenu, router, toast]);
 
-  // Debug log to check authUser
-  console.log("Auth User:", authUser);
-  console.log("Session:", session);
-
-  // Check if user logged in through social providers
-  const isSocialLogin = authUser?.provider === "google" || authUser?.provider === "facebook";
-
-  const handleNavClick = (item: (typeof navItems)[0]) => {
+  const handleNavClick = useCallback((item: (typeof navItems)[0]) => {
     if (item.requiresAuth && !authUser) {
       toast({
         title: "Authentication Required",
@@ -158,20 +163,37 @@ const Header = ({ onSidebarChange }: HeaderProps) => {
       return;
     }
     router.push(item.path);
-  };
+  }, [authUser, router, toast]);
 
-  // Get user initials for avatar fallback
-  const getUserInitials = (name: string) => {
+  const handleAdminNav = useCallback((path: string) => {
+    if (!hasAdminAccess()) {
+      toast({
+        title: "Access Denied",
+        description: "You don't have permission to access the admin area.",
+        variant: "destructive",
+      });
+      return;
+    }
+    router.push(path);
+    closeMobileMenu();
+  }, [router, closeMobileMenu, toast]);
+
+  // Memoize computed values
+  const isSocialLogin = useMemo(() => 
+    authUser?.provider === "google" || authUser?.provider === "facebook",
+    [authUser?.provider]
+  );
+
+  const getUserInitials = useCallback((name: string) => {
     if (!name) return "U";
     return name
       .split(" ")
       .map((word) => word.charAt(0).toUpperCase())
       .join("")
       .slice(0, 2);
-  };
+  }, []);
 
-  // Get user avatar with fallback
-  const getUserAvatar = () => {
+  const getUserAvatar = useCallback(() => {
     // First check if user has a custom avatar from our system
     if (profileUser?.avatar) {
       return profileUser.avatar;
@@ -188,10 +210,9 @@ const Header = ({ onSidebarChange }: HeaderProps) => {
     }
 
     return undefined;
-  };
+  }, [profileUser?.avatar, authUser?.avatar, session?.user?.image]);
 
-  // Get user name with fallback
-  const getUserName = () => {
+  const getUserName = useCallback(() => {
     return profileUser?.name || 
            authUser?.name || 
            session?.user?.name || 
@@ -199,21 +220,47 @@ const Header = ({ onSidebarChange }: HeaderProps) => {
            authUser?.email || 
            session?.user?.email || 
            "User";
-  };
+  }, [profileUser, authUser, session?.user]);
 
-  // Get user email with fallback
-  const getUserEmail = () => {
+  const getUserEmail = useCallback(() => {
     return profileUser?.email || 
            authUser?.email || 
            session?.user?.email;
-  };
+  }, [profileUser?.email, authUser?.email, session?.user?.email]);
 
-  // Get user role with fallback
-  const getUserRole = () => {
-    return profileUser?.role || 
-           authUser?.role || 
-           session?.user?.role;
-  };
+  const getUserRole = useCallback(() => {
+    if (admin?.role) return admin.role;
+    if (profileUser?.role) return profileUser.role;
+    if (authUser?.role) return authUser.role;
+    if (session?.user?.role) return session.user.role;
+    return 'user' as const;
+  }, [admin?.role, profileUser?.role, authUser?.role, session?.user?.role]);
+
+  const hasAdminAccess = useCallback(() => {
+    const role = getUserRole();
+    return role === 'admin' || role === 'moderator';
+  }, [getUserRole]);
+
+  const formatRole = useCallback((role: string) => {
+    return role.charAt(0).toUpperCase() + role.slice(1);
+  }, []);
+
+  const navItems = [
+    { name: "Home", path: "/home", icon: Home },
+    { name: "Explore", path: "/explore", icon: Compass },
+    { name: "Search", path: "/search", icon: Search },
+    {
+      name: "Watchlist",
+      path: "/watchlist",
+      icon: BookmarkPlus,
+      requiresAuth: true,
+    },
+    { name: "History", path: "/history", icon: History, requiresAuth: true },
+  ];
+
+  // Debug log to check authUser
+  console.log("Auth User:", authUser);
+  console.log("Session:", session);
 
   return (
     <>
@@ -335,6 +382,14 @@ const Header = ({ onSidebarChange }: HeaderProps) => {
                                 {getUserEmail()}
                               </span>
                             )}
+                            {hasAdminAccess() && (
+                              <Badge
+                                variant={getUserRole() === 'admin' ? 'destructive' : 'default'}
+                                className="mt-1 text-xs"
+                              >
+                                {formatRole(getUserRole())}
+                              </Badge>
+                            )}
                           </div>
                         </div>
                       </DropdownMenuLabel>
@@ -345,34 +400,21 @@ const Header = ({ onSidebarChange }: HeaderProps) => {
                           Profile
                         </Link>
                       </DropdownMenuItem>
-                      {getUserRole() === "admin" && (
+                      {hasAdminAccess() && (
                         <>
-                          <DropdownMenuItem asChild>
-                            <Link
-                              href="/admin/dashboard"
-                              className="cursor-pointer"
-                            >
-                              <PanelLeft className="mr-3 h-4 w-4" />
-                              Admin Dashboard
-                            </Link>
+                          <DropdownMenuItem
+                            onClick={() => handleAdminNav('/admin/dashboard')}
+                            className="cursor-pointer"
+                          >
+                            <PanelLeft className="mr-3 h-4 w-4" />
+                            Admin Dashboard
                           </DropdownMenuItem>
-                          <DropdownMenuItem asChild>
-                            <Link
-                              href="/admin/users"
-                              className="cursor-pointer"
-                            >
-                              <Users className="mr-3 h-4 w-4" />
-                              User Management
-                            </Link>
-                          </DropdownMenuItem>
-                          <DropdownMenuItem asChild>
-                            <Link
-                              href="/admin/activity-logs"
-                              className="cursor-pointer"
-                            >
-                              <Activity className="mr-3 h-4 w-4" />
-                              Activity Logs
-                            </Link>
+                          <DropdownMenuItem
+                            onClick={() => handleAdminNav('/admin/users')}
+                            className="cursor-pointer"
+                          >
+                            <Users className="mr-3 h-4 w-4" />
+                            User Management
                           </DropdownMenuItem>
                         </>
                       )}
@@ -510,6 +552,14 @@ const Header = ({ onSidebarChange }: HeaderProps) => {
                                   {getUserEmail()}
                                 </p>
                               )}
+                              {hasAdminAccess() && (
+                                <Badge
+                                  variant={getUserRole() === 'admin' ? 'destructive' : 'default'}
+                                  className="mt-1 text-xs"
+                                >
+                                  {formatRole(getUserRole())}
+                                </Badge>
+                              )}
                             </div>
                           </div>
 
@@ -522,14 +572,25 @@ const Header = ({ onSidebarChange }: HeaderProps) => {
                             <span>Profile</span>
                           </Link>
 
-                          <Button
-                            variant="ghost"
-                            onClick={handleLogout}
-                            className="w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium text-red-500 hover:text-red-600 hover:bg-red-500/10"
-                          >
-                            <LogOut size={20} className="flex-shrink-0" />
-                            <span>Logout</span>
-                          </Button>
+                          {hasAdminAccess() && (
+                            <>
+                              <button
+                                onClick={() => handleAdminNav('/admin/users')}
+                                className="w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium text-muted-foreground hover:text-primary hover:bg-accent/10"
+                              >
+                                <Users size={20} className="flex-shrink-0" />
+                                <span>User Management</span>
+                              </button>
+                              <Button
+                                variant="ghost"
+                                onClick={handleLogout}
+                                className="w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium text-red-500 hover:text-red-600 hover:bg-red-500/10"
+                              >
+                                <LogOut size={20} className="flex-shrink-0" />
+                                <span>Logout</span>
+                              </Button>
+                            </>
+                          )}
                         </div>
                       ) : (
                         <div className="space-y-2">

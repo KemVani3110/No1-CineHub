@@ -179,7 +179,7 @@ export function UserManagement({
     }
   };
 
-  const getRoleBadgeVariant = (role: string) => {
+  const getRoleBadgeVariant = (role: UserRole) => {
     switch (role) {
       case "admin":
         return "destructive";
@@ -190,7 +190,7 @@ export function UserManagement({
     }
   };
 
-  const getRoleIcon = (role: string) => {
+  const getRoleIcon = (role: UserRole) => {
     switch (role) {
       case "admin":
         return <Shield className="h-3 w-3" />;
@@ -201,7 +201,7 @@ export function UserManagement({
     }
   };
 
-  const formatRoleDisplay = (role: string) => {
+  const formatRoleDisplay = (role: UserRole) => {
     return role.charAt(0).toUpperCase() + role.slice(1);
   };
 
@@ -400,11 +400,11 @@ export function UserManagement({
                   </TableCell>
                   <TableCell>
                     <Badge
-                      variant={getRoleBadgeVariant(user.role)}
+                      variant={getRoleBadgeVariant(user.role as UserRole)}
                       className="flex items-center space-x-1 w-fit cursor-pointer hover:opacity-80 transition-opacity"
                     >
-                      {getRoleIcon(user.role)}
-                      <span>{formatRoleDisplay(user.role)}</span>
+                      {getRoleIcon(user.role as UserRole)}
+                      <span>{formatRoleDisplay(user.role as UserRole)}</span>
                     </Badge>
                   </TableCell>
                   <TableCell className="hidden md:table-cell">

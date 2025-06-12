@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { getFirestore } from 'firebase-admin/firestore';
 import { UserRole, AuthProvider } from '@/types/auth';
+import { NextAuthSession } from '@/types/auth';
 
 const db = getFirestore();
 
@@ -28,15 +29,16 @@ interface UserData {
 
 export async function GET() {
   try {
-    const session = await getServerSession(authOptions);
+    const session = await getServerSession(authOptions) as NextAuthSession | null;
 
     if (!session?.user?.role) {
       console.log("API - No session");
       return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
     }
 
-    if (session.user.role !== 'admin') {
-      console.log("API - Not admin");
+    const userRole = session.user.role as UserRole;
+    if (!['admin', 'moderator'].includes(userRole)) {
+      console.log("API - Not admin/moderator");
       return NextResponse.json({ error: 'Not authorized' }, { status: 403 });
     }
 
@@ -67,14 +69,20 @@ export async function GET() {
 
 export async function PATCH(request: Request) {
   try {
-    const session = await getServerSession(authOptions);
+    const session = await getServerSession(authOptions) as NextAuthSession | null;
 
-    if (!session?.user) {
+    if (!session?.user?.role) {
       return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
     }
 
-    if (session.user.role !== 'admin') {
+    const userRole = session.user.role as UserRole;
+    if (!['admin', 'moderator'].includes(userRole)) {
       return NextResponse.json({ error: 'Not authorized' }, { status: 403 });
+    }
+
+    // Only admin can change roles
+    if (userRole !== 'admin') {
+      return NextResponse.json({ error: 'Only admin can change user roles' }, { status: 403 });
     }
 
     const { userId, role, isActive } = await request.json();

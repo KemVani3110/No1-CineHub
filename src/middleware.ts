@@ -31,12 +31,15 @@ export async function middleware(request: NextRequest) {
       return NextResponse.redirect(new URL('/login', request.url));
     }
 
-    if (token.role !== 'admin') {
-      console.log('Middleware - User is not admin, redirecting to home');
+    // Check if user has admin role from token
+    if (token.role !== 'admin' && token.role !== 'moderator') {
+      console.log('Middleware - User is not admin/moderator');
       return NextResponse.redirect(new URL('/home', request.url));
     }
 
-    console.log('Middleware - Admin access granted');
+    // If user has admin role, allow access
+    console.log('Middleware - Admin access granted for role:', token.role);
+    return NextResponse.next();
   }
 
   return NextResponse.next();

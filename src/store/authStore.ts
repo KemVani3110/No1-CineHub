@@ -86,13 +86,16 @@ export const useAuthStore = create<AuthState>((set) => ({
     set({ isLoading: true, error: null });
     try {
       const user = await authService.getCurrentUser();
+      console.log('Current user from authService:', user); // Debug log
       if (!user) {
+        console.log('No user found'); // Debug log
         set({ user: null, isLoading: false });
         return;
       }
+      console.log('Setting user in store:', user); // Debug log
       set({ user, isLoading: false });
     } catch (error) {
-      console.error('Error getting current user:', error);
+      console.error('Error getting current user:', error); // Debug log
       set({ 
         user: null,
         error: error instanceof Error ? error.message : 'Failed to get current user',

@@ -1,6 +1,6 @@
 // src/types/auth.ts
 
-export type UserRole = 'admin' | 'user' | 'moderator';
+export type UserRole = 'user' | 'admin' | 'moderator';
 export type AuthProvider = 'local' | 'google' | 'facebook';
 
 export interface BaseUser {
